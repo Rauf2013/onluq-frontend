@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { API_URL } from '../api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -51,7 +52,8 @@ const STICKERS = [
 const STICKER_MAP = Object.fromEntries(STICKERS.map(s => [s.n, s]));
 
 // Mesaj mətnindəki :token: kimi ifadələri Lucide icon ilə əvəz edir.
-function renderMessageText(text) {
+// isMe true isə (öz mesajı, yaşıl arxa fon), kontrast üçün yaşıl icon-ları ağa çevirir.
+function renderMessageText(text, isMe = false) {
   if (!text) return null;
   const parts = text.split(/(:[a-z-]+:)/g);
   return parts.map((part, i) => {
@@ -59,17 +61,46 @@ function renderMessageText(text) {
     if (m && STICKER_MAP[m[1]]) {
       const s = STICKER_MAP[m[1]];
       const Icon = s.I;
-      return <Icon key={i} size={18} color={s.c} fill={s.f ? s.c : 'none'} style={{ display: 'inline', verticalAlign: '-4px', margin: '0 2px' }} />;
+      // Sender's green bubble: green icons would be invisible — make them white
+      const lowContrast = isMe && (s.c === '#10b981' || s.c === '#059669');
+      const color = lowContrast ? '#ffffff' : s.c;
+      const fillColor = s.f ? color : 'none';
+      return <Icon key={i} size={18} color={color} fill={fillColor} style={{ display: 'inline', verticalAlign: '-4px', margin: '0 2px' }} />;
     }
     return <React.Fragment key={i}>{part}</React.Fragment>;
   });
+}
+
+// Komposeri (contenteditable) idarə etmək üçün helper-lər
+function makeStickerChipHtml(s) {
+  const Icon = s.I;
+  const svgHtml = renderToStaticMarkup(
+    <Icon size={18} color={s.c} fill={s.f ? s.c : 'none'} />
+  );
+  // contenteditable=false → cursor chip-in içinə girmir; data-icon serializasiya üçündür
+  return `<span contenteditable="false" data-icon="${s.n}" style="display:inline-flex;align-items:center;vertical-align:middle;margin:0 1px;line-height:0;pointer-events:none;user-select:none">${svgHtml}</span>`;
+}
+
+// contenteditable DOM-undan token-li mətn çıxar (göndərmək üçün)
+function serializeComposer(rootEl) {
+  if (!rootEl) return '';
+  let out = '';
+  const walk = (node) => {
+    if (node.nodeType === Node.TEXT_NODE) out += node.textContent;
+    else if (node.nodeType === Node.ELEMENT_NODE) {
+      if (node.dataset?.icon) out += `:${node.dataset.icon}:`;
+      else if (node.tagName === 'BR') out += '\n';
+      else for (const c of node.childNodes) walk(c);
+    }
+  };
+  for (const c of rootEl.childNodes) walk(c);
+  return out;
 }
 
 function Messages() {
   const [conversations, setConversations] = useState([]);
   const [activeChat, setActiveChat] = useState(null);
   const [messages, setMessages] = useState([]);
-  const [newMessage, setNewMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [showEmoji, setShowEmoji] = useState(false);
@@ -81,6 +112,8 @@ function Messages() {
   const fileInputRef = useRef(null);
   const docInputRef = useRef(null);
   const typingTimerRef = useRef(null);
+  const composerRef = useRef(null);
+  const [composerEmpty, setComposerEmpty] = useState(true);
 
   const messagesEndRef = useRef(null);
   const messagesContainerRef = useRef(null);
@@ -289,22 +322,35 @@ function Messages() {
   };
 
   const handleSendMessage = async (e) => {
-    e.preventDefault();
-    if (!newMessage.trim() || !activeChat) return;
-    const text = newMessage;
-    setNewMessage('');
+    if (e) e.preventDefault();
+    if (!activeChat || !composerRef.current) return;
+    const text = serializeComposer(composerRef.current).trim();
+    if (!text) return;
+    composerRef.current.innerHTML = '';
+    setComposerEmpty(true);
     if (socketRef.current) socketRef.current.emit('typing', { to: activeChat.partnerId, from: userId, isTyping: false });
     await sendPayload({ text, type: 'text' });
   };
 
-  const handleTyping = (val) => {
-    setNewMessage(val);
+  const handleComposerInput = () => {
+    if (!composerRef.current) return;
+    const text = serializeComposer(composerRef.current);
+    setComposerEmpty(!text.trim());
     if (!activeChat || !socketRef.current) return;
     socketRef.current.emit('typing', { to: activeChat.partnerId, from: userId, isTyping: true });
     if (typingTimerRef.current) clearTimeout(typingTimerRef.current);
     typingTimerRef.current = setTimeout(() => {
       socketRef.current?.emit('typing', { to: activeChat.partnerId, from: userId, isTyping: false });
     }, 1500);
+  };
+
+  const insertStickerIntoComposer = (s) => {
+    const ref = composerRef.current;
+    if (!ref) return;
+    ref.focus();
+    // Cursor pozisiyasına SVG chip əlavə et
+    document.execCommand('insertHTML', false, makeStickerChipHtml(s) + '&#8203;');
+    handleComposerInput();
   };
 
   const handleFileUpload = (e, kind) => {
@@ -536,7 +582,7 @@ function Messages() {
                             </div>
                           </div>
                         )}
-                        {msg.text && <span style={{ fontSize: '15px', lineHeight: '1.4', whiteSpace: 'pre-wrap' }}>{renderMessageText(msg.text)}</span>}
+                        {msg.text && <span style={{ fontSize: '15px', lineHeight: '1.4', whiteSpace: 'pre-wrap' }}>{renderMessageText(msg.text, isMe)}</span>}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px', marginTop: '5px' }}>
                           <span style={{ fontSize: '11px', color: isMe ? '#d1fae5' : 'var(--text-muted)' }}>{msg.time}</span>
                           {isMe && renderTicks(msg.status)}
@@ -555,7 +601,7 @@ function Messages() {
                   {STICKERS.map((s) => {
                     const Icon = s.I;
                     return (
-                      <button key={s.n} type="button" title={s.n} onClick={() => { setNewMessage((m) => m + `:${s.n}:`); }}
+                      <button key={s.n} type="button" title={s.n} onClick={() => insertStickerIntoComposer(s)}
                         style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, lineHeight: 0, minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: '0.15s' }}
                         onMouseOver={(ev) => ev.currentTarget.style.background = 'var(--bg-muted)'}
                         onMouseOut={(ev) => ev.currentTarget.style.background = 'transparent'}>
@@ -579,17 +625,24 @@ function Messages() {
               <button type="button" onClick={() => { setShowAttachMenu((v) => !v); setShowEmoji(false); }} aria-label="Əlavə et" style={iconBtn(showAttachMenu)}><Paperclip size={22} /></button>
 
               <form onSubmit={handleSendMessage} style={{ flex: 1, display: 'flex', alignItems: 'center', gap: '12px' }}>
-                <input
-                  type="text"
-                  placeholder="Bir mesaj yazın..."
-                  value={newMessage}
-                  onChange={(e) => handleTyping(e.target.value)}
-                  style={{ flex: 1, background: 'var(--bg-muted)', border: 'none', padding: '12px 20px', borderRadius: '24px', fontSize: '15px', outline: 'none' }}
+                <div
+                  ref={composerRef}
+                  contentEditable
+                  suppressContentEditableWarning
+                  role="textbox"
+                  aria-label="Mesaj yazın"
+                  data-placeholder="Bir mesaj yazın..."
+                  className={`composer ${composerEmpty ? 'composer-empty' : ''}`}
+                  onInput={handleComposerInput}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }
+                  }}
+                  style={{ flex: 1, background: 'var(--bg-muted)', padding: '11px 20px', borderRadius: '24px', fontSize: '15px', outline: 'none', minHeight: 42, maxHeight: 130, overflowY: 'auto', wordBreak: 'break-word', whiteSpace: 'pre-wrap', lineHeight: 1.4 }}
                 />
                 <button
                   type="submit"
-                  disabled={!newMessage.trim()}
-                  style={{ background: newMessage.trim() ? '#10b981' : 'var(--border-strong)', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: newMessage.trim() ? 'pointer' : 'not-allowed', transition: '0.2s', paddingLeft: '4px' }}
+                  disabled={composerEmpty}
+                  style={{ background: !composerEmpty ? '#10b981' : 'var(--border-strong)', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: !composerEmpty ? 'pointer' : 'not-allowed', transition: '0.2s', paddingLeft: '4px', flexShrink: 0 }}
                 >
                   <Send size={20} />
                 </button>
