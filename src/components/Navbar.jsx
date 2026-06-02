@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { MessageSquare, Package, Briefcase, Wallet, ShieldCheck, LogOut, CheckCircle, Bell, Heart, Sun, Moon, ArrowRight, Menu, X, User, Brain } from 'lucide-react';
+import { MessageSquare, Package, Briefcase, Wallet, ShieldCheck, LogOut, CheckCircle, Bell, Heart, Sun, Moon, ArrowRight, Menu, X, User, Lightbulb } from 'lucide-react';
 import { toast } from 'react-toastify';
 import { useTheme } from '../context/ThemeContext';
 
@@ -294,8 +294,8 @@ function Navbar() {
             <Link to="/xidmetlerim" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
               <Briefcase size={18} style={{ marginRight: '6px' }} /> Xidmətlərim
             </Link>
-            <Link to="/beyin-yedeyi" title="Beyin Yedəyi" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8 }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
-              <Brain size={17} style={{ marginRight: '5px' }} /> Beyin
+            <Link to="/beyin-yedeyi" title="Bilik bazası — Frilanserlərin paylaşdığı həllər" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8 }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
+              <Lightbulb size={17} style={{ marginRight: '5px' }} /> Bilik
             </Link>
             <Link to="/cuzdan" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--brand-soft)', color: '#10b981', fontWeight: '700', padding: '8px 15px', borderRadius: '8px', border: '1px solid var(--brand-soft)' }}>
               <Wallet size={18} style={{ marginRight: '6px' }} /> Cüzdanım
