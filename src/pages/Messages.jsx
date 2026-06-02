@@ -48,7 +48,9 @@ function Messages() {
 
   useEffect(() => {
     if (userId) {
-      socketRef.current = io(API_URL);
+      socketRef.current = io(API_URL, {
+        auth: { token: localStorage.getItem('token') || sessionStorage.getItem('token') },
+      });
       
       socketRef.current.emit("user_connected", userId);
 
