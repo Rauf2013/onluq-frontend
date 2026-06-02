@@ -1938,6 +1938,13 @@ body.dark-mode .theme-toggle-btn:hover {
   .navbar-actions > div:last-child > button { padding: 7px 10px !important; font-size: 13px !important; }
 }
 
+/* === BEYİN YEDƏYİ AI MODAL === */
+.ai-dots::after { content: '.'; animation: aiDot 1.4s steps(4, end) infinite; }
+@keyframes aiDot { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
+@media (max-width: 768px) {
+  .ai-modal { height: 100vh !important; max-height: 100vh !important; border-radius: 0 !important; }
+}
+
 /* === BEYİN YEDƏYİ === */
 .brain-card { transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
 .brain-card:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.4) !important; box-shadow: 0 10px 24px rgba(99,102,241,0.10); }

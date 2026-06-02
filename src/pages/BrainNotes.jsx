@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock } from 'lucide-react';
+import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock, Sparkles, Send, X as XIcon, Bot } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
 import { levelColor } from '../constants/seller';
 
@@ -16,6 +16,11 @@ function BrainNotes() {
   const [category, setCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [myLevel, setMyLevel] = useState('Yeni Satıcı');
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiQ, setAiQ] = useState('');
+  const [aiThread, setAiThread] = useState([]); // [{role, content, related?}]
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiRemaining, setAiRemaining] = useState(null);
 
   const fetchNotes = async () => {
     setLoading(true);
@@ -37,6 +42,32 @@ function BrainNotes() {
 
   const onSearch = (e) => { e.preventDefault(); setPage(1); setQ(searchInput.trim()); };
 
+  const askAI = async () => {
+    if (!aiQ.trim() || aiLoading) return;
+    const userMsg = aiQ.trim();
+    setAiThread((t) => [...t, { role: 'user', content: userMsg }]);
+    setAiQ('');
+    setAiLoading(true);
+    const token = localStorage.getItem('token') || sessionStorage.getItem('token');
+    try {
+      const r = await fetch(`${API_URL}/api/ai/ask`, {
+        method: 'POST',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: userMsg, category: category || undefined }),
+      });
+      const d = await r.json();
+      if (r.ok) {
+        setAiThread((t) => [...t, { role: 'ai', content: d.answer, related: d.relatedNotes }]);
+        setAiRemaining(d.remaining);
+      } else {
+        setAiThread((t) => [...t, { role: 'ai', content: `⚠ ${d.message || 'Xəta'}`, error: true }]);
+      }
+    } catch {
+      setAiThread((t) => [...t, { role: 'ai', content: '⚠ Bağlantı xətası', error: true }]);
+    }
+    setAiLoading(false);
+  };
+
   return (
     <div className="main-content brain-notes-page" style={{ maxWidth: 1100, margin: '30px auto', padding: '0 16px' }}>
       {/* Header */}
@@ -52,9 +83,17 @@ function BrainNotes() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', gap: 10 }}>
           <span style={{ fontSize: 13, opacity: 0.9 }}>Sənin səviyyən: <strong>{myLevel}</strong></span>
-          <Link to="/beyin-yedeyi/yeni" style={{ background: 'white', color: '#6366f1', padding: '10px 18px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
-            <Plus size={16} /> Yeni yedək yaz
-          </Link>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            <button onClick={() => setAiOpen(true)}
+              style={{ background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 16px', borderRadius: 10, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, transition: '0.2s' }}
+              onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.26)'}
+              onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}>
+              <Sparkles size={16} /> AI-dan soruş
+            </button>
+            <Link to="/beyin-yedeyi/yeni" style={{ background: 'white', color: '#6366f1', padding: '10px 18px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+              <Plus size={16} /> Yeni yedək yaz
+            </Link>
+          </div>
         </div>
       </div>
 
@@ -131,6 +170,91 @@ function BrainNotes() {
             </div>
           )}
         </>
+      )}
+
+      {/* AI Modal */}
+      {aiOpen && (
+        <div onClick={() => setAiOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 0 }}>
+          <div onClick={(e) => e.stopPropagation()} className="ai-modal" style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: '80vh', maxHeight: 720, borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 -10px 30px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+            {/* Başlıq */}
+            <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
+                <div>
+                  <strong style={{ fontSize: 16 }}>Beyin Yedəyi AI</strong>
+                  <div style={{ fontSize: 11, opacity: 0.85 }}>Frilanserlərin kolektiv biliyindən cavab</div>
+                </div>
+              </div>
+              <button onClick={() => setAiOpen(false)} aria-label="Bağla" style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
+                <XIcon size={22} />
+              </button>
+            </div>
+
+            {/* Söhbət */}
+            <div style={{ flex: 1, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 14, background: 'var(--bg-page)' }}>
+              {aiThread.length === 0 && (
+                <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 30 }}>
+                  <Sparkles size={32} color="#8b5cf6" style={{ marginBottom: 10 }} />
+                  <p style={{ margin: 0, fontSize: 14 }}>Sualını yaz — AI həm bilik bazasından oxşar problemlərə baxır, həm öz bilgisini istifadə edir.</p>
+                  <div style={{ marginTop: 14, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
+                    {['React-də CORS xətası', 'MongoDB performans optimizasiyası', 'Logo dizaynına necə başlayım?'].map((s) => (
+                      <button key={s} onClick={() => setAiQ(s)} style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)', padding: '6px 12px', borderRadius: 999, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>{s}</button>
+                    ))}
+                  </div>
+                </div>
+              )}
+              {aiThread.map((m, i) => (
+                <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
+                  <div style={{
+                    maxWidth: '85%',
+                    background: m.role === 'user' ? '#6366f1' : 'var(--bg-surface)',
+                    color: m.role === 'user' ? 'white' : (m.error ? '#ef4444' : 'var(--text-primary)'),
+                    padding: '10px 14px',
+                    borderRadius: 12,
+                    borderBottomRightRadius: m.role === 'user' ? 4 : 12,
+                    borderBottomLeftRadius: m.role === 'user' ? 12 : 4,
+                    fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
+                    border: m.role === 'ai' ? '1px solid var(--border)' : 'none',
+                  }}>
+                    {m.content}
+                    {m.related && m.related.length > 0 && (
+                      <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
+                        <div style={{ fontSize: 11, color: 'var(--text-tertiary)', marginBottom: 6, fontWeight: 700 }}>İSTİNAD OLUNAN HƏLLƏR:</div>
+                        {m.related.map((r) => (
+                          <Link key={r._id} to={`/beyin-yedeyi/${r._id}`} onClick={() => setAiOpen(false)} style={{ display: 'block', fontSize: 12, color: '#6366f1', textDecoration: 'none', marginBottom: 3, fontWeight: 600 }}>→ {r.title}</Link>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              ))}
+              {aiLoading && (
+                <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
+                  <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', padding: '10px 14px', borderRadius: 12, color: 'var(--text-tertiary)', fontSize: 14 }}>
+                    Düşünür<span className="ai-dots">...</span>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Input */}
+            <div style={{ padding: 14, borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
+              <form onSubmit={(e) => { e.preventDefault(); askAI(); }} style={{ display: 'flex', gap: 8 }}>
+                <input value={aiQ} onChange={(e) => setAiQ(e.target.value)} placeholder="Probleminizi yazın..." maxLength={800}
+                  className="auth-input" style={{ flex: 1, marginBottom: 0 }} autoFocus disabled={aiLoading} />
+                <button type="submit" disabled={aiLoading || !aiQ.trim()}
+                  style={{ background: '#6366f1', color: 'white', border: 'none', padding: '0 18px', borderRadius: 8, cursor: aiLoading || !aiQ.trim() ? 'not-allowed' : 'pointer', opacity: aiLoading || !aiQ.trim() ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
+                  <Send size={16} />
+                </button>
+              </form>
+              {aiRemaining !== null && (
+                <div style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 6, textAlign: 'right' }}>
+                  Bu gün üçün qalıb: <strong>{aiRemaining}</strong> sorğu
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
