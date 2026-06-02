@@ -23,6 +23,9 @@ import Wallet from './pages/Wallet';
 import AdminPanel from './pages/AdminPanel';
 import Profile from './pages/Profile';
 import Notifications from './pages/Notifications';
+import BrainNotes from './pages/BrainNotes';
+import BrainNoteCreate from './pages/BrainNoteCreate';
+import BrainNoteDetail from './pages/BrainNoteDetail';
 import NotFound from './pages/NotFound';
 import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
@@ -53,6 +56,9 @@ function App() {
         <Route path="/cuzdan" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
         <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
         <Route path="/bildirisler" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+        <Route path="/beyin-yedeyi" element={<ProtectedRoute><BrainNotes /></ProtectedRoute>} />
+        <Route path="/beyin-yedeyi/yeni" element={<ProtectedRoute><BrainNoteCreate /></ProtectedRoute>} />
+        <Route path="/beyin-yedeyi/:id" element={<ProtectedRoute><BrainNoteDetail /></ProtectedRoute>} />
 
         <Route path="*" element={<NotFound />} />
       </Routes>

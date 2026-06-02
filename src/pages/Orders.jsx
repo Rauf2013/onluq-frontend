@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Package, CheckCircle, UploadCloud, RefreshCw, Star, ExternalLink, AlertTriangle, User, Clock, Check, X, MessageSquare, Briefcase } from 'lucide-react';
+import { Package, CheckCircle, UploadCloud, RefreshCw, Star, ExternalLink, AlertTriangle, User, Clock, Check, X, MessageSquare, Briefcase, Brain } from 'lucide-react';
 
 function Orders() {
+  const navigate = useNavigate();
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState('aktiv'); 
+  const [activeTab, setActiveTab] = useState('aktiv');
 
   const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : null;
@@ -326,6 +328,14 @@ function Orders() {
                   {isSeller && (order.status === 'Havuzda (Gözləyir)' || order.status === 'Düzəliş Gözləyir') && (
                     <button onClick={() => { setDeliveryData({ orderId: order._id, note: '', url: '' }); setIsDeliveryModalOpen(true); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
                       <UploadCloud size={16} /> İşi Təhvil Ver
+                    </button>
+                  )}
+
+                  {isSeller && (order.status === 'Təhvil Verildi' || order.status === 'Tamamlandı') && (
+                    <button onClick={() => navigate('/beyin-yedeyi/yeni', { state: { order } })}
+                      title="Bu işdə qarşılaşdığın problem və həll yolunu paylaş"
+                      style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', padding: '10px 18px', borderRadius: 8, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                      <Brain size={16} /> Beyin yedəyi
                     </button>
                   )}
 

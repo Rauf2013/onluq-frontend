@@ -1938,6 +1938,17 @@ body.dark-mode .theme-toggle-btn:hover {
   .navbar-actions > div:last-child > button { padding: 7px 10px !important; font-size: 13px !important; }
 }
 
+/* === BEYİN YEDƏYİ === */
+.brain-card { transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s; }
+.brain-card:hover { transform: translateY(-3px); border-color: rgba(99,102,241,0.4) !important; box-shadow: 0 10px 24px rgba(99,102,241,0.10); }
+@media (max-width: 768px) {
+  .brain-notes-page > div:first-child { padding: 24px 18px !important; }
+  .brain-notes-page h1 { font-size: 22px !important; }
+  .brain-grid { grid-template-columns: 1fr !important; }
+  .brain-create-page > div:first-child { padding: 22px 18px !important; }
+  .brain-detail-page h1 { font-size: 20px !important; }
+}
+
 /* === ADMİN PANEL === */
 .admin-tabs::-webkit-scrollbar { display: none; }
 .admin-tabs { scrollbar-width: none; }
