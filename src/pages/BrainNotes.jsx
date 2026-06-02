@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -21,6 +21,14 @@ function BrainNotes() {
   const [aiThread, setAiThread] = useState([]); // [{role, content, related?}]
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRemaining, setAiRemaining] = useState(null);
+  const aiBottomRef = useRef(null);
+
+  // Yeni mesaj əlavə olunanda və ya AI cavab gözlədikdə avtomatik aşağı kaydır
+  useEffect(() => {
+    if (aiOpen && aiBottomRef.current) {
+      aiBottomRef.current.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    }
+  }, [aiThread, aiLoading, aiOpen]);
 
   const fetchNotes = async () => {
     setLoading(true);
@@ -247,6 +255,7 @@ function BrainNotes() {
                   </div>
                 </div>
               )}
+              <div ref={aiBottomRef} style={{ height: 1 }} />
             </div>
 
             {/* Input */}
