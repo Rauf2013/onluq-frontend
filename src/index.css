@@ -1943,6 +1943,7 @@ body.dark-mode .theme-toggle-btn:hover {
 @keyframes aiDot { 0%, 20% { content: '.'; } 40% { content: '..'; } 60%, 100% { content: '...'; } }
 @media (max-width: 768px) {
   .ai-modal { height: 100vh !important; max-height: 100vh !important; border-radius: 0 !important; }
+  .ai-modal-overlay { padding: 0 !important; }
 }
 
 /* === BEYİN YEDƏYİ === */

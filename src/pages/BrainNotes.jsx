@@ -174,8 +174,8 @@ function BrainNotes() {
 
       {/* AI Modal */}
       {aiOpen && (
-        <div onClick={() => setAiOpen(false)} style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 2000, display: 'flex', alignItems: 'flex-end', justifyContent: 'center', padding: 0 }}>
-          <div onClick={(e) => e.stopPropagation()} className="ai-modal" style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: '80vh', maxHeight: 720, borderTopLeftRadius: 18, borderTopRightRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 -10px 30px rgba(0,0,0,0.2)', overflow: 'hidden' }}>
+        <div onClick={() => setAiOpen(false)} className="ai-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(2px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+          <div onClick={(e) => e.stopPropagation()} className="ai-modal" style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: 'min(85vh, 720px)', borderRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
             {/* Başlıq */}
             <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
