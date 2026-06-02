@@ -2,11 +2,68 @@ import React, { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Search, Send, Paperclip, Smile, MoreVertical, Check, CheckCheck, User, AlertCircle, Trash2, Image as ImageIcon, FileText, Tag, X, ShoppingCart, Download, ArrowLeft } from 'lucide-react';
+import { Search, Send, Paperclip, Smile, MoreVertical, Check, CheckCheck, User, AlertCircle, Trash2, Image as ImageIcon, FileText, Tag, X, ShoppingCart, Download, ArrowLeft,
+  Heart, ThumbsUp, ThumbsDown, Star, Flame, Sparkles, PartyPopper, Trophy, Crown, Award, Rocket, Lightbulb, CheckCircle, XCircle, AlertTriangle,
+  Coffee, Music, Gift, Gem, Zap, Sun, Moon, Cloud, Phone, Mail, MapPin, Clock, Bell, BookOpen, Cake, Camera, ShieldCheck, Smile as SmileIcon, Laugh, HandHeart } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { PACKAGE_TIERS } from '../constants/seller';
 
-const EMOJIS = ['😀','😁','😂','🤣','😊','😍','🥰','😘','😎','🤔','😏','😴','🤩','🥳','😢','😭','😡','😱','🤯','🙏','👍','👎','👏','🙌','💪','🤝','👌','✌️','🔥','💯','⭐','✨','❤️','💔','🎉','🎊','💰','💸','💎','🚀','✅','❌','⚡','🌟','📌','📎','📷','📁'];
+// Mesajda inline göstəriləcək icon-lar. Picker-də klik edincə `:adı:` token-i mətnə əlavə olunur,
+// mesaj göstərilərkən token-lər Lucide icon-a çevrilir.
+const STICKERS = [
+  { n: 'heart',     I: Heart,         c: '#ef4444', f: true },
+  { n: 'smile',     I: SmileIcon,     c: '#fbbf24' },
+  { n: 'laugh',     I: Laugh,         c: '#fbbf24' },
+  { n: 'thumbs-up', I: ThumbsUp,      c: '#10b981' },
+  { n: 'thumbs-down', I: ThumbsDown,  c: '#94a3b8' },
+  { n: 'star',      I: Star,          c: '#fbbf24', f: true },
+  { n: 'flame',     I: Flame,         c: '#f97316', f: true },
+  { n: 'sparkles',  I: Sparkles,      c: '#a855f7' },
+  { n: 'party',     I: PartyPopper,   c: '#ec4899' },
+  { n: 'trophy',    I: Trophy,        c: '#fbbf24' },
+  { n: 'crown',     I: Crown,         c: '#fbbf24' },
+  { n: 'award',     I: Award,         c: '#10b981' },
+  { n: 'rocket',    I: Rocket,        c: '#6366f1' },
+  { n: 'bulb',      I: Lightbulb,     c: '#fbbf24' },
+  { n: 'check',     I: CheckCircle,   c: '#10b981', f: true },
+  { n: 'x',         I: XCircle,       c: '#ef4444', f: true },
+  { n: 'alert',     I: AlertTriangle, c: '#f59e0b' },
+  { n: 'shield',    I: ShieldCheck,   c: '#10b981' },
+  { n: 'gift',      I: Gift,          c: '#ec4899' },
+  { n: 'cake',      I: Cake,          c: '#ec4899' },
+  { n: 'coffee',    I: Coffee,        c: '#92400e' },
+  { n: 'music',     I: Music,         c: '#a855f7' },
+  { n: 'gem',       I: Gem,           c: '#06b6d4' },
+  { n: 'zap',       I: Zap,           c: '#fbbf24', f: true },
+  { n: 'sun',       I: Sun,           c: '#fbbf24' },
+  { n: 'moon',      I: Moon,          c: '#6366f1' },
+  { n: 'cloud',     I: Cloud,         c: '#94a3b8' },
+  { n: 'camera',    I: Camera,        c: '#475569' },
+  { n: 'phone',     I: Phone,         c: '#10b981' },
+  { n: 'mail',      I: Mail,          c: '#3b82f6' },
+  { n: 'map-pin',   I: MapPin,        c: '#ef4444' },
+  { n: 'clock',     I: Clock,         c: '#64748b' },
+  { n: 'bell',      I: Bell,          c: '#f59e0b' },
+  { n: 'book',      I: BookOpen,      c: '#8b5cf6' },
+  { n: 'hand-heart', I: HandHeart,    c: '#ec4899' },
+];
+
+const STICKER_MAP = Object.fromEntries(STICKERS.map(s => [s.n, s]));
+
+// Mesaj mətnindəki :token: kimi ifadələri Lucide icon ilə əvəz edir.
+function renderMessageText(text) {
+  if (!text) return null;
+  const parts = text.split(/(:[a-z-]+:)/g);
+  return parts.map((part, i) => {
+    const m = /^:([a-z-]+):$/.exec(part);
+    if (m && STICKER_MAP[m[1]]) {
+      const s = STICKER_MAP[m[1]];
+      const Icon = s.I;
+      return <Icon key={i} size={18} color={s.c} fill={s.f ? s.c : 'none'} style={{ display: 'inline', verticalAlign: '-4px', margin: '0 2px' }} />;
+    }
+    return <React.Fragment key={i}>{part}</React.Fragment>;
+  });
+}
 
 function Messages() {
   const [conversations, setConversations] = useState([]);
@@ -380,7 +437,7 @@ function Messages() {
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                      {chat.lastMessage}
+                      {renderMessageText(chat.lastMessage)}
                     </p>
                     {chat.unread > 0 && <span style={{ background: '#10b981', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', marginLeft: '10px' }}>{chat.unread}</span>}
                   </div>
@@ -479,7 +536,7 @@ function Messages() {
                             </div>
                           </div>
                         )}
-                        {msg.text && <span style={{ fontSize: '15px', lineHeight: '1.4', whiteSpace: 'pre-wrap' }}>{msg.text}</span>}
+                        {msg.text && <span style={{ fontSize: '15px', lineHeight: '1.4', whiteSpace: 'pre-wrap' }}>{renderMessageText(msg.text)}</span>}
                         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: '5px', marginTop: '5px' }}>
                           <span style={{ fontSize: '11px', color: isMe ? '#d1fae5' : 'var(--text-muted)' }}>{msg.time}</span>
                           {isMe && renderTicks(msg.status)}
@@ -495,11 +552,17 @@ function Messages() {
             <div style={{ position: 'relative', padding: '15px 20px', background: 'var(--bg-surface)', borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: '12px' }}>
               {showEmoji && (
                 <div style={{ position: 'absolute', bottom: '100%', left: 12, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 10, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 4, width: 300, boxSizing: 'border-box', zIndex: 50 }}>
-                  {EMOJIS.map((e) => (
-                    <button key={e} type="button" onClick={() => { setNewMessage((m) => m + e); setShowEmoji(false); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', fontSize: 18, padding: 2, borderRadius: 6, lineHeight: 1, minWidth: 0 }}
-                      onMouseOver={(ev) => ev.currentTarget.style.background = 'var(--bg-muted)'}
-                      onMouseOut={(ev) => ev.currentTarget.style.background = 'transparent'}>{e}</button>
-                  ))}
+                  {STICKERS.map((s) => {
+                    const Icon = s.I;
+                    return (
+                      <button key={s.n} type="button" title={s.n} onClick={() => { setNewMessage((m) => m + `:${s.n}:`); }}
+                        style={{ background: 'transparent', border: 'none', cursor: 'pointer', padding: 6, borderRadius: 8, lineHeight: 0, minWidth: 0, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: '0.15s' }}
+                        onMouseOver={(ev) => ev.currentTarget.style.background = 'var(--bg-muted)'}
+                        onMouseOut={(ev) => ev.currentTarget.style.background = 'transparent'}>
+                        <Icon size={20} color={s.c} fill={s.f ? s.c : 'none'} />
+                      </button>
+                    );
+                  })}
                 </div>
               )}
               {showAttachMenu && (
