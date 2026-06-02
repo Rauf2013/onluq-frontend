@@ -23,6 +23,8 @@ function BrainNotes() {
   const [aiRemaining, setAiRemaining] = useState(null);
   const aiBottomRef = useRef(null);
 
+  const isGuest = !(localStorage.getItem('token') || sessionStorage.getItem('token'));
+
   // Yeni mesaj əlavə olunanda və ya AI cavab gözlədikdə avtomatik aşağı kaydır
   useEffect(() => {
     if (aiOpen && aiBottomRef.current) {
@@ -33,12 +35,12 @@ function BrainNotes() {
   const fetchNotes = async () => {
     setLoading(true);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
-    if (!token) { navigate('/giris'); return; }
     try {
       const params = new URLSearchParams({ page, limit: 12 });
       if (q) params.set('q', q);
       if (category) params.set('category', category);
-      const r = await fetch(`${API_URL}/api/brain-notes?${params}`, { headers: { Authorization: `Bearer ${token}` } });
+      const headers = token ? { Authorization: `Bearer ${token}` } : {};
+      const r = await fetch(`${API_URL}/api/brain-notes?${params}`, { headers });
       const d = await r.json();
       if (r.ok) { setItems(d.items); setTotal(d.total); setMyLevel(d.myLevel || 'Yeni Satıcı'); }
       else toast.error(d.message || 'Yüklənmədi');
@@ -63,9 +65,11 @@ function BrainNotes() {
     setAiLoading(true);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     try {
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
       const r = await fetch(`${API_URL}/api/ai/ask`, {
         method: 'POST',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ question: userMsg, category: category || undefined, history: historyForApi }),
       });
       const d = await r.json();
@@ -95,17 +99,25 @@ function BrainNotes() {
           </div>
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, flexWrap: 'wrap', gap: 10 }}>
-          <span style={{ fontSize: 13, opacity: 0.9 }}>Sənin səviyyən: <strong>{myLevel}</strong></span>
+          <span style={{ fontSize: 13, opacity: 0.9 }}>
+            {isGuest ? 'Qonaq rejimi — limitli funksiya' : <>Sənin səviyyən: <strong>{myLevel}</strong></>}
+          </span>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button onClick={() => setAiOpen(true)}
               style={{ background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 16px', borderRadius: 10, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, transition: '0.2s' }}
               onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.26)'}
               onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}>
-              <Bot size={16} /> AI-dan soruş
+              <Bot size={16} /> AI-dan soruş {isGuest && <span style={{ opacity: 0.75, fontSize: 11 }}>(20/gün)</span>}
             </button>
-            <Link to="/beyin-yedeyi/yeni" style={{ background: 'white', color: '#6366f1', padding: '10px 18px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
-              <Plus size={16} /> Yeni yedək yaz
-            </Link>
+            {isGuest ? (
+              <Link to="/giris" style={{ background: 'white', color: '#6366f1', padding: '10px 18px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                <Plus size={16} /> Yazmaq üçün giriş et
+              </Link>
+            ) : (
+              <Link to="/beyin-yedeyi/yeni" style={{ background: 'white', color: '#6366f1', padding: '10px 18px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                <Plus size={16} /> Yeni yedək yaz
+              </Link>
+            )}
           </div>
         </div>
       </div>
