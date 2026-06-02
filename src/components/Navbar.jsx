@@ -94,7 +94,7 @@ function Navbar() {
     };
 
     fetchNotifs();
-    const interval = setInterval(fetchNotifs, 5000); 
+    const interval = setInterval(fetchNotifs, 20000); 
     return () => clearInterval(interval);
   }, [userId, location.pathname]); 
 
