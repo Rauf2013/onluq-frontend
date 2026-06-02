@@ -328,6 +328,9 @@ function Navbar() {
           </>
         ) : (
           <>
+            <Link to="/beyin-yedeyi" title="Bilik bazası + AI köməkçisi (qonaq rejimi)" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8 }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
+              <Lightbulb size={17} style={{ marginRight: '5px' }} /> Bilik / AI
+            </Link>
             <Link to="/giris" style={{ textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>Giriş Et</Link>
             <Link to="/qeydiyyat" style={{ background: '#10b981', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)' }}>
               Qeydiyyat
