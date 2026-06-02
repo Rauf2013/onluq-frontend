@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock, Sparkles, Send, X as XIcon, Bot } from 'lucide-react';
+import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock, Send, X as XIcon, Bot, AlertTriangle } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
 import { levelColor } from '../constants/seller';
 
@@ -60,10 +60,10 @@ function BrainNotes() {
         setAiThread((t) => [...t, { role: 'ai', content: d.answer, related: d.relatedNotes }]);
         setAiRemaining(d.remaining);
       } else {
-        setAiThread((t) => [...t, { role: 'ai', content: `⚠ ${d.message || 'Xəta'}`, error: true }]);
+        setAiThread((t) => [...t, { role: 'ai', content: d.message || 'Xəta baş verdi', error: true }]);
       }
     } catch {
-      setAiThread((t) => [...t, { role: 'ai', content: '⚠ Bağlantı xətası', error: true }]);
+      setAiThread((t) => [...t, { role: 'ai', content: 'Bağlantı xətası', error: true }]);
     }
     setAiLoading(false);
   };
@@ -88,7 +88,7 @@ function BrainNotes() {
               style={{ background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 16px', borderRadius: 10, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, transition: '0.2s' }}
               onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.26)'}
               onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}>
-              <Sparkles size={16} /> AI-dan soruş
+              <Bot size={16} /> AI-dan soruş
             </button>
             <Link to="/beyin-yedeyi/yeni" style={{ background: 'white', color: '#6366f1', padding: '10px 18px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
               <Plus size={16} /> Yeni yedək yaz
@@ -194,7 +194,7 @@ function BrainNotes() {
             <div style={{ flex: 1, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 14, background: 'var(--bg-page)' }}>
               {aiThread.length === 0 && (
                 <div style={{ textAlign: 'center', color: 'var(--text-tertiary)', padding: 30 }}>
-                  <Sparkles size={32} color="#8b5cf6" style={{ marginBottom: 10 }} />
+                  <Bot size={36} color="#8b5cf6" style={{ marginBottom: 10 }} />
                   <p style={{ margin: 0, fontSize: 14 }}>Sualını yaz — AI həm bilik bazasından oxşar problemlərə baxır, həm öz bilgisini istifadə edir.</p>
                   <div style={{ marginTop: 14, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
                     {['React-də CORS xətası', 'MongoDB performans optimizasiyası', 'Logo dizaynına necə başlayım?'].map((s) => (
@@ -216,6 +216,7 @@ function BrainNotes() {
                     fontSize: 14, lineHeight: 1.6, whiteSpace: 'pre-wrap', wordBreak: 'break-word',
                     border: m.role === 'ai' ? '1px solid var(--border)' : 'none',
                   }}>
+                    {m.error && <AlertTriangle size={14} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6 }} />}
                     {m.content}
                     {m.related && m.related.length > 0 && (
                       <div style={{ marginTop: 10, paddingTop: 10, borderTop: '1px dashed var(--border)' }}>
