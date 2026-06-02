@@ -107,7 +107,7 @@ function Messages() {
   const [showAttachMenu, setShowAttachMenu] = useState(false);
   const [showOfferModal, setShowOfferModal] = useState(false);
   const [myServices, setMyServices] = useState([]);
-  const [offerForm, setOfferForm] = useState({ serviceId: '', tier: 'bronze' });
+  const [offerForm, setOfferForm] = useState({ serviceId: '', tier: 'bronze', note: '' });
   const [partnerTyping, setPartnerTyping] = useState(false);
   const fileInputRef = useRef(null);
   const docInputRef = useRef(null);
@@ -196,7 +196,9 @@ function Messages() {
           text: msg.text || '',
           senderId: msg.senderId || 'unknown',
           time: msg.time || '',
-          status: msg.status || 'delivered' 
+          status: msg.status || 'delivered',
+          type: msg.type || 'text',
+          meta: msg.meta || null,
         }));
         setMessages(safeMessages);
       } else {
@@ -379,7 +381,7 @@ function Messages() {
       if (res.ok) {
         if (!data.length) { toast.info('Təklif göndərmək üçün ən azı bir xidmətiniz olmalıdır.'); return; }
         setMyServices(data);
-        setOfferForm({ serviceId: data[0]._id, tier: data[0].packages?.[0]?.tier || 'bronze' });
+        setOfferForm({ serviceId: data[0]._id, tier: data[0].packages?.[0]?.tier || 'bronze', note: '' });
         setShowOfferModal(true);
       } else { toast.error('Xidmətlər yüklənə bilmədi.'); }
     } catch { toast.error('Bağlantı xətası.'); }
@@ -391,18 +393,21 @@ function Messages() {
     const pkg = (svc.packages || []).find((p) => p.tier === offerForm.tier) || svc.packages?.[0];
     if (!pkg) { toast.error('Bu xidmətdə paket yoxdur.'); return; }
     setShowOfferModal(false);
+    const note = (offerForm.note || '').trim().slice(0, 500);
     await sendPayload({
       type: 'offer',
-      text: `${pkg.title || 'Paket'} təklifi`,
+      text: note, // istəyə bağlı şəxsi mesaj — offer card altında görünəcək
       meta: {
         serviceId: svc._id,
         serviceTitle: svc.title,
         serviceImage: svc.image,
         tier: pkg.tier,
         packageTitle: pkg.title,
+        packageDescription: pkg.description || '',
         price: pkg.price,
         deliveryDays: pkg.deliveryDays,
         revisions: pkg.revisions,
+        features: Array.isArray(pkg.features) ? pkg.features.slice(0, 6) : [],
       }
     });
   };
@@ -662,21 +667,24 @@ function Messages() {
       </div>
 
       <div className={`custom-modal-overlay ${showOfferModal ? 'active' : ''}`} onClick={() => setShowOfferModal(false)}>
-        <div className="custom-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 460, textAlign: 'left' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
-            <h3 style={{ margin: 0, color: 'var(--text-primary)' }}>Xüsusi təklif göndər</h3>
+        <div className="custom-modal" onClick={(e) => e.stopPropagation()} style={{ maxWidth: 500, textAlign: 'left' }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
+            <h3 style={{ margin: 0, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Tag size={20} color="#f59e0b" /> Xüsusi təklif göndər
+            </h3>
             <button onClick={() => setShowOfferModal(false)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)' }}><X size={20} /></button>
           </div>
+
           <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>Xidmət</label>
           <select value={offerForm.serviceId} onChange={(e) => {
             const s = myServices.find((x) => x._id === e.target.value);
-            setOfferForm({ serviceId: e.target.value, tier: s?.packages?.[0]?.tier || 'bronze' });
+            setOfferForm({ serviceId: e.target.value, tier: s?.packages?.[0]?.tier || 'bronze', note: offerForm.note });
           }} className="auth-input" style={{ width: '100%', padding: 10, marginBottom: 14 }}>
             {myServices.map((s) => <option key={s._id} value={s._id}>{s.title}</option>)}
           </select>
 
           <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>Paket</label>
-          <div style={{ display: 'flex', gap: 8, marginBottom: 18 }}>
+          <div style={{ display: 'flex', gap: 8, marginBottom: 14 }}>
             {(myServices.find((s) => s._id === offerForm.serviceId)?.packages || []).map((p) => {
               const tm = PACKAGE_TIERS.find((t) => t.tier === p.tier);
               const active = offerForm.tier === p.tier;
@@ -688,6 +696,38 @@ function Messages() {
               );
             })}
           </div>
+
+          {/* Seçilmiş paketin detalları */}
+          {(() => {
+            const svc = myServices.find((s) => s._id === offerForm.serviceId);
+            const pkg = (svc?.packages || []).find((p) => p.tier === offerForm.tier);
+            if (!pkg) return null;
+            return (
+              <div style={{ background: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: 10, padding: 12, marginBottom: 14, fontSize: 13 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 8, color: 'var(--text-secondary)' }}>
+                  <span><Clock size={13} style={{ verticalAlign: '-2px', marginRight: 4 }} />{pkg.deliveryDays} gün təslim</span>
+                  <span>{pkg.revisions} revizyon</span>
+                </div>
+                {pkg.description && <div style={{ color: 'var(--text-tertiary)', fontSize: 12, lineHeight: 1.5, marginBottom: pkg.features?.length ? 8 : 0 }}>{pkg.description}</div>}
+                {pkg.features?.length > 0 && (
+                  <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    {pkg.features.slice(0, 4).map((f, i) => (
+                      <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, color: 'var(--text-secondary)', fontSize: 12 }}>
+                        <Check size={12} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }} /> {f}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            );
+          })()}
+
+          <label style={{ fontSize: 13, fontWeight: 700, color: 'var(--text-secondary)', display: 'block', marginBottom: 6 }}>Şəxsi mesaj <span style={{ fontWeight: 400, color: 'var(--text-muted)' }}>(istəyə bağlı)</span></label>
+          <textarea value={offerForm.note} onChange={(e) => setOfferForm((f) => ({ ...f, note: e.target.value }))}
+            placeholder="Məsələn: 'Sizin layihəniz üçün xüsusi olaraq...'"
+            maxLength={500}
+            className="auth-input" style={{ width: '100%', padding: 10, marginBottom: 16, minHeight: 70, resize: 'vertical', fontFamily: 'inherit' }} />
+
           <div style={{ display: 'flex', gap: 10 }}>
             <button className="btn-modal-cancel" onClick={() => setShowOfferModal(false)}>Ləğv et</button>
             <button className="btn-modal-confirm" onClick={sendOffer}>Təklifi göndər</button>
