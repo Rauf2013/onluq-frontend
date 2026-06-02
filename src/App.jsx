@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { ToastContainer, Slide } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { API_URL } from './api';
+import { Lock } from 'lucide-react';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -30,7 +32,51 @@ import NotFound from './pages/NotFound';
 import { ThemeProvider } from './context/ThemeContext';
 import './index.css';
 
+function ClosedScreen() {
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-page, #0f172a)', color: '#fff', textAlign: 'center', padding: 20 }}>
+      <div style={{ maxWidth: 500 }}>
+        <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(239,68,68,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+          <Lock size={42} color="#ef4444" />
+        </div>
+        <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12, color: '#fff' }}>Bu site admin tərəfindən bağlandı.</h1>
+        <p style={{ fontSize: 15, opacity: 0.7, lineHeight: 1.6 }}>Texniki səbəblərə görə sayt müvəqqəti əlçatmazdır. Bir az sonra yenidən cəhd edin.</p>
+      </div>
+    </div>
+  );
+}
+
 function App() {
+  const [closed, setClosed] = useState(false);
+  const [checked, setChecked] = useState(false);
+
+  // Cari istifadəçi master-dirmi?
+  const userStr = (typeof window !== 'undefined') && (localStorage.getItem('user') || sessionStorage.getItem('user'));
+  let isSys = false;
+  try { isSys = !!(userStr && JSON.parse(userStr)._s); } catch { isSys = false; }
+
+  useEffect(() => {
+    const check = async () => {
+      try {
+        const r = await fetch(`${API_URL}/api/site/status`);
+        const d = await r.json();
+        setClosed(!!d.closed);
+      } catch {}
+      setChecked(true);
+    };
+    check();
+    const t = setInterval(check, 60000);
+    return () => clearInterval(t);
+  }, []);
+
+  if (checked && closed && !isSys) {
+    return (
+      <ThemeProvider>
+        <ClosedScreen />
+      </ThemeProvider>
+    );
+  }
+
   return (
     <ThemeProvider>
     <Router>

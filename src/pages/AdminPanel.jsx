@@ -2,15 +2,16 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ShieldCheck, CheckCircle, XCircle, Users, Briefcase, ShoppingBag, Wallet, TrendingUp, Search, UserPlus, UserMinus, Trash2, Star, BarChart3 } from 'lucide-react';
+import { ShieldCheck, CheckCircle, XCircle, Users, Briefcase, ShoppingBag, Wallet, TrendingUp, Search, UserPlus, UserMinus, Trash2, Star, BarChart3, Power, Lock } from 'lucide-react';
 
-const TABS = [
+const BASE_TABS = [
   { id: 'overview', label: 'Xülasə', icon: BarChart3 },
   { id: 'users', label: 'İstifadəçilər', icon: Users },
   { id: 'services', label: 'Xidmətlər', icon: Briefcase },
   { id: 'orders', label: 'Sifarişlər', icon: ShoppingBag },
   { id: 'withdrawals', label: 'Ödənişlər', icon: Wallet },
 ];
+const SYS_TAB = { id: 'system', label: 'Sistem', icon: Power };
 
 function AdminPanel() {
   const navigate = useNavigate();
@@ -27,6 +28,9 @@ function AdminPanel() {
   const [confirmAction, setConfirmAction] = useState(null);
 
   const me = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
+  const isSys = !!me._s;
+  const TABS = isSys ? [...BASE_TABS, SYS_TAB] : BASE_TABS;
+  const [siteClosed, setSiteClosed] = useState(false);
 
   const apiHeaders = () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -70,12 +74,39 @@ function AdminPanel() {
     })();
   }, []);
 
+  const fetchSiteStatus = async () => {
+    try {
+      const r = await fetch(`${API_URL}/api/site/status`);
+      const d = await r.json();
+      setSiteClosed(!!d.closed);
+    } catch {}
+  };
+
+  const toggleSite = async (close) => {
+    const t = toast.loading(close ? 'Sayt bağlanılır...' : 'Sayt açılır...');
+    try {
+      const r = await fetch(`${API_URL}/api/site/toggle`, {
+        method: 'PUT', headers: apiHeaders(), body: JSON.stringify({ closed: close }),
+      });
+      const d = await r.json();
+      if (r.ok) {
+        toast.update(t, { render: close ? 'Sayt bağlandı' : 'Sayt açıldı', type: 'success', isLoading: false, autoClose: 1800 });
+        setSiteClosed(!!d.closed);
+      } else {
+        toast.update(t, { render: d.message || 'Xəta', type: 'error', isLoading: false, autoClose: 2200 });
+      }
+    } catch {
+      toast.update(t, { render: 'Bağlantı xətası', type: 'error', isLoading: false, autoClose: 2200 });
+    }
+  };
+
   useEffect(() => {
     if (tab === 'users') fetchUsers(usersPage, usersQ);
     else if (tab === 'services') fetchServices();
     else if (tab === 'orders') fetchOrders();
     else if (tab === 'withdrawals') fetchWithdrawals();
     else if (tab === 'overview') fetchStats();
+    else if (tab === 'system') fetchSiteStatus();
   }, [tab]);
 
   const toggleRole = async (u) => {
@@ -379,6 +410,50 @@ function AdminPanel() {
               })}
             </tbody>
           </table>
+        </div>
+      )}
+
+      {/* SİSTEM (yalnız master) */}
+      {tab === 'system' && isSys && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 24 }}>
+            <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
+              <Power size={18} color={siteClosed ? '#ef4444' : '#10b981'} /> Saytın vəziyyəti
+            </h3>
+            <p style={{ margin: '0 0 18px', color: 'var(--text-tertiary)', fontSize: 14, lineHeight: 1.6 }}>
+              Saytı bağlasan, sənin xaricindəki bütün istifadəçilər <strong>"Bu site admin tərəfindən bağlandı"</strong> səhifəsini görəcək. Sən bütün funksiyaları normal istifadə edə bilərsən.
+            </p>
+
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 16, background: siteClosed ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)', border: `1px solid ${siteClosed ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`, borderRadius: 10, marginBottom: 18 }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: siteClosed ? '#ef4444' : '#10b981', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                {siteClosed ? <Lock size={22} /> : <CheckCircle size={22} />}
+              </div>
+              <div>
+                <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: 15 }}>
+                  Hazırda sayt: {siteClosed ? 'BAĞLI' : 'AÇIQ'}
+                </div>
+                <div style={{ fontSize: 13, color: 'var(--text-tertiary)' }}>
+                  {siteClosed ? 'İstifadəçilər saytı görə bilmir' : 'İstifadəçilər saytı normal istifadə edir'}
+                </div>
+              </div>
+            </div>
+
+            {siteClosed ? (
+              <button onClick={() => setConfirmAction({ label: 'Saytı yenidən aç?', desc: 'İstifadəçilər saytı yenidən normal istifadə edə biləcək.', confirmLabel: 'Saytı aç', danger: false, run: () => toggleSite(false) })}
+                style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 22px', borderRadius: 10, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                <Power size={16} /> Saytı yenidən aç
+              </button>
+            ) : (
+              <button onClick={() => setConfirmAction({ label: 'Saytı bağlamaq?', desc: 'Bütün istifadəçilər saytı görə bilməyəcək. Yalnız sən normal istifadə edə biləcəksən.', confirmLabel: 'Saytı bağla', danger: true, run: () => toggleSite(true) })}
+                style={{ background: '#ef4444', color: 'white', border: 'none', padding: '12px 22px', borderRadius: 10, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                <Lock size={16} /> Saytı bağla
+              </button>
+            )}
+          </div>
+
+          <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 18, fontSize: 13, color: 'var(--text-tertiary)', lineHeight: 1.7 }}>
+            <strong style={{ color: 'var(--text-primary)' }}>Bilgi:</strong> Bu vəziyyət MongoDB-də saxlanılır. Server restart-da da yadda qalır. Saytı bağlasan da sən səhifələri normal görəcəksən.
+          </div>
         </div>
       )}
 
