@@ -65,8 +65,17 @@ function App() {
       setChecked(true);
     };
     check();
-    const t = setInterval(check, 60000);
-    return () => clearInterval(t);
+    // Hər 3 saniyədə avtomatik yoxla — açıq/bağlı dəyişikliyi yenidən yükləmədən tutulsun
+    const t = setInterval(check, 3000);
+    // Tab-a qayıdanda dərhal yoxla
+    const onVis = () => { if (document.visibilityState === 'visible') check(); };
+    document.addEventListener('visibilitychange', onVis);
+    window.addEventListener('focus', check);
+    return () => {
+      clearInterval(t);
+      document.removeEventListener('visibilitychange', onVis);
+      window.removeEventListener('focus', check);
+    };
   }, []);
 
   if (checked && closed && !isSys) {
