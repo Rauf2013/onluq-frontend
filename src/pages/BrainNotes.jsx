@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock, Send, X as XIcon, Bot, AlertTriangle } from 'lucide-react';
+import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock, Send, X as XIcon, Bot, AlertTriangle, Trash2 } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
 import { levelColor } from '../constants/seller';
 
@@ -185,9 +185,20 @@ function BrainNotes() {
                   <div style={{ fontSize: 11, opacity: 0.85 }}>Frilanserlərin kolektiv biliyindən cavab</div>
                 </div>
               </div>
-              <button onClick={() => setAiOpen(false)} aria-label="Bağla" style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer' }}>
-                <XIcon size={22} />
-              </button>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+                {aiThread.length > 0 && (
+                  <button onClick={() => { setAiThread([]); setAiQ(''); }} title="Söhbəti təmizlə" aria-label="Söhbəti təmizlə"
+                    style={{ background: 'rgba(255,255,255,0.15)', border: 'none', color: 'white', cursor: 'pointer', padding: 8, borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', transition: '0.15s' }}
+                    onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.28)'}
+                    onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.15)'}>
+                    <Trash2 size={17} />
+                  </button>
+                )}
+                <button onClick={() => setAiOpen(false)} aria-label="Bağla" title="Bağla"
+                  style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', padding: 6, display: 'inline-flex' }}>
+                  <XIcon size={22} />
+                </button>
+              </div>
             </div>
 
             {/* Söhbət */}
