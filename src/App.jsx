@@ -34,14 +34,14 @@ import './index.css';
 
 function ClosedScreen() {
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-page, #0f172a)', color: '#fff', textAlign: 'center', padding: 20 }}>
-      <div style={{ maxWidth: 500 }}>
-        <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(239,68,68,0.18)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
-          <Lock size={42} color="#ef4444" />
+    <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', color: '#fff', textAlign: 'center', padding: 20, position: 'fixed', inset: 0, zIndex: 9999 }}>
+        <div style={{ maxWidth: 500 }}>
+          <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'rgba(239,68,68,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px' }}>
+            <Lock size={42} color="#ef4444" />
+          </div>
+          <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12, color: '#ffffff' }}>Bu site admin tərəfindən bağlandı.</h1>
+          <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>Texniki səbəblərə görə sayt müvəqqəti əlçatmazdır. Bir az sonra yenidən cəhd edin.</p>
         </div>
-        <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12, color: '#fff' }}>Bu site admin tərəfindən bağlandı.</h1>
-        <p style={{ fontSize: 15, opacity: 0.7, lineHeight: 1.6 }}>Texniki səbəblərə görə sayt müvəqqəti əlçatmazdır. Bir az sonra yenidən cəhd edin.</p>
-      </div>
     </div>
   );
 }
