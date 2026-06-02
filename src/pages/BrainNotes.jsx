@@ -53,6 +53,11 @@ function BrainNotes() {
   const askAI = async () => {
     if (!aiQ.trim() || aiLoading) return;
     const userMsg = aiQ.trim();
+    // Cari thread-i tarixçə kimi gönder (son 10 mesaj, xəta mesajlarını çıxar)
+    const historyForApi = aiThread
+      .filter(m => !m.error)
+      .slice(-10)
+      .map(m => ({ role: m.role, content: m.content }));
     setAiThread((t) => [...t, { role: 'user', content: userMsg }]);
     setAiQ('');
     setAiLoading(true);
@@ -61,7 +66,7 @@ function BrainNotes() {
       const r = await fetch(`${API_URL}/api/ai/ask`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ question: userMsg, category: category || undefined }),
+        body: JSON.stringify({ question: userMsg, category: category || undefined, history: historyForApi }),
       });
       const d = await r.json();
       if (r.ok) {
