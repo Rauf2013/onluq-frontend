@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { MessageSquare, Package, Briefcase, Wallet, ShieldCheck, LogOut, CheckCircle, Bell, Heart, Sun, Moon, ArrowRight, Menu, X, User, Lightbulb } from 'lucide-react';
+import { MessageSquare, Package, Briefcase, Wallet, ShieldCheck, LogOut, CheckCircle, Bell, Heart, Sun, Moon, ArrowRight, Menu, X, User, Lightbulb, Bot } from 'lucide-react';
+import AIChat from './AIChat';
 import { toast } from 'react-toastify';
 import { useTheme } from '../context/ThemeContext';
 
@@ -27,6 +28,7 @@ function Navbar() {
   const [notifications, setNotifications] = useState([]);
   const [showNotifs, setShowNotifs] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [aiOpen, setAiOpen] = useState(false);
 
   useEffect(() => { setMobileOpen(false); }, [location.pathname]);
 
@@ -328,15 +330,16 @@ function Navbar() {
           </>
         ) : (
           <>
-            <Link to="/beyin-yedeyi" title="Bilik bazası + AI köməkçisi (qonaq rejimi)" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8 }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
-              <Lightbulb size={17} style={{ marginRight: '5px' }} /> Bilik / AI
-            </Link>
+            <button type="button" onClick={() => setAiOpen(true)} title="AI ilə danış" style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8, border: 'none' }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
+              <Bot size={17} style={{ marginRight: '5px' }} /> AI ilə danış
+            </button>
             <Link to="/giris" style={{ textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>Giriş Et</Link>
             <Link to="/qeydiyyat" style={{ background: '#10b981', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)' }}>
               Qeydiyyat
             </Link>
           </>
         )}
+        <AIChat open={aiOpen} onClose={() => setAiOpen(false)} />
       </div>
     </nav>
   );
