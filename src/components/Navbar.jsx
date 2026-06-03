@@ -298,7 +298,7 @@ function Navbar() {
             </Link>
             <Link to="/beyin-yedeyi" title="Bilik bazası — Frilanserlərin paylaşdığı həllər" style={{ position: 'relative', display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8 }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
               <Lightbulb size={17} style={{ marginRight: '5px' }} /> Bilik
-              <span style={{ position: 'absolute', top: -6, left: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(-35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
+              <span style={{ position: 'absolute', top: -6, right: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
             </Link>
             <Link to="/cuzdan" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--brand-soft)', color: '#10b981', fontWeight: '700', padding: '8px 15px', borderRadius: '8px', border: '1px solid var(--brand-soft)' }}>
               <Wallet size={18} style={{ marginRight: '6px' }} /> Cüzdanım
@@ -333,7 +333,7 @@ function Navbar() {
           <>
             <button type="button" onClick={() => setAiOpen(true)} title="AI ilə danış" style={{ position: 'relative', display: 'flex', alignItems: 'center', cursor: 'pointer', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8, border: 'none' }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
               <Bot size={17} style={{ marginRight: '5px' }} /> AI ilə danış
-              <span style={{ position: 'absolute', top: -6, left: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(-35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
+              <span style={{ position: 'absolute', top: -6, right: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
             </button>
             <Link to="/giris" style={{ textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>Giriş Et</Link>
             <Link to="/qeydiyyat" style={{ background: '#10b981', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)' }}>
