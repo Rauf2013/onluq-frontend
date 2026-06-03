@@ -19,7 +19,7 @@ export const CATEGORY_DATA = [
   {
     name: 'Video və Montaj',
     icon: Video,
-    subcategories: ['Video Montaj', '2D/3D Animasiya', 'İntro və Outro', 'Reklam Videoları', 'YouTube Videoları', 'Subtitr və Tərcümə', 'Vizual Effektlər (VFX)'],
+    subcategories: ['Video Montaj', '2D/3D Animasiya', 'İntro və Outro', 'Reklam Videoları', 'YouTube Videoları', 'Subtitr və Tərcümə', 'Vizual Effektlər (VFX)', 'AI ilə Düzəldilmiş Qısa Videolar', 'AI ilə Düzəldilmiş Uzun Videolar'],
   },
   {
     name: 'Rəqəmsal Marketinq',
