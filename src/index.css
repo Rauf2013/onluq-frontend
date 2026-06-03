@@ -1938,6 +1938,12 @@ body.dark-mode .theme-toggle-btn:hover {
   .navbar-actions > div:last-child > button { padding: 7px 10px !important; font-size: 13px !important; }
 }
 
+/* === ZƏNG (CALL) UI MOBİL === */
+@media (max-width: 768px) {
+  /* Görüntülü zəng local video-su mobilda daha kiçik */
+  video[playsinline][muted] { width: 100px !important; height: 80px !important; top: 14px !important; right: 14px !important; }
+}
+
 /* === MESAJ KOMPOSER (contenteditable) === */
 .composer:empty:before, .composer.composer-empty:before {
   content: attr(data-placeholder);

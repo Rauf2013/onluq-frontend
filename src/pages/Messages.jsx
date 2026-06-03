@@ -6,8 +6,10 @@ import { toast } from 'react-toastify';
 import { Search, Send, Paperclip, Smile, MoreVertical, Check, CheckCheck, User, AlertCircle, Trash2, Image as ImageIcon, FileText, Tag, X, ShoppingCart, Download, ArrowLeft,
   Heart, ThumbsUp, ThumbsDown, Star, Flame, Sparkles, PartyPopper, Trophy, Crown, Award, Rocket, Lightbulb, CheckCircle, XCircle, AlertTriangle,
   Coffee, Music, Gift, Gem, Zap, Sun, Moon, Cloud, Phone, Mail, MapPin, Clock, Bell, BookOpen, Cake, Camera, ShieldCheck, Smile as SmileIcon, Laugh, HandHeart } from 'lucide-react';
+import { Video as VideoIcon } from 'lucide-react';
 import { io } from 'socket.io-client';
 import { PACKAGE_TIERS } from '../constants/seller';
+import CallSystem from '../components/CallSystem';
 
 // Mesajda inline göstəriləcək icon-lar. Picker-də klik edincə `:adı:` token-i mətnə əlavə olunur,
 // mesaj göstərilərkən token-lər Lucide icon-a çevrilir.
@@ -113,6 +115,7 @@ function Messages() {
   const docInputRef = useRef(null);
   const typingTimerRef = useRef(null);
   const composerRef = useRef(null);
+  const callSystemRef = useRef(null);
   const [composerEmpty, setComposerEmpty] = useState(true);
 
   const messagesEndRef = useRef(null);
@@ -129,6 +132,7 @@ function Messages() {
   const partnerNameFromState = location.state ? location.state.partnerName : null;
 
   const socketRef = useRef(null);
+  const [socketReady, setSocketReady] = useState(false);
 
   useEffect(() => {
     if (location.state && location.state.partnerId) {
@@ -141,7 +145,8 @@ function Messages() {
       socketRef.current = io(API_URL, {
         auth: { token: localStorage.getItem('token') || sessionStorage.getItem('token') },
       });
-      
+      setSocketReady(true);
+
       socketRef.current.emit("user_connected", userId);
 
       socketRef.current.on("receive_message", (data) => {
@@ -518,9 +523,21 @@ function Messages() {
                   </span>
                 </div>
               </div>
-              <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+              <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+                <button onClick={() => callSystemRef.current?.startCall('audio')} title="Səsli zəng" aria-label="Səsli zəng"
+                  style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.22)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.12)'}>
+                  <Phone size={18} />
+                </button>
+                <button onClick={() => callSystemRef.current?.startCall('video')} title="Görüntülü zəng" aria-label="Görüntülü zəng"
+                  style={{ background: 'rgba(59,130,246,0.12)', color: '#3b82f6', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}
+                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.22)'}
+                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.12)'}>
+                  <VideoIcon size={18} />
+                </button>
                 <button
-                  onClick={handleDeleteConversation} 
+                  onClick={handleDeleteConversation}
                   style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold', transition: '0.2s' }}
                   onMouseOver={(e) => e.currentTarget.style.background = '#fca5a5'}
                   onMouseOut={(e) => e.currentTarget.style.background = '#fee2e2'}
@@ -748,6 +765,16 @@ function Messages() {
           </div>
         </div>
       </div>
+
+      {socketReady && (
+        <CallSystem
+          ref={callSystemRef}
+          socket={socketRef.current}
+          myId={userId}
+          partnerId={activeChat?.partnerId}
+          partnerName={activeChat?.partnerName}
+        />
+      )}
     </div>
   );
 }
