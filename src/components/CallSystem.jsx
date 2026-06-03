@@ -18,14 +18,22 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
   const [duration, setDuration] = useState(0);
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+
+  // Stable refs (event listener-lərdə stale closure-dan qaçmaq üçün)
+  const stateRef = useRef(state);
+  const kindRef = useRef(kind);
+  const remoteIdRef = useRef(remoteId);
+  useEffect(() => { stateRef.current = state; }, [state]);
+  useEffect(() => { kindRef.current = kind; }, [kind]);
+  useEffect(() => { remoteIdRef.current = remoteId; }, [remoteId]);
 
   const pcRef = useRef(null);
-  const localStreamRef = useRef(null);
   const localVideoRef = useRef(null);
-  const remoteVideoRef = useRef(null);
+  const remoteMediaRef = useRef(null); // həm <audio>, həm <video> üçün eyni ref
   const timerRef = useRef(null);
   const pendingIceRef = useRef([]);
-  const remoteAudioRef = useRef(null);
 
   const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
@@ -35,16 +43,27 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
   };
 
+  // === Hard cleanup — bütün resursları azad et ===
+  const stopAllTracks = (stream) => {
+    if (!stream) return;
+    try { stream.getTracks().forEach((t) => { try { t.stop(); } catch {} }); } catch {}
+  };
+
   const cleanup = () => {
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    if (pcRef.current) { try { pcRef.current.close(); } catch {} pcRef.current = null; }
-    if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach((t) => t.stop());
-      localStreamRef.current = null;
+    // peer-in göndərənlərinin də tracklarını dayandır
+    if (pcRef.current) {
+      try {
+        pcRef.current.getSenders().forEach((s) => { if (s.track) { try { s.track.stop(); } catch {} } });
+        pcRef.current.getReceivers().forEach((r) => { if (r.track) { try { r.track.stop(); } catch {} } });
+      } catch {}
+      try { pcRef.current.close(); } catch {}
+      pcRef.current = null;
     }
-    if (localVideoRef.current) localVideoRef.current.srcObject = null;
-    if (remoteVideoRef.current) remoteVideoRef.current.srcObject = null;
-    if (remoteAudioRef.current) remoteAudioRef.current.srcObject = null;
+    setLocalStream((s) => { stopAllTracks(s); return null; });
+    setRemoteStream((s) => { stopAllTracks(s); return null; });
+    if (localVideoRef.current) { try { localVideoRef.current.srcObject = null; } catch {} }
+    if (remoteMediaRef.current) { try { remoteMediaRef.current.srcObject = null; } catch {} }
     pendingIceRef.current = [];
     setState('idle');
     setKind('audio');
@@ -55,6 +74,27 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     setCamOff(false);
   };
 
+  // Komponent unmount-da da hard cleanup
+  useEffect(() => () => cleanup(), []);
+
+  // === Stream-i UI element-inə bağla (element render olunduqdan sonra) ===
+  useEffect(() => {
+    if (localStream && localVideoRef.current && kind === 'video') {
+      localVideoRef.current.srcObject = localStream;
+    }
+  }, [localStream, kind, state]);
+
+  useEffect(() => {
+    if (remoteStream && remoteMediaRef.current) {
+      try {
+        remoteMediaRef.current.srcObject = remoteStream;
+        const playP = remoteMediaRef.current.play();
+        if (playP && typeof playP.catch === 'function') playP.catch(() => {});
+      } catch {}
+    }
+  }, [remoteStream, kind, state]);
+
+  // === Peer connection qur ===
   const setupPeer = async (peerKind, peerId) => {
     const pc = new RTCPeerConnection(ICE);
     pcRef.current = pc;
@@ -63,18 +103,23 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       if (e.candidate && peerId) socket.emit('call:ice', { to: peerId, candidate: e.candidate });
     };
 
+    // ⚡ KRİTİK FIX: ontrack yalnız stream-i state-ə yaz, render olduqdan sonra srcObject useEffect-də qoşulur
     pc.ontrack = (e) => {
       const stream = e.streams[0];
-      if (peerKind === 'video' && remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = stream;
-      }
-      if (remoteAudioRef.current) remoteAudioRef.current.srcObject = stream;
+      setRemoteStream(stream);
     };
 
     pc.onconnectionstatechange = () => {
-      if (['failed', 'disconnected', 'closed'].includes(pc.connectionState)) {
-        // peer dropped → end on our side too
-        setTimeout(() => { if (pcRef.current === pc) cleanup(); }, 500);
+      const st = pc.connectionState;
+      if (['failed', 'disconnected', 'closed'].includes(st)) {
+        if (pcRef.current === pc) {
+          // Bir az gözlə — bəzən "disconnected" qısa müddətli olur (ICE restart-da gərək yox)
+          setTimeout(() => {
+            if (pcRef.current === pc && ['failed', 'disconnected', 'closed'].includes(pc.connectionState)) {
+              cleanup();
+            }
+          }, 1500);
+        }
       }
     };
 
@@ -86,19 +131,20 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       toast.error(peerKind === 'video' ? 'Kamera/Mikrofon icazəsi rədd edildi.' : 'Mikrofon icazəsi rədd edildi.');
       throw e;
     }
-    localStreamRef.current = stream;
-    if (peerKind === 'video' && localVideoRef.current) localVideoRef.current.srcObject = stream;
+    setLocalStream(stream);
     stream.getTracks().forEach((t) => pc.addTrack(t, stream));
 
     return pc;
   };
 
   const startAsCaller = async () => {
+    const peerId = remoteIdRef.current;
+    const peerKind = kindRef.current;
     try {
-      const pc = await setupPeer(kind, remoteId);
+      const pc = await setupPeer(peerKind, peerId);
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      socket.emit('call:offer', { to: remoteId, sdp: offer.sdp, type: offer.type });
+      socket.emit('call:offer', { to: peerId, sdp: offer.sdp, type: offer.type });
       setState('active');
       startTimer();
     } catch { cleanup(); }
@@ -108,7 +154,6 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     try {
       const pc = await setupPeer(peerKind, peerId);
       await pc.setRemoteDescription({ type: offerType || 'offer', sdp: offerSdp });
-      // pendingICE-ləri əlavə et
       for (const c of pendingIceRef.current) {
         try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch {}
       }
@@ -121,10 +166,10 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     } catch { cleanup(); }
   };
 
-  // === Imperative API ===
+  // === Imperative API (parent-dən çağrılır) ===
   useImperativeHandle(ref, () => ({
     startCall: (k) => {
-      if (state !== 'idle' || !partnerId || !socket) return;
+      if (stateRef.current !== 'idle' || !partnerId || !socket) return;
       setKind(k);
       setRemoteId(partnerId);
       setRemoteName(partnerName || 'İstifadəçi');
@@ -133,47 +178,46 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     },
   }));
 
-  // === Socket listeners ===
+  // === Socket listeners — STABIL, yalnız socket dəyişəndə re-subscribe ===
   useEffect(() => {
     if (!socket) return;
 
     const onInvite = ({ from, kind: k }) => {
-      // Zəng zamanı yeni gələn zəngləri rədd et
-      if (state !== 'idle') {
+      if (stateRef.current !== 'idle') {
         socket.emit('call:reject', { to: from, reason: 'busy' });
         return;
       }
-      setKind(k === 'video' ? 'video' : 'audio');
+      const nk = k === 'video' ? 'video' : 'audio';
+      setKind(nk);
       setRemoteId(from);
       setRemoteName(partnerName && partnerId === from ? partnerName : 'Bilinməyən');
       setState('ringing');
     };
 
     const onAccept = async ({ from }) => {
-      if (state !== 'calling' || from !== remoteId) return;
+      if (stateRef.current !== 'calling' || from !== remoteIdRef.current) return;
       await startAsCaller();
     };
 
     const onReject = ({ from, reason }) => {
-      if (from !== remoteId) return;
+      if (from !== remoteIdRef.current) return;
       toast.info(reason === 'busy' ? 'İstifadəçi məşğuldur.' : 'Zəng rədd edildi.');
       cleanup();
     };
 
     const onUnavailable = ({ to }) => {
-      if (to !== remoteId) return;
+      if (to !== remoteIdRef.current) return;
       toast.warn('İstifadəçi oflayndır.');
       cleanup();
     };
 
     const onOffer = async ({ from, sdp, type }) => {
-      if (from !== remoteId) return;
-      // Yalnız callee onOffer alır
-      await startAsCallee(sdp, type, kind, from);
+      if (from !== remoteIdRef.current) return;
+      await startAsCallee(sdp, type, kindRef.current, from);
     };
 
     const onAnswer = async ({ from, sdp, type }) => {
-      if (from !== remoteId || !pcRef.current) return;
+      if (from !== remoteIdRef.current || !pcRef.current) return;
       try {
         await pcRef.current.setRemoteDescription({ type: type || 'answer', sdp });
         for (const c of pendingIceRef.current) {
@@ -184,7 +228,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     };
 
     const onIce = async ({ from, candidate }) => {
-      if (from !== remoteId) return;
+      if (from !== remoteIdRef.current) return;
       if (pcRef.current && pcRef.current.remoteDescription) {
         try { await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate)); } catch {}
       } else {
@@ -193,7 +237,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     };
 
     const onEnd = ({ from }) => {
-      if (from !== remoteId) return;
+      if (from !== remoteIdRef.current) return;
       toast.info('Qarşı tərəf zəngi bitirdi.');
       cleanup();
     };
@@ -217,30 +261,22 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       socket.off('call:ice', onIce);
       socket.off('call:end', onEnd);
     };
-  }, [socket, state, remoteId, kind, partnerName, partnerId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [socket]);
 
-  const accept = () => {
-    socket.emit('call:accept', { to: remoteId });
-    // setState stays 'ringing' till offer comes; UI shows "connecting"
-  };
-  const reject = () => {
-    socket.emit('call:reject', { to: remoteId });
-    cleanup();
-  };
-  const hangup = () => {
-    if (remoteId) socket.emit('call:end', { to: remoteId });
-    cleanup();
-  };
+  const accept = () => socket.emit('call:accept', { to: remoteId });
+  const reject = () => { socket.emit('call:reject', { to: remoteId }); cleanup(); };
+  const hangup = () => { if (remoteId) socket.emit('call:end', { to: remoteId }); cleanup(); };
   const toggleMute = () => {
-    if (!localStreamRef.current) return;
+    if (!localStream) return;
     const next = !muted;
-    localStreamRef.current.getAudioTracks().forEach((t) => (t.enabled = !next));
+    localStream.getAudioTracks().forEach((t) => (t.enabled = !next));
     setMuted(next);
   };
   const toggleCam = () => {
-    if (!localStreamRef.current) return;
+    if (!localStream) return;
     const next = !camOff;
-    localStreamRef.current.getVideoTracks().forEach((t) => (t.enabled = !next));
+    localStream.getVideoTracks().forEach((t) => (t.enabled = !next));
     setCamOff(next);
   };
 
@@ -253,19 +289,28 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', zIndex: 3000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-      {/* Remote audio (gizli) */}
-      <audio ref={remoteAudioRef} autoPlay playsInline style={{ display: 'none' }} />
-
-      {/* Görüntülü aktiv */}
-      {isVideo && isActive && (
-        <>
-          <video ref={remoteVideoRef} autoPlay playsInline style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#000' }} />
-          <video ref={localVideoRef} autoPlay playsInline muted style={{ position: 'absolute', top: 20, right: 20, width: 140, height: 100, objectFit: 'cover', borderRadius: 12, border: '2px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', background: '#0f172a', zIndex: 1 }} />
-          <div style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(0,0,0,0.5)', padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700 }}>{remoteName} · {fmtTime(duration)}</div>
-        </>
+      {/* TƏK remote media element — video çağrı üçün <video>, səsli üçün <audio> */}
+      {isVideo ? (
+        <video ref={remoteMediaRef} autoPlay playsInline
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#000', display: isActive ? 'block' : 'none' }} />
+      ) : (
+        <audio ref={remoteMediaRef} autoPlay playsInline style={{ display: 'none' }} />
       )}
 
-      {/* Səsli və ya zəng vəziyyəti */}
+      {/* Local video preview — yalnız görüntülü aktiv zaman */}
+      {isVideo && isActive && (
+        <video ref={localVideoRef} autoPlay playsInline muted
+          style={{ position: 'absolute', top: 20, right: 20, width: 140, height: 100, objectFit: 'cover', borderRadius: 12, border: '2px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', background: '#0f172a', zIndex: 1 }} />
+      )}
+
+      {/* Üst informasiya overlay (video çağrı aktivdə) */}
+      {isVideo && isActive && (
+        <div style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(0,0,0,0.55)', padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, zIndex: 2 }}>
+          {remoteName} · {fmtTime(duration)}
+        </div>
+      )}
+
+      {/* Səsli zəng / yığma / cavab gözləmə UI */}
       {(!isVideo || !isActive) && (
         <div style={{ textAlign: 'center', padding: 24 }}>
           <div style={{ width: 130, height: 130, borderRadius: '50%', background: 'rgba(255,255,255,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 24px', animation: isCalling || isRinging ? 'callPulse 1.6s infinite' : 'none' }}>
