@@ -370,6 +370,52 @@ function ServiceDetail() {
               </div>
             )}
           </div>
+
+          {/* Real-time xidmət statistikası kartı */}
+          {service.stats && (() => {
+            const s = service.stats;
+            const fmtAgo = (d) => {
+              if (!d) return '—';
+              const diff = (Date.now() - new Date(d).getTime()) / 60000;
+              if (diff < 1) return 'İndi';
+              if (diff < 60) return `${Math.floor(diff)} dəq əvvəl`;
+              if (diff < 60 * 24) return `${Math.floor(diff / 60)} saat əvvəl`;
+              if (diff < 60 * 24 * 30) return `${Math.floor(diff / 60 / 24)} gün əvvəl`;
+              return new Date(d).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short', year: 'numeric' });
+            };
+            const fmtResp = (m) => {
+              if (m === null || m === undefined) return 'Məlumat yoxdur';
+              if (m < 60) return `~${m} dəq`;
+              const h = Math.round(m / 60);
+              if (h < 24) return `~${h} saat`;
+              return `~${Math.round(h / 24)} gün`;
+            };
+            const rows = [
+              { label: 'İlan tarixi', val: fmtAgo(service.createdAt), icon: Clock },
+              { label: 'Cəmi sifariş', val: s.ordersTotal },
+              { label: 'Tamamlanmış', val: s.ordersCompleted },
+              { label: 'Ləğv edilmiş', val: s.ordersCanceled },
+              { label: 'Son baxış', val: `${service.views || 0} dəfə` },
+              { label: 'Ort. cavab müddəti', val: fmtResp(s.authorResponseMinutes) },
+              { label: 'Son aktivlik', val: fmtAgo(s.authorLastActive) },
+              { label: 'Son təslim', val: fmtAgo(s.lastDeliveredAt) },
+            ];
+            return (
+              <div style={{ marginTop: 14, background: 'var(--bg-surface)', borderRadius: 16, border: '1px solid var(--border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
+                <div style={{ padding: '14px 20px', background: 'var(--bg-page)', borderBottom: '1px solid var(--border)', fontWeight: 800, fontSize: 14, color: 'var(--text-primary)' }}>
+                  Statistika
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column' }}>
+                  {rows.map((r, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderTop: i === 0 ? 'none' : '1px solid var(--border-soft)', fontSize: 13 }}>
+                      <span style={{ color: 'var(--text-tertiary)' }}>{r.label}</span>
+                      <strong style={{ color: 'var(--text-primary)', textAlign: 'right' }}>{r.val}</strong>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
 

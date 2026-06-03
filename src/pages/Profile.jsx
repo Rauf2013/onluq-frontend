@@ -244,7 +244,8 @@ function Profile() {
   };
 
   const formatResponseTime = (m) => {
-    if (!m || m <= 0) return 'Tez bir zamanda';
+    if (m === null || m === undefined) return 'Hələ məlumat yoxdur';
+    if (m <= 0) return 'Dərhal cavab verir';
     if (m < 60) return `Ortalama ${m} dəq. ərzində cavab verir`;
     const h = Math.round(m / 60);
     if (h < 24) return `Ortalama ${h} saat ərzində cavab verir`;
