@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Star, Clock, User, MessageSquare, ShoppingCart, Image as ImageIcon, ChevronRight, ChevronLeft, RefreshCw, Check, ChevronDown, ChevronUp, Award, Reply, Trash2, X as XIcon } from 'lucide-react';
+import { Star, Clock, User, MessageSquare, ShoppingCart, Image as ImageIcon, ChevronRight, ChevronLeft, RefreshCw, Check, ChevronDown, ChevronUp, Award, Reply, Trash2, X as XIcon, Calendar, ShoppingBag, CheckCircle, XCircle, Eye, Activity, Package, BarChart3 } from 'lucide-react';
 import { PACKAGE_TIERS, levelColor } from '../constants/seller';
 
 function ServiceDetail() {
@@ -391,27 +391,37 @@ function ServiceDetail() {
               return `~${Math.round(h / 24)} gün`;
             };
             const rows = [
-              { label: 'İlan tarixi', val: fmtAgo(service.createdAt), icon: Clock },
-              { label: 'Cəmi sifariş', val: s.ordersTotal },
-              { label: 'Tamamlanmış', val: s.ordersCompleted },
-              { label: 'Ləğv edilmiş', val: s.ordersCanceled },
-              { label: 'Son baxış', val: `${service.views || 0} dəfə` },
-              { label: 'Ort. cavab müddəti', val: fmtResp(s.authorResponseMinutes) },
-              { label: 'Son aktivlik', val: fmtAgo(s.authorLastActive) },
-              { label: 'Son təslim', val: fmtAgo(s.lastDeliveredAt) },
+              { label: 'İlan tarixi',         val: fmtAgo(service.createdAt),               icon: Calendar,    color: '#6366f1' },
+              { label: 'Cəmi sifariş',        val: s.ordersTotal,                           icon: ShoppingBag, color: '#f59e0b' },
+              { label: 'Tamamlanmış',         val: s.ordersCompleted,                       icon: CheckCircle, color: '#10b981' },
+              { label: 'Ləğv edilmiş',        val: s.ordersCanceled,                        icon: XCircle,     color: '#ef4444' },
+              { label: 'Son baxış',           val: `${service.views || 0} dəfə`,            icon: Eye,         color: '#8b5cf6' },
+              { label: 'Ort. cavab müddəti',  val: fmtResp(s.authorResponseMinutes),        icon: Clock,       color: '#06b6d4' },
+              { label: 'Son aktivlik',        val: fmtAgo(s.authorLastActive),              icon: Activity,    color: '#10b981' },
+              { label: 'Son təslim',          val: fmtAgo(s.lastDeliveredAt),               icon: Package,     color: '#3b82f6' },
             ];
             return (
               <div style={{ marginTop: 14, background: 'var(--bg-surface)', borderRadius: 16, border: '1px solid var(--border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                <div style={{ padding: '14px 20px', background: 'var(--bg-page)', borderBottom: '1px solid var(--border)', fontWeight: 800, fontSize: 14, color: 'var(--text-primary)' }}>
-                  Statistika
+                <div style={{ padding: '14px 20px', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, fontSize: 14 }}>
+                  <BarChart3 size={16} /> Statistika
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
-                  {rows.map((r, i) => (
-                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 20px', borderTop: i === 0 ? 'none' : '1px solid var(--border-soft)', fontSize: 13 }}>
-                      <span style={{ color: 'var(--text-tertiary)' }}>{r.label}</span>
-                      <strong style={{ color: 'var(--text-primary)', textAlign: 'right' }}>{r.val}</strong>
-                    </div>
-                  ))}
+                  {rows.map((r, i) => {
+                    const Icon = r.icon;
+                    return (
+                      <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '12px 18px', borderTop: i === 0 ? 'none' : '1px solid var(--border-soft)', fontSize: 13, transition: 'background 0.15s' }}
+                        onMouseOver={(e) => e.currentTarget.style.background = 'var(--bg-page)'}
+                        onMouseOut={(e) => e.currentTarget.style.background = 'transparent'}>
+                        <span style={{ color: 'var(--text-tertiary)', display: 'inline-flex', alignItems: 'center', gap: 9 }}>
+                          <span style={{ width: 28, height: 28, borderRadius: 8, background: `${r.color}15`, color: r.color, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <Icon size={14} />
+                          </span>
+                          {r.label}
+                        </span>
+                        <strong style={{ color: 'var(--text-primary)', textAlign: 'right', fontSize: 13 }}>{r.val}</strong>
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
