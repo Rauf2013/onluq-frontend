@@ -123,7 +123,14 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       }
     };
 
-    const constraints = { audio: true, video: peerKind === 'video' };
+    const constraints = {
+      audio: {
+        echoCancellation: true,
+        noiseSuppression: true,
+        autoGainControl: true,
+      },
+      video: peerKind === 'video' ? { width: { ideal: 640 }, height: { ideal: 480 } } : false,
+    };
     let stream;
     try {
       stream = await navigator.mediaDevices.getUserMedia(constraints);
