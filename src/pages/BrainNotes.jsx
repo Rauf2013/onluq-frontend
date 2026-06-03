@@ -5,6 +5,7 @@ import { toast } from 'react-toastify';
 import { Brain, Search, Plus, ThumbsUp, Eye, Tag, User, Award, Lock, Send, X as XIcon, Bot, AlertTriangle, Trash2 } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
 import { levelColor } from '../constants/seller';
+import BetaInfo from '../components/BetaInfo';
 
 function BrainNotes() {
   const navigate = useNavigate();
@@ -202,7 +203,8 @@ function BrainNotes() {
         <div onClick={() => setAiOpen(false)} className="ai-modal-overlay" style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(2px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
           <div onClick={(e) => e.stopPropagation()} className="ai-modal" style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: 'min(85vh, 720px)', borderRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
             {/* Başlıq */}
-            <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div style={{ position: 'relative', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px 16px 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <BetaInfo variant={isGuest ? 'guest' : 'full'} />
               <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                 <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
                 <div>

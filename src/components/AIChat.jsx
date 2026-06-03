@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { Link } from 'react-router-dom';
 import { Bot, Send, X as XIcon, AlertTriangle, Trash2 } from 'lucide-react';
+import BetaInfo from './BetaInfo';
 
 // Hər yerdən aça bilən AI chat widget'i
 function AIChat({ open, onClose }) {
@@ -59,7 +60,8 @@ function AIChat({ open, onClose }) {
         style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: 'min(85vh, 720px)', borderRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
 
         {/* Başlıq */}
-        <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <div style={{ position: 'relative', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px 16px 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <BetaInfo variant={isGuest ? 'guest' : 'full'} />
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
             <div>
@@ -123,6 +125,13 @@ function AIChat({ open, onClose }) {
           )}
           <div ref={bottomRef} style={{ height: 1 }} />
         </div>
+
+        {/* Qonaq qeydi */}
+        {isGuest && (
+          <div style={{ padding: '8px 14px', background: 'rgba(251,191,36,0.08)', borderTop: '1px solid rgba(251,191,36,0.25)', fontSize: 11.5, color: 'var(--text-tertiary)', textAlign: 'center', lineHeight: 1.5 }}>
+            Qeydiyyatdan keçmədiyin üçün AI funksiyaları tam deyil. <Link to="/qeydiyyat" style={{ color: '#6366f1', fontWeight: 700, textDecoration: 'none' }}>Qeydiyyatdan keç →</Link>
+          </div>
+        )}
 
         {/* Input */}
         <div style={{ padding: 14, borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
