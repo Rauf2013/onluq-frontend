@@ -122,7 +122,7 @@ function Home() {
             const IconComponent = category.icon;
             const isMainActive = activeCategory === category.name || category.subcategories.includes(activeCategory);
             
-            const alignRight = index >= 4;
+            const alignRight = index >= 3;
 
             return (
               <div
