@@ -37,18 +37,17 @@ function BetaInfo({ variant = 'full' }) {
   );
 
   return (
-    <div ref={ref} style={{ position: 'absolute', top: 14, left: 14, zIndex: 10 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-        <span style={{ background: '#fbbf24', color: 'white', padding: '3px 8px', borderRadius: 4, fontSize: 10, fontWeight: 900, transform: 'rotate(-8deg)', letterSpacing: 0.6, boxShadow: '0 2px 4px rgba(0,0,0,0.25)', display: 'inline-block' }}>BETA</span>
+    <div ref={ref} style={{ position: 'absolute', top: 18, left: 18, zIndex: 3500 }}>
+      <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, background: '#fbbf24', padding: '4px 8px 4px 9px', borderRadius: 6, boxShadow: '0 3px 8px rgba(0,0,0,0.25)' }}>
+        <span style={{ color: 'white', fontSize: 11, fontWeight: 900, letterSpacing: 0.6 }}>BETA</span>
+        <span style={{ color: 'rgba(255,255,255,0.7)', fontSize: 12, margin: '0 2px' }}>—</span>
         <button onClick={() => setOpen((v) => !v)} title="Beta haqqında" aria-label="Beta haqqında"
-          style={{ background: 'rgba(255,255,255,0.22)', border: 'none', borderRadius: '50%', width: 22, height: 22, color: 'white', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}
-          onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.4)'}
-          onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.22)'}>
-          <HelpCircle size={14} />
+          style={{ background: 'transparent', border: 'none', color: 'white', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
+          <HelpCircle size={15} />
         </button>
       </div>
       {open && (
-        <div style={{ position: 'absolute', top: 34, left: 0, background: 'white', color: '#334155', padding: 14, borderRadius: 10, width: 290, boxShadow: '0 10px 24px rgba(0,0,0,0.25)', fontSize: 12.5, lineHeight: 1.55, maxHeight: 260, overflowY: 'auto' }}>
+        <div style={{ position: 'absolute', top: 38, left: 0, background: 'white', color: '#334155', padding: 14, borderRadius: 10, width: 290, boxShadow: '0 10px 24px rgba(0,0,0,0.25)', fontSize: 12.5, lineHeight: 1.55, maxHeight: 260, overflowY: 'auto', border: '1px solid #e2e8f0' }}>
           {variant === 'guest' ? guestText : fullText}
         </div>
       )}

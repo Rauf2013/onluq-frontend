@@ -56,12 +56,15 @@ function AIChat({ open, onClose }) {
   return (
     <div onClick={onClose} className="ai-modal-overlay"
       style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.55)', backdropFilter: 'blur(2px)', zIndex: 2000, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 20 }}>
+      {/* Beta info — modal-dan kənar, viewport-un sol üstündə */}
+      <div onClick={(e) => e.stopPropagation()}>
+        <BetaInfo variant={isGuest ? 'guest' : 'full'} />
+      </div>
       <div onClick={(e) => e.stopPropagation()} className="ai-modal"
         style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: 'min(85vh, 720px)', borderRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
 
         {/* Başlıq */}
-        <div style={{ position: 'relative', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px 16px 80px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <BetaInfo variant={isGuest ? 'guest' : 'full'} />
+        <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
             <div>
