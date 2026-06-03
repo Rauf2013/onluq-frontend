@@ -402,7 +402,7 @@ function ServiceDetail() {
             ];
             return (
               <div style={{ marginTop: 14, background: 'var(--bg-surface)', borderRadius: 16, border: '1px solid var(--border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                <div style={{ padding: '14px 20px', background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, fontSize: 14 }}>
+                <div style={{ padding: '14px 20px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, fontSize: 14 }}>
                   <BarChart3 size={16} /> Statistika
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
