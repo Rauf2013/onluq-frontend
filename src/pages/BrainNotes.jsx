@@ -105,9 +105,10 @@ function BrainNotes() {
           </span>
           <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
             <button onClick={() => setAiOpen(true)}
-              style={{ background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 16px', borderRadius: 10, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, transition: '0.2s' }}
+              style={{ position: 'relative', background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 16px', borderRadius: 10, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, transition: '0.2s' }}
               onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.26)'}
               onMouseOut={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.16)'}>
+              <span style={{ position: 'absolute', top: -6, left: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(-35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.25)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
               <Bot size={16} /> AI-dan soruş {isGuest && <span style={{ opacity: 0.75, fontSize: 11 }}>(20/gün)</span>}
             </button>
             {isGuest ? (
