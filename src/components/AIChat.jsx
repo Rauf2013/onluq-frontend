@@ -37,7 +37,8 @@ function AIChat({ open, onClose, model = 'mid' }) {
         headers,
         body: JSON.stringify({ question: userMsg, history, model }),
       });
-      const d = await r.json();
+      let d = {};
+      try { d = await r.json(); } catch {}
       if (r.ok) {
         setThread((t) => [...t, { role: 'ai', content: d.answer }]);
         setRemaining(d.remaining);
@@ -45,12 +46,24 @@ function AIChat({ open, onClose, model = 'mid' }) {
         setIsGuest(!!d.guest);
         if (d.modelLabel) setModelLabel(d.modelLabel);
       } else {
-        setThread((t) => [...t, { role: 'ai', content: d.message || 'Xəta baş verdi', error: true }]);
+        const msg = d.message || `Server xətası (HTTP ${r.status})`;
+        setThread((t) => [...t, { role: 'ai', content: msg, error: true, retry: userMsg }]);
       }
-    } catch {
-      setThread((t) => [...t, { role: 'ai', content: 'Bağlantı xətası', error: true }]);
+    } catch (e) {
+      const detail = (e && e.message) ? ` (${e.message})` : '';
+      setThread((t) => [...t, {
+        role: 'ai',
+        content: `Bağlantı xətası${detail}. Yoxla: internet var? Server (${API_URL}) əlçatandır?`,
+        error: true,
+        retry: userMsg,
+      }]);
     }
     setLoading(false);
+  };
+
+  const retry = (text) => {
+    setQ(text);
+    setTimeout(() => ask(), 50);
   };
 
   if (!open) return null;

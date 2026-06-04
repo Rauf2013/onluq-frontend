@@ -45,9 +45,9 @@ jobs:
 
       - name: Build web (production)
         run: npm run build
-        env:
-          VITE_API_URL: ${{ vars.VITE_API_URL || 'https://api.tars.az' }}
-          VITE_GOOGLE_CLIENT_ID: ${{ vars.VITE_GOOGLE_CLIENT_ID }}
+        # NOT: VITE_* dəyişənlər .env.production-dan oxunur. Burada override etmirik
+        # cünki bos vars onlari sifirlayardi. Override lazımdırsa repo Variables/Secrets-da
+        # VITE_API_URL_OVERRIDE qoy və burada istifade et.
 
       - name: Capacitor sync (android)
         run: npx cap sync android

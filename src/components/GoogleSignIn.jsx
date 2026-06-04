@@ -2,12 +2,25 @@ import React, { useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { isNative } from '../native/capacitor';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 function GoogleSignIn({ rememberMe = true, onSuccess }) {
   const btnRef = useRef(null);
   const navigate = useNavigate();
+
+  // Native (Capacitor) — Google web SDK WebView'da redirect URI sebebiyle calismaz.
+  // Native Google Sign-In plugin Play Store sonrasi keystore SHA-1 ile baglanacak.
+  // Su an email/sifre ile devam etmesi yeterli.
+  if (isNative) {
+    return (
+      <div style={{ padding: 14, background: 'var(--bg-muted)', border: '1px solid var(--border-soft)', borderRadius: 12, color: 'var(--text-tertiary)', fontSize: 13, textAlign: 'center', lineHeight: 1.5 }}>
+        Google ilə giriş <strong>mobil tətbiqdə tezliklə</strong> aktiv olacaq.
+        Hələlik email və şifrə ilə daxil olun.
+      </div>
+    );
+  }
 
   useEffect(() => {
     if (!CLIENT_ID) return;

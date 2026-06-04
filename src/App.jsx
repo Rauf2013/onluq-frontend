@@ -8,6 +8,8 @@ import { attachBackButton, isNative } from './native/capacitor';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import MobileNav from './components/MobileNav';
+import MobileHeader from './components/MobileHeader';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Register from './pages/Register';
@@ -115,8 +117,8 @@ function App() {
     <ThemeProvider>
     <Router>
       <NativeBridge />
-      <Navbar />
-      <ToastContainer position="top-center" autoClose={1500} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover transition={Slide} />
+      {isNative ? <MobileHeader /> : <Navbar />}
+      <ToastContainer position={isNative ? "bottom-center" : "top-center"} autoClose={1500} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover transition={Slide} />
 
       <AnimatedRoutes>
       <Routes>
@@ -145,7 +147,7 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       </AnimatedRoutes>
-      <Footer />
+      {isNative ? <MobileNav /> : <Footer />}
     </Router>
     </ThemeProvider>
   );
