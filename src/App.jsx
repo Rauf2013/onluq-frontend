@@ -65,7 +65,7 @@ function NativeBridge() {
 function AnimatedRoutes({ children }) {
   const location = useLocation();
   return (
-    <div key={location.pathname} className="native-page" style={{ minHeight: '100vh' }}>
+    <div key={location.pathname} className="native-page app-shell">
       {children}
     </div>
   );
