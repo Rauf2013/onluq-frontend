@@ -109,9 +109,9 @@ function Home() {
     <div style={{ width: '100%', background: 'var(--bg-page)', minHeight: '100vh' }}>
       
       {/* ========================================== */}
-      {/* MEGA MENÜ: ÇARPIŞMA (COLLISION) SORUNU ÇÖZÜLDÜ */}
+      {/* MEGA MENÜ — desktop only (native'de gizli, alt tab "Kateqoriya" var) */}
       {/* ========================================== */}
-      <div style={{ display: 'flex', justifyContent: 'center', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', position: 'relative', zIndex: 100, padding: '10px 5%' }}>
+      <div className="home-mega-menu" style={{ display: 'flex', justifyContent: 'center', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', position: 'relative', zIndex: 100, padding: '10px 5%' }}>
         <div style={{ display: 'flex', gap: '20px', maxWidth: '1200px', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
           
           <div onClick={() => setActiveCategory('Bütün Xidmətlər')} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 15px', cursor: 'pointer', background: activeCategory === 'Bütün Xidmətlər' ? '#f0fdf4' : 'transparent', color: activeCategory === 'Bütün Xidmətlər' ? '#10b981' : 'var(--text-secondary)', fontWeight: 'bold', borderRadius: '8px', transition: '0.2s' }}>
@@ -213,10 +213,10 @@ function Home() {
               <p style={{ color: 'var(--text-muted)', fontSize: '20px', marginBottom: '40px', lineHeight: '1.6' }}>
                 Onluq ilə minlərlə frilanser arasından sənə ən uyğun olanı tap, işini sürətli və güvənlə həll et.
               </p>
-              <div style={{ display: 'flex', background: 'var(--bg-surface)', padding: '8px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
+              <div className="hero-search-bar" style={{ display: 'flex', background: 'var(--bg-surface)', padding: '8px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                 <Search size={24} color="var(--text-muted)" style={{ margin: 'auto 15px' }} />
-                <input type="text" placeholder="Nəyə ehtiyacınız var? (Məs: Loqo, Veb sayt...)" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ flex: 1, border: 'none', fontSize: '18px', outline: 'none' }} />
-                <button onClick={() => document.getElementById('services-section').scrollIntoView({ behavior: 'smooth' })} style={{ background: '#10b981', color: 'white', border: 'none', padding: '15px 30px', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s' }}>Axtar</button>
+                <input type="text" placeholder="Nəyə ehtiyacınız var? (Məs: Loqo, Veb sayt...)" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ flex: 1, border: 'none', fontSize: '18px', outline: 'none', minWidth: 0, background: 'transparent' }} />
+                <button onClick={() => document.getElementById('services-section').scrollIntoView({ behavior: 'smooth' })} style={{ background: '#10b981', color: 'white', border: 'none', padding: '15px 30px', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s', flexShrink: 0 }}>Axtar</button>
               </div>
             </div>
           </div>
