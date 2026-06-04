@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Heart, Star, ImageIcon, User, Search, Clock, Award } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
 import { levelColor } from '../constants/seller';
 
 function Categories() {
+  const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -48,6 +49,12 @@ function Categories() {
 
   const toggleFavorite = (e, serviceId) => {
     e.preventDefault();
+    e.stopPropagation();
+    if (!currentUser) {
+      toast.warning('Sevimlilərə əlavə etmək üçün əvvəlcə giriş etməlisiniz!', { autoClose: 1500 });
+      setTimeout(() => navigate('/giris'), 600);
+      return;
+    }
     const isFav = favorites.includes(serviceId);
     if (isFav) {
       setFavorites(favorites.filter(id => id !== serviceId));

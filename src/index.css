@@ -17,11 +17,7 @@ html, body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overscroll-behavior-y: contain; /* alt cubuk esnemesin, bounce yok ama scroll ok */
 }
-
-html { height: 100%; }
-body { min-height: 100%; }
 
 body {
   user-select: none;
@@ -100,16 +96,27 @@ body.keyboard-open .app-shell { padding-bottom: 0 !important; }
   border: 2px solid var(--bg-surface);
 }
 
-/* ===== Mobile Bottom Tab Bar (native) ===== */
+/* ===== Mobile Bottom Tab Bar (native) =====
+   position: fixed + translateZ(0) — kendi compositing katmaninda kalir,
+   scroll esnasinda repaint olmaz, esneme/titreme yok. */
 .mobile-tab-bar {
   position: fixed; bottom: 0; left: 0; right: 0;
   height: calc(64px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
-  display: grid; /* grid-template-columns inline'da dinamik (tab sayisina gore) */
+  display: grid;
   background: var(--bg-surface);
   border-top: 1px solid var(--border-soft);
   z-index: 1000;
   box-shadow: 0 -1px 4px rgba(0,0,0,0.05);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+  backface-visibility: hidden;
+}
+.mobile-top-header {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
 }
 .mobile-tab {
   display: flex; flex-direction: column; align-items: center; justify-content: center;

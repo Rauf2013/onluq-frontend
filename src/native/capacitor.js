@@ -107,13 +107,14 @@ export const hapticError   = () => isNative && safe(() => Haptics.notification({
 export const hapticSelect  = () => isNative && safe(() => Haptics.selectionStart().then(() => Haptics.selectionEnd()));
 
 // Google native sign-in — returns ID token (backend /api/auth/google bunu kabul ediyor)
+// NOT: scopes verilmez — plugin default olarak email + profile + openid ekler,
+// custom scopes verilse MainActivity interface implementation gerekir.
 export async function nativeGoogleSignIn() {
   if (!isNative) throw new Error('Native deyil');
   const res = await SocialLogin.login({
     provider: 'google',
-    options: { scopes: ['email', 'profile'] },
+    options: {},
   });
-  // res.result icinde idToken, accessToken, profile var
   const idToken = res?.result?.idToken;
   if (!idToken) throw new Error('Google ID token alinmadi');
   return { idToken, profile: res?.result?.profile };
