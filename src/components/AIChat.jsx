@@ -5,13 +5,14 @@ import { Bot, Send, X as XIcon, AlertTriangle, Trash2 } from 'lucide-react';
 import BetaInfo from './BetaInfo';
 
 // Hər yerdən aça bilən AI chat widget'i
-function AIChat({ open, onClose }) {
+function AIChat({ open, onClose, model = 'mid' }) {
   const [q, setQ] = useState('');
   const [thread, setThread] = useState([]);
   const [loading, setLoading] = useState(false);
   const [remaining, setRemaining] = useState(null);
   const [dailyLimit, setDailyLimit] = useState(null);
   const [isGuest, setIsGuest] = useState(false);
+  const [modelLabel, setModelLabel] = useState('');
   const bottomRef = useRef(null);
 
   useEffect(() => {
@@ -34,7 +35,7 @@ function AIChat({ open, onClose }) {
       const r = await fetch(`${API_URL}/api/ai/ask`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ question: userMsg, history }),
+        body: JSON.stringify({ question: userMsg, history, model }),
       });
       const d = await r.json();
       if (r.ok) {
@@ -42,6 +43,7 @@ function AIChat({ open, onClose }) {
         setRemaining(d.remaining);
         setDailyLimit(d.dailyLimit);
         setIsGuest(!!d.guest);
+        if (d.modelLabel) setModelLabel(d.modelLabel);
       } else {
         setThread((t) => [...t, { role: 'ai', content: d.message || 'Xəta baş verdi', error: true }]);
       }
@@ -69,7 +71,9 @@ function AIChat({ open, onClose }) {
             <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
             <div>
               <strong style={{ fontSize: 16 }}>Onluq AI Köməkçi</strong>
-              <div style={{ fontSize: 11, opacity: 0.85 }}>{isGuest ? 'Qonaq rejimi — limitli' : 'Səninlə söhbət edir'}</div>
+              <div style={{ fontSize: 11, opacity: 0.85 }}>
+                {isGuest ? 'Qonaq rejimi — Sadə model' : (modelLabel ? `Model: ${modelLabel}` : 'Səninlə söhbət edir')}
+              </div>
             </div>
           </div>
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>

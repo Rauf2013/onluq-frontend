@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ShieldCheck, CheckCircle, XCircle, Users, Briefcase, ShoppingBag, Wallet, TrendingUp, Search, UserPlus, UserMinus, Trash2, Star, BarChart3, Power, Lock } from 'lucide-react';
+import { ShieldCheck, CheckCircle, XCircle, Users, Briefcase, ShoppingBag, Wallet, TrendingUp, Search, UserPlus, UserMinus, Trash2, Star, BarChart3, Power, Lock, AlertTriangle } from 'lucide-react';
 
 const BASE_TABS = [
   { id: 'overview', label: 'Xülasə', icon: BarChart3 },
@@ -251,7 +251,15 @@ function AdminPanel() {
                           <span style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--bg-muted)', overflow: 'hidden', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 12, fontWeight: 700 }}>
                             {u.avatar ? <img src={u.avatar} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /> : (u.fullName || '?').slice(0, 1).toUpperCase()}
                           </span>
-                          <strong style={{ fontSize: 14 }}>{u.fullName}{isMe && <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 12 }}> (sən)</span>}</strong>
+                          <strong style={{ fontSize: 14, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                            {u.fullName}
+                            {isMe && <span style={{ color: 'var(--text-muted)', fontWeight: 400, fontSize: 12 }}>(sən)</span>}
+                            {u.suspicious && (
+                              <span title={u.suspicionReason || 'Şübhəli hesab'} style={{ background: '#fef3c7', color: '#b45309', fontSize: 10, fontWeight: 800, padding: '2px 6px', borderRadius: 4, border: '1px solid #fde68a', display: 'inline-flex', alignItems: 'center', gap: 3 }}>
+                                <AlertTriangle size={10} /> ŞÜBHƏLİ
+                              </span>
+                            )}
+                          </strong>
                         </Link>
                       </td>
                       <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-tertiary)' }}>{u.email}</td>

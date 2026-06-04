@@ -23,8 +23,20 @@ function BrainNotes() {
   const [aiLoading, setAiLoading] = useState(false);
   const [aiRemaining, setAiRemaining] = useState(null);
   const aiBottomRef = useRef(null);
+  const [aiModels, setAiModels] = useState([]);
+  const [selectedModel, setSelectedModel] = useState(localStorage.getItem('aiModel') || 'mid');
 
   const isGuest = !(localStorage.getItem('token') || sessionStorage.getItem('token'));
+
+  useEffect(() => {
+    fetch(`${API_URL}/api/ai/models`).then(r => r.json()).then(d => {
+      if (d.models) setAiModels(d.models);
+    }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem('aiModel', selectedModel);
+  }, [selectedModel]);
 
   // Yeni mesaj əlavə olunanda və ya AI cavab gözlədikdə avtomatik aşağı kaydır
   useEffect(() => {
@@ -71,7 +83,7 @@ function BrainNotes() {
       const r = await fetch(`${API_URL}/api/ai/ask`, {
         method: 'POST',
         headers,
-        body: JSON.stringify({ question: userMsg, category: category || undefined, history: historyForApi }),
+        body: JSON.stringify({ question: userMsg, category: category || undefined, history: historyForApi, model: selectedModel }),
       });
       const d = await r.json();
       if (r.ok) {
@@ -103,7 +115,18 @@ function BrainNotes() {
           <span style={{ fontSize: 13, opacity: 0.9 }}>
             {isGuest ? 'Qonaq rejimi — limitli funksiya' : <>Sənin səviyyən: <strong>{myLevel}</strong></>}
           </span>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
+            {!isGuest && aiModels.length > 0 && (
+              <select value={selectedModel} onChange={(e) => setSelectedModel(e.target.value)}
+                title={aiModels.find(m => m.key === selectedModel)?.desc || ''}
+                style={{ background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 12px', borderRadius: 10, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', fontSize: 13, fontWeight: 700, outline: 'none' }}>
+                {aiModels.map((m) => (
+                  <option key={m.key} value={m.key} style={{ color: '#0f172a', background: 'white' }}>
+                    {m.label} ({m.limit}/gün)
+                  </option>
+                ))}
+              </select>
+            )}
             <button onClick={() => setAiOpen(true)}
               style={{ position: 'relative', background: 'rgba(255,255,255,0.16)', color: 'white', padding: '10px 16px', borderRadius: 10, fontWeight: 700, border: '1px solid rgba(255,255,255,0.3)', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 14, transition: '0.2s' }}
               onMouseOver={(e) => e.currentTarget.style.background = 'rgba(255,255,255,0.26)'}
