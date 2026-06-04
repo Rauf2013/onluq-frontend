@@ -17,6 +17,7 @@ html, body {
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overscroll-behavior-y: contain; /* alt cubuk esnemesin, bounce yok ama scroll ok */
 }
 
 html { height: 100%; }
@@ -121,6 +122,16 @@ body.keyboard-open .app-shell { padding-bottom: 0 !important; }
 .mobile-tab:active { transform: scale(0.95); }
 .mobile-tab span { letter-spacing: -0.2px; }
 body.keyboard-open .mobile-tab-bar { display: none; }
+
+/* AI tab — biraz vurgu */
+.mobile-tab-ai {
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  color: #6366f1;
+}
+.mobile-tab-ai svg { color: #6366f1; }
+.mobile-tab-ai:active { transform: scale(0.92); }
 
 /* ===== Global mobile responsive fix (her zaman) ===== */
 @media (max-width: 768px) {

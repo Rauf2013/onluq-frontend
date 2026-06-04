@@ -6,6 +6,9 @@ import { Keyboard } from '@capacitor/keyboard';
 import { App as CapApp } from '@capacitor/app';
 import { Network } from '@capacitor/network';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
+import { SocialLogin } from '@capgo/capacitor-social-login';
+
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
 export const isNative = Capacitor.isNativePlatform();
 export const platform = Capacitor.getPlatform();
@@ -17,6 +20,16 @@ export async function initNative() {
 
   document.body.classList.add('native-app');
   document.body.classList.add(`platform-${platform}`);
+
+  // Google native sign-in init
+  if (GOOGLE_CLIENT_ID) {
+    await safe(() => SocialLogin.initialize({
+      google: {
+        webClientId: GOOGLE_CLIENT_ID,
+        mode: 'online',
+      },
+    }));
+  }
 
   await safe(() => StatusBar.setOverlaysWebView({ overlay: false }));
   const dark = document.body.classList.contains('dark-mode');
@@ -92,3 +105,21 @@ export const hapticSuccess = () => isNative && safe(() => Haptics.notification({
 export const hapticWarning = () => isNative && safe(() => Haptics.notification({ type: NotificationType.Warning }));
 export const hapticError   = () => isNative && safe(() => Haptics.notification({ type: NotificationType.Error }));
 export const hapticSelect  = () => isNative && safe(() => Haptics.selectionStart().then(() => Haptics.selectionEnd()));
+
+// Google native sign-in — returns ID token (backend /api/auth/google bunu kabul ediyor)
+export async function nativeGoogleSignIn() {
+  if (!isNative) throw new Error('Native deyil');
+  const res = await SocialLogin.login({
+    provider: 'google',
+    options: { scopes: ['email', 'profile'] },
+  });
+  // res.result icinde idToken, accessToken, profile var
+  const idToken = res?.result?.idToken;
+  if (!idToken) throw new Error('Google ID token alinmadi');
+  return { idToken, profile: res?.result?.profile };
+}
+
+export async function nativeGoogleSignOut() {
+  if (!isNative) return;
+  await safe(() => SocialLogin.logout({ provider: 'google' }));
+}

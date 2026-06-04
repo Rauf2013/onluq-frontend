@@ -24,7 +24,8 @@ function ServiceCard({ id, title, author, price, rating, image, deliveryDays, le
   const handleFavoriteClick = (e) => {
     e.stopPropagation();
     if (!isAuthenticated || !favKey) {
-      toast.warning('Sevimlilərə əlavə etmək üçün əvvəlcə giriş etməlisiniz!', { theme: 'colored' });
+      toast.warning('Sevimlilərə əlavə etmək üçün əvvəlcə giriş etməlisiniz!', { theme: 'colored', autoClose: 1500 });
+      setTimeout(() => navigate('/giris'), 600);
       return;
     }
     let favs = JSON.parse(localStorage.getItem(favKey)) || [];

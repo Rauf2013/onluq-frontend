@@ -10,6 +10,7 @@ import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import MobileNav from './components/MobileNav';
 import MobileHeader from './components/MobileHeader';
+import AIChat from './components/AIChat';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Register from './pages/Register';
@@ -71,6 +72,16 @@ function AnimatedRoutes({ children }) {
       {children}
     </div>
   );
+}
+
+function GlobalAI() {
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    const onOpen = () => setOpen(true);
+    window.addEventListener('open-ai-chat', onOpen);
+    return () => window.removeEventListener('open-ai-chat', onOpen);
+  }, []);
+  return <AIChat open={open} onClose={() => setOpen(false)} model="mid" />;
 }
 
 function App() {
@@ -148,6 +159,7 @@ function App() {
       </Routes>
       </AnimatedRoutes>
       {isNative ? <MobileNav /> : <Footer />}
+      {isNative && <GlobalAI />}
     </Router>
     </ThemeProvider>
   );
