@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Onluq</string>
+    <string name="title_activity_main">Onluq</string>
+    <string name="package_name">az.onluq.app</string>
+    <string name="custom_url_scheme">az.onluq.app</string>
+</resources>

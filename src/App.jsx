@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import { ToastContainer, Slide } from 'react-toastify';
+import { BrowserRouter as Router, Routes, Route, useNavigate, useLocation } from 'react-router-dom';
+import { ToastContainer, Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { API_URL } from './api';
 import { Lock } from 'lucide-react';
+import { attachBackButton, isNative } from './native/capacitor';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -42,6 +43,30 @@ function ClosedScreen() {
           <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 12, color: '#ffffff' }}>Bu site admin tərəfindən bağlandı.</h1>
           <p style={{ fontSize: 15, color: '#cbd5e1', lineHeight: 1.6, margin: 0 }}>Texniki səbəblərə görə sayt müvəqqəti əlçatmazdır. Bir az sonra yenidən cəhd edin.</p>
         </div>
+    </div>
+  );
+}
+
+function NativeBridge() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  useEffect(() => {
+    if (!isNative) return;
+    const detach = attachBackButton(navigate);
+    const hint = () => toast.info('Çıxmaq üçün yenidən geri düyməsinə basın', { autoClose: 1800 });
+    window.addEventListener('app:doubleBackHint', hint);
+    return () => { detach && detach(); window.removeEventListener('app:doubleBackHint', hint); };
+  }, [navigate]);
+  // Sayfa degisince scroll'u en uste al (native his)
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [location.pathname]);
+  return null;
+}
+
+function AnimatedRoutes({ children }) {
+  const location = useLocation();
+  return (
+    <div key={location.pathname} className="native-page" style={{ minHeight: '100vh' }}>
+      {children}
     </div>
   );
 }
@@ -89,9 +114,11 @@ function App() {
   return (
     <ThemeProvider>
     <Router>
+      <NativeBridge />
       <Navbar />
       <ToastContainer position="top-center" autoClose={1500} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover transition={Slide} />
 
+      <AnimatedRoutes>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/kategoriler" element={<Categories />} />
@@ -117,6 +144,7 @@ function App() {
 
         <Route path="*" element={<NotFound />} />
       </Routes>
+      </AnimatedRoutes>
       <Footer />
     </Router>
     </ThemeProvider>
