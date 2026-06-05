@@ -55,6 +55,16 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x android/gradlew
 
+      - name: Apply fixed debug keystore (sabit SHA-1 / Google sign-in)
+        run: |
+          if [ -f android/app/evden-debug.keystore ]; then
+            mkdir -p ~/.android
+            cp android/app/evden-debug.keystore ~/.android/debug.keystore
+            echo "Sabit debug keystore tətbiq edildi (sabit SHA-1)."
+          else
+            echo "Sabit keystore tapılmadı — 'Setup Fixed Debug Keystore' workflow-nu işə sal."
+          fi
+
       - name: Build DEBUG APK
         if: ${{ github.event_name == 'push' || inputs.release != true }}
         working-directory: android
@@ -65,13 +75,11 @@ jobs:
         run: |
           KEYSTORE=$HOME/.android/debug.keystore
           if [ -f "$KEYSTORE" ]; then
-            echo "===== Debug keystore SHA-1 ====="
-            keytool -list -v -keystore "$KEYSTORE" -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -E "SHA1|SHA-1|Sertifikat barmaq izi" || true
-            echo "================================"
-            echo "Package name: az.onluq.app"
-            echo ""
-            echo "NOT: Bu SHA-1 her runda ferqlidir cunku GitHub Actions her seferinde rastgele keystore yaradir."
-            echo "Stabil SHA-1 ucun ANDROID_DEBUG_KEYSTORE_B64 secret-i qoy."
+            echo "## Debug keystore SHA-1 (Google Console)" >> $GITHUB_STEP_SUMMARY
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            keytool -list -v -keystore "$KEYSTORE" -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -Ei "SHA1:|SHA-1:|SHA256:" >> $GITHUB_STEP_SUMMARY || true
+            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "Package: az.onluq.app" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload DEBUG APK
