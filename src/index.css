@@ -246,6 +246,74 @@ body.keyboard-open .mobile-tab-bar { display: none; }
   border-color: rgba(255,255,255,0.7);
 }
 
+/* ----- Dashboard (daxil olmuş istifadəçi) ----- */
+.evden-dash-hero {
+  background: var(--brand);
+  color: #fff;
+  padding: 40px 5% 44px;
+  position: relative;
+}
+.evden-dash-hero::after {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0; height: 5px;
+  background: var(--accent);
+}
+.evden-dash-inner { max-width: 1100px; margin: 0 auto; }
+.evden-dash-hi {
+  color: var(--accent);
+  font-size: 15px; font-weight: 700; margin: 0 0 6px;
+}
+.evden-dash-title {
+  color: #fff; font-size: clamp(22px, 4vw, 32px); font-weight: 900;
+  margin: 0 0 22px; letter-spacing: -0.4px;
+}
+.evden-dash-search {
+  display: flex; align-items: center; gap: 10px;
+  background: var(--bg-surface);
+  border-radius: 14px; padding: 8px 8px 8px 16px;
+  box-shadow: var(--shadow-lg);
+  max-width: 640px;
+}
+.evden-dash-search input {
+  flex: 1; min-width: 0;
+  border: 0; outline: 0; background: transparent;
+  font-size: 16px; color: var(--text-primary);
+}
+.evden-dash-search button {
+  padding: 12px 24px !important; border-radius: 10px !important;
+  font-size: 15px !important; flex-shrink: 0; cursor: pointer;
+}
+.evden-dash-actions {
+  display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px;
+}
+.evden-dash-action {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: rgba(255,255,255,0.12);
+  color: #fff; border: 1px solid rgba(255,255,255,0.18);
+  padding: 9px 16px; border-radius: 12px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: background 0.15s;
+}
+.evden-dash-action:hover { background: rgba(255,255,255,0.22); }
+.evden-dash-action:active { transform: scale(0.97); }
+
+/* Kateqoriya chip'lər */
+.evden-cat-chips {
+  display: flex; gap: 10px; flex-wrap: wrap;
+}
+.evden-cat-chip {
+  display: inline-flex; align-items: center; gap: 7px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 10px 16px; border-radius: 999px;
+  font-size: 14px; font-weight: 600; cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+.evden-cat-chip:hover { border-color: var(--brand); background: var(--brand-soft); }
+.evden-cat-chip:active { transform: scale(0.96); }
+.evden-cat-chip svg { color: var(--brand); }
+
 /* ----- Section base ----- */
 .evden-section {
   padding: 80px 5%;

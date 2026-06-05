@@ -133,12 +133,151 @@ function Home() {
 
   const featured = services.slice(0, 8);
 
+  // Axtarış (yalnız daxil olmuş dashboard üçün)
+  const [search, setSearch] = useState('');
+  const submitSearch = (e) => {
+    e.preventDefault();
+    const q = search.trim();
+    navigate(q ? `/kategoriler?q=${encodeURIComponent(q)}` : '/kategoriler');
+  };
+
+  // ---- Ortaq: xidmət kartları grid'i (hər iki ekranda göstərilir) ----
+  const servicesGrid = (
+    loading ? (
+      <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Yüklənir...</div>
+    ) : featured.length === 0 ? (
+      <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>
+        Hələ elan yoxdur. <Link to="/yeni-xidmet" style={{ color: 'var(--brand)', fontWeight: 700 }}>İlk elan ver →</Link>
+      </div>
+    ) : (
+      <div className="evden-services-grid">
+        {featured.map((s) => {
+          const isFav = favorites.includes(s._id);
+          const startPrice = s.packages?.length ? Math.min(...s.packages.map((p) => p.price)) : s.price;
+          const fastest = s.packages?.length ? Math.min(...s.packages.map((p) => p.deliveryDays)) : s.deliveryDays;
+          const lc = levelColor(s.author?.level || 'Yeni Satıcı');
+          return (
+            <Link key={s._id} to={`/xidmet/${s._id}`} className="evden-service-card">
+              <div className="evden-service-img">
+                {s.images?.[0] ? (
+                  <img src={s.images[0]} alt={s.title} />
+                ) : (
+                  <div className="evden-service-img-fallback"><ImageIcon size={32} /></div>
+                )}
+                {fastest && (
+                  <span className="evden-service-badge">
+                    <Clock size={12} /> {fastest} gün
+                  </span>
+                )}
+                <button
+                  className="evden-service-fav"
+                  onClick={(e) => toggleFavorite(e, s._id)}
+                  aria-label={isFav ? 'Sevimlilərdən çıxar' : 'Sevimlilərə əlavə et'}
+                >
+                  <Heart size={16} fill={isFav ? '#ef4444' : 'none'} color={isFav ? '#ef4444' : 'var(--text-muted)'} />
+                </button>
+              </div>
+              <div className="evden-service-body">
+                <div className="evden-service-author">
+                  <User size={14} />
+                  <span>{s.author?.fullName || 'Anonim'}</span>
+                  {s.author?.level && (
+                    <span style={{ background: lc.bg, color: lc.fg, padding: '1px 7px', borderRadius: 999, fontSize: 10, fontWeight: 700 }}>
+                      <Award size={9} style={{ display: 'inline', marginRight: 2 }} />
+                      {s.author.level}
+                    </span>
+                  )}
+                </div>
+                <h3 className="evden-service-title">{s.title}</h3>
+                <div className="evden-service-footer">
+                  <span className="evden-service-rating"><Star size={14} fill="#FFED00" color="#FFED00" /> {s.rating || '—'}</span>
+                  <span className="evden-service-price"><strong>{startPrice}</strong> AZN</span>
+                </div>
+              </div>
+            </Link>
+          );
+        })}
+      </div>
+    )
+  );
+
+  // ============================================
+  //   DAXİL OLMUŞ İSTİFADƏÇİ — Dashboard
+  // ============================================
+  if (currentUser) {
+    const firstName = (currentUser.fullName || '').split(' ')[0] || 'istifadəçi';
+    return (
+      <div className="evden-page">
+        {/* Salamlama + axtarış */}
+        <section className="evden-dash-hero">
+          <div className="evden-dash-inner">
+            <p className="evden-dash-hi">Xoş gəldin, {firstName} 👋</p>
+            <h1 className="evden-dash-title">Bu gün hansı xidmət lazımdır?</h1>
+            <form className="evden-dash-search" onSubmit={submitSearch}>
+              <Search size={20} color="var(--text-muted)" />
+              <input
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                placeholder="Xidmət axtar (məs: Loqo, Veb sayt...)"
+              />
+              <button type="submit" className="btn-evden-cta">Axtar</button>
+            </form>
+            <div className="evden-dash-actions">
+              <button className="evden-dash-action" onClick={() => navigate('/yeni-xidmet')}>
+                <ClipboardList size={18} /> Elan ver
+              </button>
+              <button className="evden-dash-action" onClick={() => navigate('/sifarislerim')}>
+                <ClipboardCheck size={18} /> Sifarişlərim
+              </button>
+              <button className="evden-dash-action" onClick={() => navigate('/cuzdan')}>
+                <Wallet size={18} /> Cüzdan
+              </button>
+              <button className="evden-dash-action" onClick={() => navigate('/mesajlar')}>
+                <MessageSquare size={18} /> Mesajlar
+              </button>
+            </div>
+          </div>
+        </section>
+
+        {/* Kateqoriyalar chip */}
+        <section className="evden-section" style={{ paddingBottom: 30 }}>
+          <div className="evden-section-inner">
+            <h2 className="evden-section-title" style={{ fontSize: 24 }}>Kateqoriyalar</h2>
+            <div className="evden-cat-chips">
+              {CATEGORY_DATA.map((c) => {
+                const Icon = c.icon;
+                return (
+                  <button key={c.name} className="evden-cat-chip" onClick={() => navigate('/kategoriler')}>
+                    {Icon && <Icon size={16} />}
+                    <span>{c.name}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Xidmətlər feed */}
+        <section className="evden-section evden-section-muted" id="services-section">
+          <div className="evden-section-inner">
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 24 }}>
+              <h2 className="evden-section-title" style={{ fontSize: 24, marginBottom: 0 }}>Son xidmətlər</h2>
+              <Link to="/kategoriler" style={{ color: 'var(--brand)', fontWeight: 700, fontSize: 14, textDecoration: 'none' }}>Hamısını gör →</Link>
+            </div>
+            {servicesGrid}
+          </div>
+        </section>
+      </div>
+    );
+  }
+
+  // ============================================
+  //   QONAQ (giriş yapmamış) — Tanıtım landing (PDF)
+  // ============================================
   return (
     <div className="evden-page">
 
-      {/* ============================================
-            PAGE 1 — HERO
-         ============================================ */}
+      {/* PAGE 1 — HERO */}
       <section className="evden-hero">
         <div className="evden-hero-inner">
           <EvdenLogo size={104} style={{ color: 'var(--accent)' }} />
@@ -148,32 +287,17 @@ function Home() {
             İşini evdən tap, xidmətini evdən sifariş et — hər şey bir tətbiqdə.
           </p>
           <div className="evden-hero-cta">
-            {!currentUser ? (
-              <>
-                <button className="btn-evden-cta evden-hero-btn" onClick={() => navigate('/qeydiyyat')}>
-                  Qeydiyyatdan keç
-                </button>
-                <button className="evden-hero-btn-ghost" onClick={() => navigate('/giris')}>
-                  Daxil ol
-                </button>
-              </>
-            ) : (
-              <>
-                <button className="btn-evden-cta evden-hero-btn" onClick={() => navigate('/kategoriler')}>
-                  Xidmət tap
-                </button>
-                <button className="evden-hero-btn-ghost" onClick={() => navigate('/yeni-xidmet')}>
-                  Elan ver
-                </button>
-              </>
-            )}
+            <button className="btn-evden-cta evden-hero-btn" onClick={() => navigate('/qeydiyyat')}>
+              Qeydiyyatdan keç
+            </button>
+            <button className="evden-hero-btn-ghost" onClick={() => navigate('/giris')}>
+              Daxil ol
+            </button>
           </div>
         </div>
       </section>
 
-      {/* ============================================
-            PAGE 3 — EVDƏN nədir? (4 feature)
-         ============================================ */}
+      {/* PAGE 3 — EVDƏN nədir? (4 feature) */}
       <section className="evden-section">
         <div className="evden-section-inner">
           <h2 className="evden-section-title">EVDƏN nədir?</h2>
@@ -188,9 +312,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ============================================
-            PAGE 4 — Platformanın modulları (8 module)
-         ============================================ */}
+      {/* PAGE 4 — Platformanın modulları (8 module) */}
       <section className="evden-section evden-section-muted">
         <div className="evden-section-inner">
           <h2 className="evden-section-title">Platformanın modulları</h2>
@@ -200,9 +322,7 @@ function Home() {
         </div>
       </section>
 
-      {/* ============================================
-            PAGE 5 — İstifadəçi axını (6 step)
-         ============================================ */}
+      {/* PAGE 5 — İstifadəçi axını (6 step) */}
       <section className="evden-section">
         <div className="evden-section-inner">
           <h2 className="evden-section-title">İstifadəçi axını</h2>
@@ -217,76 +337,17 @@ function Home() {
         </div>
       </section>
 
-      {/* ============================================
-            Xidmətlər (functional services list)
-         ============================================ */}
+      {/* Xidmətlər (functional preview) */}
       <section className="evden-section evden-section-muted" id="services-section">
         <div className="evden-section-inner">
           <h2 className="evden-section-title">Xidmətlər</h2>
           <p className="evden-section-lead">Platformadakı son elanlar.</p>
-
-          {loading ? (
-            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>Yüklənir...</div>
-          ) : featured.length === 0 ? (
-            <div style={{ textAlign: 'center', padding: 40, color: 'var(--text-tertiary)' }}>
-              Hələ elan yoxdur. <Link to="/yeni-xidmet" style={{ color: 'var(--brand)', fontWeight: 700 }}>İlk elan ver →</Link>
-            </div>
-          ) : (
-            <div className="evden-services-grid">
-              {featured.map((s) => {
-                const isFav = favorites.includes(s._id);
-                const startPrice = s.packages?.length ? Math.min(...s.packages.map((p) => p.price)) : s.price;
-                const fastest = s.packages?.length ? Math.min(...s.packages.map((p) => p.deliveryDays)) : s.deliveryDays;
-                const lc = levelColor(s.author?.level || 'Yeni Satıcı');
-                return (
-                  <Link key={s._id} to={`/xidmet/${s._id}`} className="evden-service-card">
-                    <div className="evden-service-img">
-                      {s.images?.[0] ? (
-                        <img src={s.images[0]} alt={s.title} />
-                      ) : (
-                        <div className="evden-service-img-fallback"><ImageIcon size={32} /></div>
-                      )}
-                      {fastest && (
-                        <span className="evden-service-badge">
-                          <Clock size={12} /> {fastest} gün
-                        </span>
-                      )}
-                      <button
-                        className="evden-service-fav"
-                        onClick={(e) => toggleFavorite(e, s._id)}
-                        aria-label={isFav ? 'Sevimlilərdən çıxar' : 'Sevimlilərə əlavə et'}
-                      >
-                        <Heart size={16} fill={isFav ? '#ef4444' : 'none'} color={isFav ? '#ef4444' : 'var(--text-muted)'} />
-                      </button>
-                    </div>
-                    <div className="evden-service-body">
-                      <div className="evden-service-author">
-                        <User size={14} />
-                        <span>{s.author?.fullName || 'Anonim'}</span>
-                        {s.author?.level && (
-                          <span style={{ background: lc.bg, color: lc.fg, padding: '1px 7px', borderRadius: 999, fontSize: 10, fontWeight: 700 }}>
-                            <Award size={9} style={{ display: 'inline', marginRight: 2 }} />
-                            {s.author.level}
-                          </span>
-                        )}
-                      </div>
-                      <h3 className="evden-service-title">{s.title}</h3>
-                      <div className="evden-service-footer">
-                        <span className="evden-service-rating"><Star size={14} fill="#FFED00" color="#FFED00" /> {s.rating || '—'}</span>
-                        <span className="evden-service-price"><strong>{startPrice}</strong> AZN</span>
-                      </div>
-                    </div>
-                  </Link>
-                );
-              })}
-            </div>
-          )}
-
+          {servicesGrid}
           {featured.length > 0 && (
             <div style={{ textAlign: 'center', marginTop: 36 }}>
-              <Link to="/kategoriler" className="btn-evden-secondary evden-hero-btn" style={{ display: 'inline-block', textDecoration: 'none', padding: '12px 28px', borderRadius: 12 }}>
-                Hamısını gör →
-              </Link>
+              <button className="btn-evden-cta evden-hero-btn" onClick={() => navigate('/qeydiyyat')} style={{ borderRadius: 12 }}>
+                Qeydiyyatdan keç və sifariş ver →
+              </button>
             </div>
           )}
         </div>

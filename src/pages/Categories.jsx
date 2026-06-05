@@ -1,6 +1,6 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Heart, Star, ImageIcon, User, Search, Clock, Award } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
@@ -8,9 +8,10 @@ import { levelColor } from '../constants/seller';
 
 function Categories() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState(searchParams.get('q') || '');
   const [activeCategory, setActiveCategory] = useState('Bütün Xidmətlər');
   const [levelFilter, setLevelFilter] = useState('all');
 
