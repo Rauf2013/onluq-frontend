@@ -169,6 +169,326 @@ body.keyboard-open .mobile-tab-bar { display: none; }
   h2 { font-size: clamp(18px, 5vw, 26px) !important; }
 }
 
+/* ============================================
+   EVDƏN — PDF landing dizaynı
+   ============================================ */
+.evden-page { background: var(--bg-page); }
+
+/* ----- HERO (PDF Page 1) ----- */
+.evden-hero {
+  background: var(--brand);
+  color: #ffffff;
+  padding: 90px 5% 100px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.evden-hero::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 6px;
+  background: var(--accent);
+}
+.evden-hero-inner {
+  max-width: 760px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+.evden-hero-title {
+  color: #ffffff;
+  font-size: clamp(48px, 8vw, 76px);
+  font-weight: 900;
+  letter-spacing: 8px;
+  margin: 20px 0 14px;
+  line-height: 1;
+}
+.evden-hero-tagline {
+  color: var(--accent);
+  font-size: clamp(18px, 3vw, 24px);
+  font-weight: 700;
+  margin: 0 0 18px;
+  letter-spacing: 0.2px;
+}
+.evden-hero-sub {
+  color: rgba(255,255,255,0.85);
+  font-size: clamp(15px, 2vw, 18px);
+  max-width: 600px;
+  margin: 0 auto 36px;
+  line-height: 1.6;
+}
+.evden-hero-cta {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.evden-hero-btn {
+  padding: 14px 32px !important;
+  border-radius: 14px !important;
+  font-size: 16px !important;
+  cursor: pointer;
+}
+.evden-hero-btn-ghost {
+  padding: 14px 32px;
+  border-radius: 14px;
+  font-size: 16px;
+  font-weight: 700;
+  background: transparent;
+  color: #ffffff;
+  border: 2px solid rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+.evden-hero-btn-ghost:hover {
+  background: rgba(255,255,255,0.08);
+  border-color: rgba(255,255,255,0.7);
+}
+
+/* ----- Section base ----- */
+.evden-section {
+  padding: 80px 5%;
+}
+.evden-section-muted {
+  background: var(--bg-muted);
+}
+.evden-section-inner {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.evden-section-title {
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 900;
+  color: var(--text-primary);
+  margin-bottom: 16px;
+  letter-spacing: -0.5px;
+}
+.evden-section-lead {
+  font-size: clamp(15px, 1.8vw, 18px);
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin-bottom: 48px;
+  max-width: 760px;
+}
+.evden-section-lead strong { color: var(--text-primary); font-weight: 800; }
+
+/* ----- 4 feature grid (PDF Page 3) ----- */
+.evden-features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 22px;
+}
+@media (max-width: 1024px) { .evden-features-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px)  { .evden-features-grid { grid-template-columns: 1fr; } }
+
+/* ----- 8 modules grid (PDF Page 4) ----- */
+.evden-modules-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+@media (max-width: 1024px) { .evden-modules-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 540px)  { .evden-modules-grid { grid-template-columns: 1fr; } }
+
+/* ----- Card (feature/module ortaq) ----- */
+.evden-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 18px;
+  padding: 28px 24px;
+  box-shadow: var(--shadow-sm);
+  transition: transform 0.15s ease, box-shadow 0.2s ease;
+}
+.evden-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.evden-card-icon {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 18px;
+}
+.evden-card-icon.navy   { background: var(--brand);  color: #ffffff; }
+.evden-card-icon.yellow { background: var(--accent); color: var(--brand); }
+.evden-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  margin: 0 0 8px;
+  letter-spacing: -0.2px;
+}
+.evden-card p {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  margin: 0;
+}
+
+/* ----- User flow (PDF Page 5) ----- */
+.evden-flow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 32px;
+  flex-wrap: nowrap;
+}
+.evden-flow-step {
+  flex: 1;
+  text-align: center;
+  min-width: 0;
+}
+.evden-flow-circle {
+  width: 72px; height: 72px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 14px auto 12px;
+  position: relative;
+}
+.evden-flow-circle.navy   { background: var(--brand);  color: #ffffff; }
+.evden-flow-circle.yellow { background: var(--accent); color: var(--brand); }
+.evden-flow-num {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--bg-page);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 900;
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid var(--brand);
+}
+.evden-flow-label {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+  padding: 0 4px;
+  line-height: 1.3;
+}
+.evden-flow-arrow {
+  color: var(--text-muted);
+  align-self: center;
+  margin-top: 36px;
+  flex-shrink: 0;
+}
+.evden-flow-note {
+  text-align: center;
+  color: var(--text-tertiary);
+  font-style: italic;
+  font-size: 15px;
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+@media (max-width: 768px) {
+  .evden-flow { flex-wrap: wrap; gap: 4px; }
+  .evden-flow-step { flex: 0 0 calc(33% - 6px); margin-bottom: 16px; }
+  .evden-flow-arrow { display: none; }
+  .evden-flow-circle { width: 60px; height: 60px; }
+}
+
+/* ----- Services grid ----- */
+.evden-services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 22px;
+}
+.evden-service-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-soft);
+  border-radius: 16px;
+  overflow: hidden;
+  text-decoration: none;
+  color: var(--text-primary);
+  display: flex;
+  flex-direction: column;
+  transition: transform 0.15s, box-shadow 0.2s;
+}
+.evden-service-card:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+.evden-service-img {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: var(--bg-muted);
+}
+.evden-service-img img {
+  width: 100%; height: 100%; object-fit: cover;
+}
+.evden-service-img-fallback {
+  width: 100%; height: 100%;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--text-muted);
+}
+.evden-service-badge {
+  position: absolute; top: 10px; left: 10px;
+  background: rgba(20, 34, 79, 0.9);
+  color: #fff;
+  font-size: 11px; font-weight: 700;
+  padding: 4px 10px; border-radius: 999px;
+  display: inline-flex; align-items: center; gap: 4px;
+}
+.evden-service-fav {
+  position: absolute; top: 10px; right: 10px;
+  background: rgba(255,255,255,0.95);
+  border: 0;
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+}
+.evden-service-body {
+  padding: 14px 16px 16px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.evden-service-author {
+  display: flex; align-items: center; gap: 6px;
+  color: var(--text-tertiary);
+  font-size: 12px;
+  flex-wrap: wrap;
+}
+.evden-service-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.4;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.evden-service-footer {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-top: auto;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-soft);
+}
+.evden-service-rating {
+  display: inline-flex; align-items: center; gap: 4px;
+  font-size: 13px; font-weight: 600;
+  color: var(--text-secondary);
+}
+.evden-service-price {
+  font-size: 14px;
+  color: var(--text-primary);
+}
+.evden-service-price strong { color: var(--brand); font-weight: 900; font-size: 16px; }
+
 /* ===== EVDƏN brand helper classes ===== */
 /* Sari CTA buton — birincil aksiyon (siparis ver, daxil ol, qeydiyyat) */
 .btn-evden-cta, .btn-accent {
