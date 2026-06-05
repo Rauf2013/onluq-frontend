@@ -1,4 +1,4 @@
-name: Android APK Build
+﻿name: Android APK Build
 
 on:
   push:
@@ -79,14 +79,14 @@ jobs:
             echo '```' >> $GITHUB_STEP_SUMMARY
             keytool -list -v -keystore "$KEYSTORE" -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -Ei "SHA1:|SHA-1:|SHA256:" >> $GITHUB_STEP_SUMMARY || true
             echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "Package: az.onluq.app" >> $GITHUB_STEP_SUMMARY
+            echo "Package: az.evden.app" >> $GITHUB_STEP_SUMMARY
           fi
 
       - name: Upload DEBUG APK
         if: ${{ github.event_name == 'push' || inputs.release != true }}
         uses: actions/upload-artifact@v4
         with:
-          name: onluq-debug-apk
+          name: evden-debug-apk
           path: android/app/build/outputs/apk/debug/app-debug.apk
           retention-days: 14
 
@@ -110,6 +110,6 @@ jobs:
         if: ${{ inputs.release == true }}
         uses: actions/upload-artifact@v4
         with:
-          name: onluq-release-aab
+          name: evden-release-aab
           path: android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 30
