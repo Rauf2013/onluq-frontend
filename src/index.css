@@ -707,6 +707,55 @@ body.dark-mode .evden-flow-circle.navy { background: #3D5290; }
 
   /* Body mətn okunabilirliği */
   body { font-size: 15px; line-height: 1.55; }
+
+  /* ===== QLOBAL native-feel — bütün səhifələrə tətbiq ===== */
+  /* Bütün geniş konteynerlər mobildə tam en */
+  [style*="maxWidth: '1200px'"], [style*="maxWidth: '1100px'"],
+  [style*="maxWidth: '1000px'"], [style*="maxWidth: '960px'"],
+  [style*="maxWidth: '900px'"],  [style*="maxWidth: '800px'"],
+  [style*="maxWidth: '760px'"],  [style*="maxWidth: '700px'"],
+  [style*="maxWidth: '680px'"],  [style*="maxWidth: '640px'"],
+  [style*="maxWidth: '600px'"],  [style*="maxWidth:1200px"],
+  [style*="maxWidth:900px"],     [style*="maxWidth:800px"],
+  [style*="maxWidth:600px"] {
+    max-width: 100% !important;
+  }
+
+  /* Formlar / inputlar native — 16px iOS zoom önləyir, böyük toxunma */
+  input:not([type="checkbox"]):not([type="radio"]),
+  textarea, select {
+    font-size: 16px !important;
+    border-radius: 12px !important;
+    padding: 13px 14px !important;
+  }
+
+  /* Böyük desktop padding'ləri mobildə makul */
+  [style*="padding: '40px"], [style*="padding:40px"] { padding: 20px !important; }
+  [style*="padding: '50px"], [style*="padding: '60px"] { padding: 24px !important; }
+  [style*="padding: '70px"], [style*="padding: '80px"] { padding: 28px !important; }
+
+  /* Çox sütunlu grid-lər mobildə 1 sütun (auth-fit/auto-fill istisna deyil) */
+  [style*="gridTemplateColumns: 'repeat(2"],
+  [style*="gridTemplateColumns: 'repeat(3"],
+  [style*="gridTemplateColumns: 'repeat(4"],
+  [style*="grid-template-columns: repeat(2"],
+  [style*="grid-template-columns: repeat(3"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Sabit geniş elementlər daralsın */
+  [style*="width: '500px"], [style*="width: '600px"],
+  [style*="minWidth: '500px"], [style*="minWidth: '400px"] {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  /* CTA / əsas düymələr tam en (mobil app hissi) — amma sətir-içi (inline) formlarda yox */
+  .auth-btn, .submit-btn {
+    width: 100%;
+  }
+  /* Axtar kimi sətir-içi form düymələri tam en OLMASIN */
+  .evden-dash-search button, .hero-search-bar button { width: auto !important; flex-shrink: 0; }
 }
 
 /* Dairəvi ikon/düymələr HEÇ VAXT oval olmasın (min-height onları bozur) */
