@@ -8,6 +8,7 @@ import { Network } from '@capacitor/network';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { SocialLogin } from '@capgo/capacitor-social-login';
 import { Browser } from '@capacitor/browser';
+import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
 
 const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -148,6 +149,18 @@ export async function nativeGoogleSignIn() {
 export async function nativeGoogleSignOut() {
   if (!isNative) return;
   await safe(() => SocialLogin.logout({ provider: 'google' }));
+  await safe(() => FirebaseAuthentication.signOut());
+}
+
+// ===== ƏSAS YOL: Firebase Authentication ilə Google giriş (ən etibarlı) =====
+// google-services.json + Firebase Console kurulumu lazımdır. Hər cihazda işləyir.
+export async function firebaseGoogleSignIn() {
+  if (!isNative) throw new Error('Native deyil');
+  const result = await FirebaseAuthentication.signInWithGoogle();
+  // Google ID token — backend /api/auth/google bunu doğrulayır
+  const idToken = result?.credential?.idToken;
+  if (!idToken) throw new Error('Google ID token alınmadı');
+  return { idToken, user: result?.user };
 }
 
 // ===== B PLANI: Google OAuth sistem brauzeri ilə (PKCE) =====

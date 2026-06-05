@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Brain, AlertTriangle, Lightbulb, BookOpen, GitBranch, ThumbsUp, Eye, User, Calendar, Tag, Trash2, ArrowLeft, Lock } from 'lucide-react';
 import { levelColor } from '../constants/seller';
+import { azFullDate } from '../utils/azDate';
 
 function BrainNoteDetail() {
   const { id } = useParams();
@@ -108,7 +109,7 @@ function BrainNoteDetail() {
               <span style={{ fontSize: 13, fontWeight: 700 }}>{note.author?.fullName}</span>
             </Link>
             <span style={{ display: 'inline-flex', alignItems: 'center', gap: 12, fontSize: 12, color: 'var(--text-tertiary)' }}>
-              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Calendar size={12} /> {new Date(note.createdAt).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Calendar size={12} /> {azFullDate(note.createdAt)}</span>
               <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Eye size={12} /> {note.views || 0}</span>
             </span>
           </div>

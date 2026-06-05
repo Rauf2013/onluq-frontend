@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { User, Star, MapPin, Calendar, Edit3, MessageSquare, Image as ImageIcon, UserPlus, UserCheck, Eye, Users, Award, ShoppingBag, Camera, Clock, Globe, Languages, Plus, Trash2, X, Repeat } from 'lucide-react';
 import { levelColor } from '../constants/seller';
+import { azMonthYear, azFullDate } from '../utils/azDate';
 
 // === Daire şeklinde foto kırpıcı (YouTube tarzı) ===
 function AvatarCropper({ src, onCancel, onSave }) {
@@ -430,7 +431,7 @@ function Profile() {
               )}
               <div className="meta-row" style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Calendar size={16} /> Üzv olduğu tarix</span>
-                <strong>{new Date(user.createdAt).toLocaleDateString('az-AZ', { month: 'short', year: 'numeric' })}</strong>
+                <strong>{azMonthYear(user.createdAt)}</strong>
               </div>
               <div className="meta-row" style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><ShoppingBag size={16} /> Tamamlanmış satış</span>

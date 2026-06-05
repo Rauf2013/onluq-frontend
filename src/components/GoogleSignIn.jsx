@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { API_URL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { isNative, nativeGoogleSignIn, googleOAuthBrowser } from '../native/capacitor';
+import { isNative, firebaseGoogleSignIn } from '../native/capacitor';
 
 const CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
 
@@ -18,14 +18,8 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
       setBusy(true);
       const t = toast.loading('Google ilə daxil olunur...');
       try {
-        // Əvvəlcə sistem brauzeri OAuth (B planı — hər cihazda işləyir).
-        // Uğursuz olsa, Credential Manager (Capgo) cəhd edir.
-        let idToken;
-        try {
-          ({ idToken } = await googleOAuthBrowser());
-        } catch (browserErr) {
-          ({ idToken } = await nativeGoogleSignIn());
-        }
+        // Firebase Authentication ilə Google giriş — ən etibarlı yol.
+        const { idToken } = await firebaseGoogleSignIn();
         const r = await fetch(`${API_URL}/api/auth/google`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },

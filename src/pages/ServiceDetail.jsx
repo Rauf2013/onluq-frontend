@@ -4,6 +4,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { Star, Clock, User, MessageSquare, ShoppingCart, Image as ImageIcon, ChevronRight, ChevronLeft, RefreshCw, Check, ChevronDown, ChevronUp, Award, Reply, Trash2, X as XIcon, Calendar, ShoppingBag, CheckCircle, XCircle, Eye, Activity, Package, BarChart3 } from 'lucide-react';
 import { PACKAGE_TIERS, levelColor } from '../constants/seller';
+import { azFullDate } from '../utils/azDate';
 
 function ServiceDetail() {
   const { id } = useParams();
@@ -256,7 +257,7 @@ function ServiceDetail() {
                           </span>
                         </div>
                         <p style={{ margin: '6px 0 8px', color: 'var(--text-secondary)', lineHeight: 1.6, fontSize: 14, whiteSpace: 'pre-wrap', wordBreak: 'break-word' }}>{rv.comment}</p>
-                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(rv.createdAt).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
+                        <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{azFullDate(rv.createdAt)}</div>
 
                         {rv.sellerReply?.text ? (
                           <div style={{ marginTop: 10, padding: 12, background: 'var(--bg-page)', borderRadius: 10, borderLeft: '3px solid #14224F' }}>
@@ -381,7 +382,7 @@ function ServiceDetail() {
               if (diff < 60) return `${Math.floor(diff)} dəq əvvəl`;
               if (diff < 60 * 24) return `${Math.floor(diff / 60)} saat əvvəl`;
               if (diff < 60 * 24 * 30) return `${Math.floor(diff / 60 / 24)} gün əvvəl`;
-              return new Date(d).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short', year: 'numeric' });
+              return azFullDate(d);
             };
             const fmtResp = (m) => {
               if (m === null || m === undefined) return 'Məlumat yoxdur';
