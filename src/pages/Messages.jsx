@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { API_URL } from '../api';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -17,7 +17,7 @@ const STICKERS = [
   { n: 'heart',     I: Heart,         c: '#ef4444', f: true },
   { n: 'smile',     I: SmileIcon,     c: '#fbbf24' },
   { n: 'laugh',     I: Laugh,         c: '#fbbf24' },
-  { n: 'thumbs-up', I: ThumbsUp,      c: '#10b981' },
+  { n: 'thumbs-up', I: ThumbsUp,      c: '#14224F' },
   { n: 'thumbs-down', I: ThumbsDown,  c: '#94a3b8' },
   { n: 'star',      I: Star,          c: '#fbbf24', f: true },
   { n: 'flame',     I: Flame,         c: '#f97316', f: true },
@@ -25,13 +25,13 @@ const STICKERS = [
   { n: 'party',     I: PartyPopper,   c: '#ec4899' },
   { n: 'trophy',    I: Trophy,        c: '#fbbf24' },
   { n: 'crown',     I: Crown,         c: '#fbbf24' },
-  { n: 'award',     I: Award,         c: '#10b981' },
+  { n: 'award',     I: Award,         c: '#14224F' },
   { n: 'rocket',    I: Rocket,        c: '#6366f1' },
   { n: 'bulb',      I: Lightbulb,     c: '#fbbf24' },
-  { n: 'check',     I: CheckCircle,   c: '#10b981', f: true },
+  { n: 'check',     I: CheckCircle,   c: '#14224F', f: true },
   { n: 'x',         I: XCircle,       c: '#ef4444', f: true },
   { n: 'alert',     I: AlertTriangle, c: '#f59e0b' },
-  { n: 'shield',    I: ShieldCheck,   c: '#10b981' },
+  { n: 'shield',    I: ShieldCheck,   c: '#14224F' },
   { n: 'gift',      I: Gift,          c: '#ec4899' },
   { n: 'cake',      I: Cake,          c: '#ec4899' },
   { n: 'coffee',    I: Coffee,        c: '#92400e' },
@@ -42,7 +42,7 @@ const STICKERS = [
   { n: 'moon',      I: Moon,          c: '#6366f1' },
   { n: 'cloud',     I: Cloud,         c: '#94a3b8' },
   { n: 'camera',    I: Camera,        c: '#475569' },
-  { n: 'phone',     I: Phone,         c: '#10b981' },
+  { n: 'phone',     I: Phone,         c: '#14224F' },
   { n: 'mail',      I: Mail,          c: '#3b82f6' },
   { n: 'map-pin',   I: MapPin,        c: '#ef4444' },
   { n: 'clock',     I: Clock,         c: '#64748b' },
@@ -64,7 +64,7 @@ function renderMessageText(text, isMe = false) {
       const s = STICKER_MAP[m[1]];
       const Icon = s.I;
       // Sender's green bubble: green icons would be invisible — make them white
-      const lowContrast = isMe && (s.c === '#10b981' || s.c === '#059669');
+      const lowContrast = isMe && (s.c === '#14224F' || s.c === '#0C1733');
       const color = lowContrast ? '#ffffff' : s.c;
       const fillColor = s.f ? color : 'none';
       return <Icon key={i} size={18} color={color} fill={fillColor} style={{ display: 'inline', verticalAlign: '-4px', margin: '0 2px' }} />;
@@ -483,19 +483,19 @@ function Messages() {
               >
                 <div style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '50%', background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '15px', flexShrink: 0 }}>
                   {chat.partnerAvatar ? <img src={chat.partnerAvatar} alt="avatar" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}}/> : <User size={24} color="#64748b" />}
-                  {chat.isOnline && <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', background: '#10b981', border: '2px solid white', borderRadius: '50%' }}></div>}
+                  {chat.isOnline && <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', background: '#14224F', border: '2px solid white', borderRadius: '50%' }}></div>}
                 </div>
                 
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--text-primary)', fontWeight: activeChat?.partnerId === chat.partnerId ? 'bold' : '600' }}>{chat.partnerName}</h4>
-                    <span style={{ fontSize: '12px', color: chat.unread > 0 ? '#10b981' : '#94a3b8', fontWeight: chat.unread > 0 ? 'bold' : 'normal' }}>{chat.time}</span>
+                    <span style={{ fontSize: '12px', color: chat.unread > 0 ? '#14224F' : '#94a3b8', fontWeight: chat.unread > 0 ? 'bold' : 'normal' }}>{chat.time}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {renderMessageText(chat.lastMessage)}
                     </p>
-                    {chat.unread > 0 && <span style={{ background: '#10b981', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', marginLeft: '10px' }}>{chat.unread}</span>}
+                    {chat.unread > 0 && <span style={{ background: '#14224F', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', marginLeft: '10px' }}>{chat.unread}</span>}
                   </div>
                 </div>
               </div>
@@ -518,14 +518,14 @@ function Messages() {
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-primary)' }}>{activeChat.partnerName}</h3>
-                  <span style={{ fontSize: '13px', color: partnerTyping ? '#10b981' : (activeChat.isOnline ? '#10b981' : '#94a3b8'), fontWeight: '500', fontStyle: partnerTyping ? 'italic' : 'normal' }}>
+                  <span style={{ fontSize: '13px', color: partnerTyping ? '#14224F' : (activeChat.isOnline ? '#14224F' : '#94a3b8'), fontWeight: '500', fontStyle: partnerTyping ? 'italic' : 'normal' }}>
                     {partnerTyping ? 'yazır...' : (activeChat.isOnline ? 'Onlayn' : 'Oflayn')}
                   </span>
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <button onClick={() => callSystemRef.current?.startCall('audio')} title="Səsli zəng" aria-label="Səsli zəng"
-                  style={{ background: 'rgba(16,185,129,0.12)', color: '#10b981', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}
+                  style={{ background: 'rgba(16,185,129,0.12)', color: '#14224F', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}
                   onMouseOver={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.22)'}
                   onMouseOut={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.12)'}>
                   <Phone size={18} />
@@ -559,7 +559,7 @@ function Messages() {
                   const isMe = msg.senderId === userId;
                   const bubble = {
                     maxWidth: '70%',
-                    background: isMe ? '#10b981' : 'var(--bg-surface)',
+                    background: isMe ? '#14224F' : 'var(--bg-surface)',
                     color: isMe ? 'white' : 'var(--text-primary)',
                     padding: '12px 16px',
                     borderRadius: isMe ? '16px 16px 0 16px' : '16px 16px 16px 0',
@@ -597,7 +597,7 @@ function Messages() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${isMe ? 'rgba(255,255,255,0.2)' : 'var(--border)'}`, paddingTop: 8 }}>
                               <span style={{ fontSize: 18, fontWeight: 800 }}>{meta.price} ₼</span>
                               {!isMe && (
-                                <button onClick={() => acceptOffer(meta)} style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                <button onClick={() => acceptOffer(meta)} style={{ background: '#14224F', color: 'white', border: 'none', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                                   <ShoppingCart size={13} /> Qəbul et
                                 </button>
                               )}
@@ -635,7 +635,7 @@ function Messages() {
               )}
               {showAttachMenu && (
                 <div style={{ position: 'absolute', bottom: '100%', left: 50, background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 12, padding: 6, boxShadow: '0 8px 24px rgba(0,0,0,0.12)', minWidth: 200, zIndex: 50, display: 'flex', flexDirection: 'column' }}>
-                  <button type="button" onClick={() => fileInputRef.current?.click()} style={attachItem}><ImageIcon size={18} color="#10b981" /> Şəkil</button>
+                  <button type="button" onClick={() => fileInputRef.current?.click()} style={attachItem}><ImageIcon size={18} color="#14224F" /> Şəkil</button>
                   <button type="button" onClick={() => docInputRef.current?.click()} style={attachItem}><FileText size={18} color="#3b82f6" /> Sənəd</button>
                   <button type="button" onClick={openOfferModal} style={attachItem}><Tag size={18} color="#f59e0b" /> Xüsusi Təklif</button>
                 </div>
@@ -664,7 +664,7 @@ function Messages() {
                 <button
                   type="submit"
                   disabled={composerEmpty}
-                  style={{ background: !composerEmpty ? '#10b981' : 'var(--border-strong)', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: !composerEmpty ? 'pointer' : 'not-allowed', transition: '0.2s', paddingLeft: '4px', flexShrink: 0 }}
+                  style={{ background: !composerEmpty ? '#14224F' : 'var(--border-strong)', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: !composerEmpty ? 'pointer' : 'not-allowed', transition: '0.2s', paddingLeft: '4px', flexShrink: 0 }}
                 >
                   <Send size={20} />
                 </button>
@@ -730,7 +730,7 @@ function Messages() {
                   <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 4 }}>
                     {pkg.features.slice(0, 4).map((f, i) => (
                       <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 6, color: 'var(--text-secondary)', fontSize: 12 }}>
-                        <Check size={12} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }} /> {f}
+                        <Check size={12} color="#14224F" style={{ flexShrink: 0, marginTop: 2 }} /> {f}
                       </li>
                     ))}
                   </ul>
@@ -783,7 +783,7 @@ const iconBtn = (active) => ({
   background: active ? 'var(--bg-muted)' : 'transparent',
   border: 'none',
   cursor: 'pointer',
-  color: active ? '#10b981' : 'var(--text-muted)',
+  color: active ? '#14224F' : 'var(--text-muted)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

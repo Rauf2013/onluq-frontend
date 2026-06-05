@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -19,10 +19,10 @@ function Home() {
   const [testimonialIdx, setTestimonialIdx] = useState(0);
 
   const TESTIMONIALS = [
-    { name: 'Aysel M.', role: 'Sahibkar', text: 'Loqo dizaynımı 2 günə hazırladılar, əla nəticə! Onluq sayəsində peşəkar mütəxəssis tapdım.', rating: 5 },
+    { name: 'Aysel M.', role: 'Sahibkar', text: 'Loqo dizaynımı 2 günə hazırladılar, əla nəticə! EVDƏN sayəsində peşəkar mütəxəssis tapdım.', rating: 5 },
     { name: 'Rəşad H.', role: 'Marketinq mütəxəssisi', text: 'Sosial media kampaniyamı buradan sifariş etdim. Sürətli və təhlükəsiz ödəniş sistemi var.', rating: 5 },
     { name: 'Nigar Ə.', role: 'Kiçik biznes sahibi', text: 'Veb saytımı çox uyğun qiymətə hazırlatdım. Komandadan razıyam, hamıya tövsiyə edirəm!', rating: 5 },
-    { name: 'Elvin Q.', role: 'Startup qurucusu', text: 'Tərcümə işlərimi həmişə Onluqdan götürürəm. Keyfiyyət və zamanında təslim — mükəmməl!', rating: 4 },
+    { name: 'Elvin Q.', role: 'Startup qurucusu', text: 'Tərcümə işlərimi həmişə EVDƏNdan götürürəm. Keyfiyyət və zamanında təslim — mükəmməl!', rating: 4 },
   ];
 
   useEffect(() => {
@@ -114,7 +114,7 @@ function Home() {
       <div className="home-mega-menu" style={{ display: 'flex', justifyContent: 'center', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', position: 'relative', zIndex: 100, padding: '10px 5%' }}>
         <div style={{ display: 'flex', gap: '20px', maxWidth: '1200px', width: '100%', flexWrap: 'wrap', justifyContent: 'center' }}>
           
-          <div onClick={() => setActiveCategory('Bütün Xidmətlər')} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 15px', cursor: 'pointer', background: activeCategory === 'Bütün Xidmətlər' ? '#f0fdf4' : 'transparent', color: activeCategory === 'Bütün Xidmətlər' ? '#10b981' : 'var(--text-secondary)', fontWeight: 'bold', borderRadius: '8px', transition: '0.2s' }}>
+          <div onClick={() => setActiveCategory('Bütün Xidmətlər')} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '10px 15px', cursor: 'pointer', background: activeCategory === 'Bütün Xidmətlər' ? '#F4F6FB' : 'transparent', color: activeCategory === 'Bütün Xidmətlər' ? '#14224F' : 'var(--text-secondary)', fontWeight: 'bold', borderRadius: '8px', transition: '0.2s' }}>
             <Grid size={18} /> Bütün Xidmətlər
           </div>
 
@@ -134,8 +134,8 @@ function Home() {
                   zIndex: hoveredMenu === category.name ? 50 : 1,
                   padding: '10px 15px', 
                   cursor: 'pointer', 
-                  background: isMainActive ? '#f0fdf4' : 'transparent', 
-                  color: isMainActive ? '#10b981' : 'var(--text-secondary)', 
+                  background: isMainActive ? '#F4F6FB' : 'transparent', 
+                  color: isMainActive ? '#14224F' : 'var(--text-secondary)', 
                   fontWeight: '600', 
                   borderRadius: '8px', 
                   transition: '0.2s', 
@@ -186,7 +186,7 @@ function Home() {
                         key={subCat}
                         onClick={(e) => { e.stopPropagation(); setActiveCategory(subCat); setHoveredMenu(null); }}
                         style={{ padding: '12px 15px', color: 'var(--text-primary)', fontSize: '14px', fontWeight: activeCategory === subCat ? 'bold' : 'normal', background: activeCategory === subCat ? 'var(--brand-soft)' : 'var(--bg-elevated)', borderRadius: '8px', transition: '0.2s' }}
-                        onMouseOver={(e) => { e.target.style.background = 'var(--brand-soft)'; e.target.style.color = '#10b981'; }}
+                        onMouseOver={(e) => { e.target.style.background = 'var(--brand-soft)'; e.target.style.color = '#14224F'; }}
                         onMouseOut={(e) => { e.target.style.background = activeCategory === subCat ? 'var(--brand-soft)' : 'var(--bg-elevated)'; e.target.style.color = 'var(--text-primary)'; }}
                       >
                         {subCat}
@@ -208,15 +208,15 @@ function Home() {
           <div style={{ background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', padding: '80px 5%', position: 'relative' }}>
             <div style={{ maxWidth: '800px', margin: '0 auto', textAlign: 'center', position: 'relative', zIndex: 2 }}>
               <h1 style={{ color: 'white', fontSize: '56px', fontWeight: '900', lineHeight: '1.2', marginBottom: '20px', letterSpacing: '-1px' }}>
-                Xəyallarındakı layihəni <span style={{ color: '#10b981' }}>peşəkarlara</span> etibar et.
+                Xəyallarındakı layihəni <span style={{ color: '#14224F' }}>peşəkarlara</span> etibar et.
               </h1>
               <p style={{ color: 'var(--text-muted)', fontSize: '20px', marginBottom: '40px', lineHeight: '1.6' }}>
-                Onluq ilə minlərlə frilanser arasından sənə ən uyğun olanı tap, işini sürətli və güvənlə həll et.
+                EVDƏN ilə minlərlə frilanser arasından sənə ən uyğun olanı tap, işini sürətli və güvənlə həll et.
               </p>
               <div className="hero-search-bar" style={{ display: 'flex', background: 'var(--bg-surface)', padding: '8px', borderRadius: '16px', boxShadow: '0 10px 30px rgba(0,0,0,0.2)' }}>
                 <Search size={24} color="var(--text-muted)" style={{ margin: 'auto 15px' }} />
                 <input type="text" placeholder="Nəyə ehtiyacınız var? (Məs: Loqo, Veb sayt...)" value={searchTerm} onChange={(e) => setSearchTerm(e.target.value)} style={{ flex: 1, border: 'none', fontSize: '18px', outline: 'none', minWidth: 0, background: 'transparent' }} />
-                <button onClick={() => document.getElementById('services-section').scrollIntoView({ behavior: 'smooth' })} style={{ background: '#10b981', color: 'white', border: 'none', padding: '15px 30px', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s', flexShrink: 0 }}>Axtar</button>
+                <button onClick={() => document.getElementById('services-section').scrollIntoView({ behavior: 'smooth' })} style={{ background: '#14224F', color: 'white', border: 'none', padding: '15px 30px', borderRadius: '10px', fontSize: '16px', fontWeight: 'bold', cursor: 'pointer', transition: '0.2s', flexShrink: 0 }}>Axtar</button>
               </div>
             </div>
           </div>
@@ -235,9 +235,9 @@ function Home() {
                   const Icon = s.icon;
                   return (
                     <div key={s.n} className="hiw-step" style={{ background: 'var(--bg-page)', padding: '36px 24px', borderRadius: '20px', textAlign: 'center', border: '1px solid var(--border)', position: 'relative', animation: `hiwFadeIn 0.6s ease ${i * 0.15}s both` }}>
-                      <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', width: 36, height: 36, background: '#10b981', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16, boxShadow: '0 4px 12px rgba(16,185,129,0.4)' }}>{s.n}</div>
-                      <div style={{ width: 72, height: 72, background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '12px auto 18px' }}>
-                        <Icon size={32} color="#10b981" />
+                      <div style={{ position: 'absolute', top: -18, left: '50%', transform: 'translateX(-50%)', width: 36, height: 36, background: '#14224F', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 16, boxShadow: '0 4px 12px rgba(16,185,129,0.4)' }}>{s.n}</div>
+                      <div style={{ width: 72, height: 72, background: '#E8ECF5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '12px auto 18px' }}>
+                        <Icon size={32} color="#14224F" />
                       </div>
                       <h3 style={{ fontSize: 20, fontWeight: 800, color: 'var(--text-primary)', margin: '0 0 8px' }}>{s.title}</h3>
                       <p style={{ color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.6 }}>{s.desc}</p>
@@ -249,7 +249,7 @@ function Home() {
           </div>
 
           {/* === STATİSTİKA BANDI === */}
-          <div className="home-stats-band" style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '50px 5%' }}>
+          <div className="home-stats-band" style={{ background: 'linear-gradient(135deg, #14224F 0%, #0C1733 100%)', padding: '50px 5%' }}>
             <div className="home-stats-grid" style={{ maxWidth: '1100px', margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '24px' }}>
               {[
                 { icon: Users, num: '5,000+', label: 'Frilanser' },
@@ -273,9 +273,9 @@ function Home() {
           <div className="home-section" style={{ background: 'var(--bg-surface)', padding: '70px 5%' }}>
             <div style={{ maxWidth: '900px', margin: '0 auto' }}>
               <h2 className="home-section-title" style={{ textAlign: 'center', fontSize: '36px', color: 'var(--text-primary)', marginBottom: '12px', fontWeight: '900' }}>Müştərilərimiz nə deyir?</h2>
-              <p style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '16px', marginBottom: '40px' }}>Onluq icmasından həqiqi rəylər</p>
+              <p style={{ textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '16px', marginBottom: '40px' }}>EVDƏN icmasından həqiqi rəylər</p>
               <div style={{ position: 'relative', background: 'var(--bg-page)', borderRadius: 20, border: '1px solid var(--border)', padding: '40px 50px', minHeight: 220, overflow: 'hidden' }}>
-                <Quote size={40} color="#10b981" style={{ opacity: 0.15, position: 'absolute', top: 20, left: 24 }} />
+                <Quote size={40} color="#14224F" style={{ opacity: 0.15, position: 'absolute', top: 20, left: 24 }} />
                 <div key={testimonialIdx} style={{ animation: 'fadeSlide 0.5s ease' }}>
                   <p style={{ fontSize: 18, color: 'var(--text-primary)', lineHeight: 1.7, fontStyle: 'italic', margin: '0 0 20px', textAlign: 'center' }}>
                     "{TESTIMONIALS[testimonialIdx].text}"
@@ -299,7 +299,7 @@ function Home() {
               </div>
               <div style={{ display: 'flex', justifyContent: 'center', gap: 8, marginTop: 20 }}>
                 {TESTIMONIALS.map((_, i) => (
-                  <button key={i} onClick={() => setTestimonialIdx(i)} aria-label={`Rəy ${i + 1}`} style={{ width: i === testimonialIdx ? 24 : 8, height: 8, borderRadius: 4, background: i === testimonialIdx ? '#10b981' : 'var(--border-strong)', border: 'none', cursor: 'pointer', transition: '0.3s' }} />
+                  <button key={i} onClick={() => setTestimonialIdx(i)} aria-label={`Rəy ${i + 1}`} style={{ width: i === testimonialIdx ? 24 : 8, height: 8, borderRadius: 4, background: i === testimonialIdx ? '#14224F' : 'var(--border-strong)', border: 'none', cursor: 'pointer', transition: '0.3s' }} />
                 ))}
               </div>
             </div>
@@ -312,7 +312,7 @@ function Home() {
       {/* ========================================== */}
       {currentUser && (
         <div style={{ maxWidth: '1200px', margin: '40px auto 0 auto', padding: '0 5%' }}>
-          <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', borderRadius: '24px', padding: '50px 40px', marginBottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 10px 30px rgba(16, 185, 129, 0.2)' }}>
+          <div style={{ background: 'linear-gradient(135deg, #14224F 0%, #0C1733 100%)', borderRadius: '24px', padding: '50px 40px', marginBottom: '40px', display: 'flex', flexDirection: 'column', alignItems: 'center', boxShadow: '0 10px 30px rgba(16, 185, 129, 0.2)' }}>
             <h1 style={{ margin: '0 0 10px 0', fontSize: '36px', color: 'white', fontWeight: '800', textAlign: 'center' }}>
               Yenidən xoş gəldin, {currentUser?.fullName?.split(' ')[0] ?? 'İstifadəçi'}!
             </h1>
@@ -331,9 +331,9 @@ function Home() {
           <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24, gap: 12, flexWrap: 'wrap' }}>
               <h2 className="home-section-title" style={{ fontSize: 28, color: 'var(--text-primary)', margin: 0, fontWeight: 900, display: 'flex', alignItems: 'center', gap: 10 }}>
-                <TrendingUp size={26} color="#10b981" /> Trend xidmətlər
+                <TrendingUp size={26} color="#14224F" /> Trend xidmətlər
               </h2>
-              <Link to="/kategoriler" style={{ color: '#10b981', fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>Hamısını gör →</Link>
+              <Link to="/kategoriler" style={{ color: '#14224F', fontWeight: 700, textDecoration: 'none', fontSize: 14 }}>Hamısını gör →</Link>
             </div>
             <div className="trend-carousel" style={{ display: 'flex', gap: 18, overflowX: 'auto', paddingBottom: 14, scrollSnapType: 'x mandatory', WebkitOverflowScrolling: 'touch' }}>
               {[...services].sort((a, b) => (b.rating || 0) - (a.rating || 0)).slice(0, 8).map((s) => {
@@ -349,7 +349,7 @@ function Home() {
                         <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4, fontSize: 13, color: 'var(--text-secondary)', fontWeight: 700 }}>
                           <Star size={14} fill="#fbbf24" color="#fbbf24" /> {s.rating || '0.0'}
                         </span>
-                        <span style={{ fontWeight: 800, color: '#10b981', fontSize: 14 }}>{startPrice} ₼-dən</span>
+                        <span style={{ fontWeight: 800, color: '#14224F', fontSize: 14 }}>{startPrice} ₼-dən</span>
                       </div>
                     </div>
                   </Link>
@@ -364,18 +364,18 @@ function Home() {
       {!currentUser && (
       <div className="home-section why-onluq" style={{ background: 'var(--bg-surface)', padding: '70px 5%' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
-          <h2 className="home-section-title" style={{ textAlign: 'center', fontSize: '36px', color: 'var(--text-primary)', marginBottom: '50px', fontWeight: '900' }}>Niyə Onluq Seçməlisən?</h2>
+          <h2 className="home-section-title" style={{ textAlign: 'center', fontSize: '36px', color: 'var(--text-primary)', marginBottom: '50px', fontWeight: '900' }}>Niyə EVDƏN Seçməlisən?</h2>
           <div className="why-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '30px' }}>
             {[
-              { icon: ShieldCheck, title: 'Təhlükəsiz Ödəniş', desc: 'Siz işi təsdiqləyənə qədər pulunuz Onluq havuzunda güvəndə qalır.' },
+              { icon: ShieldCheck, title: 'Təhlükəsiz Ödəniş', desc: 'Siz işi təsdiqləyənə qədər pulunuz EVDƏN havuzunda güvəndə qalır.' },
               { icon: Zap, title: 'Sürətli Təslim', desc: 'Təcrübəli frilanserlər tərəfindən ən qısa müddətdə işinizi təhvil alın.' },
               { icon: Award, title: 'Yüksək Keyfiyyət', desc: 'Portfolioları incələyərək ən peşəkar mütəxəssisi asanlıqla tapın.' },
             ].map((c, i) => {
               const Icon = c.icon;
               return (
                 <div key={i} className="why-card" style={{ background: 'var(--bg-page)', padding: '40px 30px', borderRadius: '20px', textAlign: 'center', border: '1px solid var(--border)', transition: 'transform 0.25s, box-shadow 0.25s' }}>
-                  <div style={{ width: '80px', height: '80px', background: '#ecfdf5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto' }}>
-                    <Icon size={40} color="#10b981" />
+                  <div style={{ width: '80px', height: '80px', background: '#E8ECF5', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 20px auto' }}>
+                    <Icon size={40} color="#14224F" />
                   </div>
                   <h3 style={{ fontSize: '22px', color: 'var(--text-primary)', marginBottom: '15px', fontWeight: 800 }}>{c.title}</h3>
                   <p style={{ color: 'var(--text-tertiary)', margin: 0, lineHeight: 1.6 }}>{c.desc}</p>
@@ -439,7 +439,7 @@ function Home() {
                       </div>
                       <div style={{ marginTop: 'auto', display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '15px' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-primary)', fontWeight: 'bold' }}><Star size={16} fill="#fbbf24" color="#fbbf24" /> {service.rating || "0.0"} <span style={{color: 'var(--text-muted)', fontWeight: 'normal', fontSize: '13px'}}>({service.reviewsCount || 0})</span></div>
-                        <span style={{ fontWeight: 'bold', color: '#10b981', fontSize: '15px' }}>{startPrice} ₼-dən</span>
+                        <span style={{ fontWeight: 'bold', color: '#14224F', fontSize: '15px' }}>{startPrice} ₼-dən</span>
                       </div>
                     </div>
                   </Link>

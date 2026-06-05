@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -84,7 +84,7 @@ function Notifications() {
     const isOrder = n.type === 'order' || /sifariş|təhvil|təsdiqlə|düzəliş/i.test(n.message);
     const isMessage = n.type === 'message' || /mesaj/i.test(n.message);
     const isFollow = n.type === 'follow' || /izləm/i.test(n.message);
-    if (isOrder) return <Package size={20} color="#10b981" />;
+    if (isOrder) return <Package size={20} color="#14224F" />;
     if (isMessage) return <MessageSquare size={20} color="#3b82f6" />;
     if (isFollow) return <UserPlus size={20} color="#f59e0b" />;
     return <Info size={20} color="var(--text-muted)" />;
@@ -99,7 +99,7 @@ function Notifications() {
     <div className="main-content" style={{ minHeight: '70vh', maxWidth: '900px', margin: '0 auto' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', flexWrap: 'wrap', gap: '15px' }}>
         <h2 className="section-title" style={{ margin: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Bell size={28} color="#10b981" /> Bildirişlər
+          <Bell size={28} color="#14224F" /> Bildirişlər
           {unreadCount > 0 && (
             <span style={{ background: '#ef4444', color: 'white', fontSize: '14px', fontWeight: 'bold', padding: '4px 12px', borderRadius: '20px' }}>
               {unreadCount} yeni
@@ -107,7 +107,7 @@ function Notifications() {
           )}
         </h2>
         {unreadCount > 0 && (
-          <button onClick={handleMarkAllRead} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <button onClick={handleMarkAllRead} style={{ background: '#14224F', color: 'white', border: 'none', padding: '10px 18px', borderRadius: '10px', cursor: 'pointer', fontWeight: 'bold', display: 'flex', alignItems: 'center', gap: '6px' }}>
             <Check size={16} /> Hamısını Oxundu Et
           </button>
         )}
@@ -136,7 +136,7 @@ function Notifications() {
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: '15px',
-                background: n.isRead ? 'white' : '#f0fdf4',
+                background: n.isRead ? 'white' : '#F4F6FB',
                 padding: '18px 20px',
                 borderRadius: '14px',
                 border: '1px solid ' + (n.isRead ? 'var(--border)' : '#bbf7d0'),

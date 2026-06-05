@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -100,7 +100,7 @@ function MyServices() {
         <div style={{ marginBottom: '40px' }}>
           {/* Üst sayğaclar */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '20px', marginBottom: '30px' }}>
-            <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(16,185,129,0.2)' }}>
+            <div style={{ background: 'linear-gradient(135deg, #14224F 0%, #0C1733 100%)', color: 'white', padding: '24px', borderRadius: '16px', boxShadow: '0 10px 25px rgba(16,185,129,0.2)' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '12px' }}>
                 <span style={{ fontSize: '14px', opacity: 0.9 }}>Ümumi Gəlir</span>
                 <DollarSign size={24} style={{ opacity: 0.9 }} />
@@ -137,7 +137,7 @@ function MyServices() {
           <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '30px' }}>
             <div style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: '0 4px 6px rgba(0,0,0,0.04)' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '0 0 20px 0', fontSize: '18px', color: 'var(--text-primary)' }}>
-                <BarChart3 size={22} color="#10b981" /> Son 6 ayın gəliri
+                <BarChart3 size={22} color="#14224F" /> Son 6 ayın gəliri
               </h3>
               <div style={{ display: 'flex', alignItems: 'flex-end', gap: '14px', height: '180px', borderBottom: '2px solid #e2e8f0', paddingBottom: '8px' }}>
                 {stats.monthly.map((m, idx) => {
@@ -151,7 +151,7 @@ function MyServices() {
                           width: '100%',
                           height: `${heightPct}%`,
                           minHeight: m.revenue > 0 ? '4px' : '0',
-                          background: 'linear-gradient(180deg, #10b981 0%, #059669 100%)',
+                          background: 'linear-gradient(180deg, #14224F 0%, #0C1733 100%)',
                           borderRadius: '8px 8px 0 0',
                           transition: 'all 0.3s ease',
                           cursor: 'pointer'
@@ -204,7 +204,7 @@ function MyServices() {
           {stats.perService.length > 0 && (
             <div style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: '0 4px 6px rgba(0,0,0,0.04)', marginBottom: '20px' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '0 0 20px 0', fontSize: '18px', color: 'var(--text-primary)' }}>
-                <TrendingUp size={22} color="#10b981" /> Xidmət Üzrə Performans
+                <TrendingUp size={22} color="#14224F" /> Xidmət Üzrə Performans
               </h3>
               <div style={{ overflowX: 'auto' }}>
                 <table style={{ width: '100%', borderCollapse: 'collapse', minWidth: '600px' }}>
@@ -230,7 +230,7 @@ function MyServices() {
                             <Star size={14} fill="#f59e0b" color="#f59e0b" /> {s.rating}
                           </span>
                         </td>
-                        <td style={{ padding: '14px 8px', textAlign: 'right', color: '#10b981', fontWeight: '900', fontSize: '15px' }}>{s.revenue} AZN</td>
+                        <td style={{ padding: '14px 8px', textAlign: 'right', color: '#14224F', fontWeight: '900', fontSize: '15px' }}>{s.revenue} AZN</td>
                       </tr>
                     ))}
                   </tbody>
@@ -260,7 +260,7 @@ function MyServices() {
                 <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: 'var(--text-primary)' }}>{service.title}</h3>
                 <div style={{ display: 'flex', gap: '15px', color: 'var(--text-tertiary)', fontSize: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Tag size={14} /> Kateqoriya: {service.category}</span>
-                  <span style={{ fontWeight: 'bold', color: '#10b981' }}>Qiymət: {service.price} AZN</span>
+                  <span style={{ fontWeight: 'bold', color: '#14224F' }}>Qiymət: {service.price} AZN</span>
                 </div>
               </div>
               <div className="service-actions">

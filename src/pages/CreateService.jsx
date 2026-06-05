@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import { API_URL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -133,7 +133,7 @@ function CreateService() {
   return (
     <div className="main-content" style={{ maxWidth: 900, margin: '40px auto' }}>
       <h2 style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'var(--text-primary)', marginBottom: 20, fontSize: 26 }}>
-        <PlusCircle size={28} color="#10b981" /> Yeni Xidmət Yarat
+        <PlusCircle size={28} color="#14224F" /> Yeni Xidmət Yarat
       </h2>
 
       <form onSubmit={handleSubmit}>
@@ -173,7 +173,7 @@ function CreateService() {
                 <button type="button" onClick={() => removeImage(i)} style={{ position: 'absolute', top: 6, right: 6, background: 'rgba(0,0,0,0.6)', border: 'none', borderRadius: '50%', width: 26, height: 26, color: 'white', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                   <X size={14} />
                 </button>
-                {i === 0 && <span style={{ position: 'absolute', bottom: 6, left: 6, background: '#10b981', color: 'white', fontSize: 11, padding: '2px 8px', borderRadius: 6, fontWeight: 700 }}>Əsas</span>}
+                {i === 0 && <span style={{ position: 'absolute', bottom: 6, left: 6, background: '#14224F', color: 'white', fontSize: 11, padding: '2px 8px', borderRadius: 6, fontWeight: 700 }}>Əsas</span>}
               </div>
             ))}
             {images.length < 6 && (
@@ -246,7 +246,7 @@ function CreateService() {
 
         <div style={card}>
           <h3 style={{ color: 'var(--text-primary)', marginBottom: 15, fontSize: 18, display: 'flex', alignItems: 'center', gap: 8 }}>
-            <HelpCircle size={20} color="#10b981" /> Tez-tez verilən suallar (FAQ)
+            <HelpCircle size={20} color="#14224F" /> Tez-tez verilən suallar (FAQ)
           </h3>
           {faq.map((f, i) => (
             <div key={i} style={{ marginBottom: 12, padding: 12, background: 'var(--bg-page)', borderRadius: 8, border: '1px solid var(--border)' }}>
@@ -264,7 +264,7 @@ function CreateService() {
           </button>
         </div>
 
-        <button type="submit" disabled={isSubmitting} style={{ background: '#10b981', color: 'white', border: 'none', padding: 16, borderRadius: 12, fontSize: 17, fontWeight: 800, cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.7 : 1, width: '100%' }}>
+        <button type="submit" disabled={isSubmitting} style={{ background: '#14224F', color: 'white', border: 'none', padding: 16, borderRadius: 12, fontSize: 17, fontWeight: 800, cursor: isSubmitting ? 'not-allowed' : 'pointer', opacity: isSubmitting ? 0.7 : 1, width: '100%' }}>
           {isSubmitting ? 'Yaradılır...' : 'Xidməti Yayımla'}
         </button>
       </form>

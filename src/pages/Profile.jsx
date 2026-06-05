@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -73,7 +73,7 @@ function AvatarCropper({ src, onCancel, onSave }) {
         </div>
         <div style={{ marginTop: 16, display: 'flex', alignItems: 'center', gap: 10 }}>
           <span style={{ fontSize: 12, color: 'var(--text-tertiary)' }}>Yaxınlaş</span>
-          <input type="range" min="1" max="3" step="0.05" value={scale} onChange={(e) => setScale(parseFloat(e.target.value))} style={{ flex: 1, accentColor: '#10b981' }} />
+          <input type="range" min="1" max="3" step="0.05" value={scale} onChange={(e) => setScale(parseFloat(e.target.value))} style={{ flex: 1, accentColor: '#14224F' }} />
         </div>
         <p style={{ fontSize: 12, color: 'var(--text-muted)', textAlign: 'center', margin: '12px 0 0' }}>Şəkli sürüklə və zumu tənzimlə — ortadakı dairə profil şəkli olacaq.</p>
         <div style={{ display: 'flex', gap: 10, marginTop: 16 }}>
@@ -344,7 +344,7 @@ function Profile() {
             <div style={{ display: 'flex', justifyContent: 'space-around', margin: '20px 0', padding: '15px 0', borderTop: '1px solid var(--border)', borderBottom: '1px solid var(--border)' }}>
               <div style={{ textAlign: 'center' }}>
                 <div style={{ fontSize: '20px', fontWeight: '900', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '5px' }}>
-                  <Users size={16} color="#10b981" /> {user.followersCount || 0}
+                  <Users size={16} color="#14224F" /> {user.followersCount || 0}
                 </div>
                 <div style={{ fontSize: '12px', color: 'var(--text-tertiary)' }}>İzləyən</div>
               </div>
@@ -368,7 +368,7 @@ function Profile() {
                   onClick={handleFollowToggle}
                   style={{
                     flex: 1,
-                    background: user.isFollowing ? 'var(--bg-muted)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+                    background: user.isFollowing ? 'var(--bg-muted)' : 'linear-gradient(135deg, #14224F 0%, #0C1733 100%)',
                     color: user.isFollowing ? 'var(--text-primary)' : 'white',
                     border: user.isFollowing ? '1px solid var(--border-strong)' : 'none',
                     padding: '12px',
@@ -481,7 +481,7 @@ function Profile() {
           {/* === STATİSTİKA KARTI === */}
           <div className="profile-stats" style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginBottom: 30 }}>
             <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, padding: '18px 14px', textAlign: 'center' }}>
-              <ShoppingBag size={22} color="#10b981" style={{ marginBottom: 6 }} />
+              <ShoppingBag size={22} color="#14224F" style={{ marginBottom: 6 }} />
               <div style={{ fontSize: 24, fontWeight: 900, color: 'var(--text-primary)', lineHeight: 1 }}>{user.completedSales || 0}</div>
               <div style={{ fontSize: 12, color: 'var(--text-tertiary)', marginTop: 4 }}>Tamamlanmış sifariş</div>
             </div>
@@ -503,7 +503,7 @@ function Profile() {
               <h2 style={{ fontSize: 20, color: 'var(--text-primary)', margin: 0, fontWeight: 800 }}>Portfolyo</h2>
               {isMyProfile && (
                 <>
-                  <button onClick={() => filePortfolioRef.current?.click()} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                  <button onClick={() => filePortfolioRef.current?.click()} style={{ background: '#14224F', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 6 }}>
                     <Plus size={14} /> Şəkil əlavə et
                   </button>
                   <input ref={filePortfolioRef} type="file" accept="image/*" onChange={onPortfolioFileChosen} style={{ display: 'none' }} />

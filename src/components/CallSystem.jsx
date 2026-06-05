@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+﻿import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 
@@ -372,7 +372,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 });
 
 const btnBase = { width: 64, height: 64, borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'white', transition: '0.2s', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' };
-const btnGreen = { ...btnBase, background: '#10b981' };
+const btnGreen = { ...btnBase, background: '#14224F' };
 const btnRed = { ...btnBase, background: '#ef4444' };
 const btnGray = (active) => ({ ...btnBase, background: active ? '#ef4444' : 'rgba(255,255,255,0.18)' });
 

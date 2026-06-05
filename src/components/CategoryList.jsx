@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { Globe, Palette, Code, PenTool, Video } from 'lucide-react';
 
 // value kısımları backend'e kaydederken kullandığımız anahtar kelimelerle aynı olmalı
@@ -24,7 +24,7 @@ function CategoryList({ activeCategory, onCategorySelect }) {
               onClick={() => onCategorySelect(cat.value)}
             >
               <span className="category-icon" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <IconComponent size={36} color="#10b981" />
+                <IconComponent size={36} color="#14224F" />
               </span>
               <span className="category-name">{cat.name}</span>
             </div>

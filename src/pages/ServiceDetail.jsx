@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -137,7 +137,7 @@ function ServiceDetail() {
     <div className="main-content" style={{ maxWidth: 1200, margin: '40px auto', padding: '0 5%' }}>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-tertiary)', fontSize: 14, marginBottom: 20 }}>
-        <Link to="/" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 700 }}>Ana Səhifə</Link>
+        <Link to="/" style={{ color: '#14224F', textDecoration: 'none', fontWeight: 700 }}>Ana Səhifə</Link>
         <ChevronRight size={14} />
         <span>{service.category}</span>
       </div>
@@ -185,7 +185,7 @@ function ServiceDetail() {
           {gallery.length > 1 && (
             <div style={{ display: 'flex', gap: 8, marginBottom: 30, overflowX: 'auto', paddingBottom: 4 }}>
               {gallery.map((src, i) => (
-                <button key={i} onClick={() => setActiveImg(i)} style={{ flex: '0 0 90px', height: 70, borderRadius: 8, overflow: 'hidden', border: `2px solid ${i === activeImg ? '#10b981' : 'var(--border)'}`, cursor: 'pointer', padding: 0, background: 'transparent' }}>
+                <button key={i} onClick={() => setActiveImg(i)} style={{ flex: '0 0 90px', height: 70, borderRadius: 8, overflow: 'hidden', border: `2px solid ${i === activeImg ? '#14224F' : 'var(--border)'}`, cursor: 'pointer', padding: 0, background: 'transparent' }}>
                   <img src={src} alt={`thumb-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 </button>
               ))}
@@ -259,9 +259,9 @@ function ServiceDetail() {
                         <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{new Date(rv.createdAt).toLocaleDateString('az-AZ', { day: 'numeric', month: 'short', year: 'numeric' })}</div>
 
                         {rv.sellerReply?.text ? (
-                          <div style={{ marginTop: 10, padding: 12, background: 'var(--bg-page)', borderRadius: 10, borderLeft: '3px solid #10b981' }}>
+                          <div style={{ marginTop: 10, padding: 12, background: 'var(--bg-page)', borderRadius: 10, borderLeft: '3px solid #14224F' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                              <strong style={{ fontSize: 13, color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                              <strong style={{ fontSize: 13, color: '#14224F', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                                 <Reply size={13} /> Satıcının cavabı
                               </strong>
                               {isAuthor && (
@@ -281,11 +281,11 @@ function ServiceDetail() {
                               <textarea autoFocus value={replyText} onChange={(e) => setReplyText(e.target.value)} placeholder="Müştəriyə cavabını yaz..." className="auth-input" style={{ width: '100%', minHeight: 80, padding: 10, fontSize: 14, fontFamily: 'inherit' }} maxLength={1000} />
                               <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
                                 <button onClick={() => { setReplyingTo(null); setReplyText(''); }} className="btn-modal-cancel" style={{ padding: '8px 14px' }}>Ləğv</button>
-                                <button onClick={() => submitReply(rv._id)} style={{ background: '#10b981', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Cavabı göndər</button>
+                                <button onClick={() => submitReply(rv._id)} style={{ background: '#14224F', color: 'white', border: 'none', padding: '8px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13 }}>Cavabı göndər</button>
                               </div>
                             </div>
                           ) : (
-                            <button onClick={() => { setReplyingTo(rv._id); setReplyText(''); }} style={{ marginTop: 8, background: 'transparent', border: '1px solid var(--border-strong)', color: '#10b981', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                            <button onClick={() => { setReplyingTo(rv._id); setReplyText(''); }} style={{ marginTop: 8, background: 'transparent', border: '1px solid var(--border-strong)', color: '#14224F', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                               <Reply size={13} /> Cavabla
                             </button>
                           )
@@ -297,8 +297,8 @@ function ServiceDetail() {
               )}
               {currentUser && !isAuthor && reviewsLoaded && (
                 <div style={{ marginTop: 18, padding: 14, background: 'var(--bg-page)', borderRadius: 10, fontSize: 13, color: 'var(--text-tertiary)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-                  <ShoppingCart size={16} color="#10b981" style={{ marginTop: 2, flexShrink: 0 }} />
-                  <span>Yalnız bu xidməti sifariş edib tamamladıqdan sonra rəy yaza bilərsən. <Link to="/sifarislerim" style={{ color: '#10b981', fontWeight: 700, textDecoration: 'none' }}>Sifarişlərimə bax →</Link></span>
+                  <ShoppingCart size={16} color="#14224F" style={{ marginTop: 2, flexShrink: 0 }} />
+                  <span>Yalnız bu xidməti sifariş edib tamamladıqdan sonra rəy yaza bilərsən. <Link to="/sifarislerim" style={{ color: '#14224F', fontWeight: 700, textDecoration: 'none' }}>Sifarişlərimə bax →</Link></span>
                 </div>
               )}
             </div>
@@ -321,29 +321,29 @@ function ServiceDetail() {
                   <div style={{ padding: 24 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
                       <span style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 16 }}>{selectedPkg.title || 'Paket'}</span>
-                      <span style={{ fontSize: 30, color: '#10b981', fontWeight: 900 }}>{selectedPkg.price} ₼</span>
+                      <span style={{ fontSize: 30, color: '#14224F', fontWeight: 900 }}>{selectedPkg.price} ₼</span>
                     </div>
                     {selectedPkg.description && (
                       <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, margin: '4px 0 18px 0' }}>{selectedPkg.description}</p>
                     )}
                     <div style={{ display: 'flex', gap: 18, color: 'var(--text-secondary)', fontSize: 14, fontWeight: 600, marginBottom: 18, paddingBottom: 18, borderBottom: '1px solid var(--border)' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <Clock size={16} color="#10b981" /> {selectedPkg.deliveryDays} gün
+                        <Clock size={16} color="#14224F" /> {selectedPkg.deliveryDays} gün
                       </span>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                        <RefreshCw size={16} color="#10b981" /> {selectedPkg.revisions} revizyon
+                        <RefreshCw size={16} color="#14224F" /> {selectedPkg.revisions} revizyon
                       </span>
                     </div>
                     {selectedPkg.features?.length > 0 && (
                       <ul style={{ listStyle: 'none', padding: 0, margin: '0 0 18px 0', display: 'flex', flexDirection: 'column', gap: 8 }}>
                         {selectedPkg.features.map((f, i) => (
                           <li key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 8, color: 'var(--text-secondary)', fontSize: 14 }}>
-                            <Check size={16} color="#10b981" style={{ flexShrink: 0, marginTop: 2 }} /> {f}
+                            <Check size={16} color="#14224F" style={{ flexShrink: 0, marginTop: 2 }} /> {f}
                           </li>
                         ))}
                       </ul>
                     )}
-                    <button onClick={handleOrder} style={orderBtn} onMouseOver={(e) => e.currentTarget.style.background = '#059669'} onMouseOut={(e) => e.currentTarget.style.background = '#10b981'}>
+                    <button onClick={handleOrder} style={orderBtn} onMouseOver={(e) => e.currentTarget.style.background = '#0C1733'} onMouseOut={(e) => e.currentTarget.style.background = '#14224F'}>
                       <ShoppingCart size={20} /> Bu paketi sifariş et ({selectedPkg.price} ₼)
                     </button>
                     <button onClick={handleContactSeller} style={contactBtn}>
@@ -356,10 +356,10 @@ function ServiceDetail() {
               <div style={{ padding: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
                   <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 700 }}>Qiymət</span>
-                  <span style={{ fontSize: 30, color: '#10b981', fontWeight: 900 }}>{service.price} ₼</span>
+                  <span style={{ fontSize: 30, color: '#14224F', fontWeight: 900 }}>{service.price} ₼</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 14, marginBottom: 18 }}>
-                  <Clock size={18} color="#10b981" /> {service.deliveryDays} gün
+                  <Clock size={18} color="#14224F" /> {service.deliveryDays} gün
                 </div>
                 <button onClick={handleOrder} style={orderBtn}>
                   <ShoppingCart size={20} /> İndi sifariş et
@@ -393,16 +393,16 @@ function ServiceDetail() {
             const rows = [
               { label: 'İlan tarixi',         val: fmtAgo(service.createdAt),               icon: Calendar,    color: '#6366f1' },
               { label: 'Cəmi sifariş',        val: s.ordersTotal,                           icon: ShoppingBag, color: '#f59e0b' },
-              { label: 'Tamamlanmış',         val: s.ordersCompleted,                       icon: CheckCircle, color: '#10b981' },
+              { label: 'Tamamlanmış',         val: s.ordersCompleted,                       icon: CheckCircle, color: '#14224F' },
               { label: 'Ləğv edilmiş',        val: s.ordersCanceled,                        icon: XCircle,     color: '#ef4444' },
               { label: 'Son baxış',           val: `${service.views || 0} dəfə`,            icon: Eye,         color: '#8b5cf6' },
               { label: 'Ort. cavab müddəti',  val: fmtResp(s.authorResponseMinutes),        icon: Clock,       color: '#06b6d4' },
-              { label: 'Son aktivlik',        val: fmtAgo(s.authorLastActive),              icon: Activity,    color: '#10b981' },
+              { label: 'Son aktivlik',        val: fmtAgo(s.authorLastActive),              icon: Activity,    color: '#14224F' },
               { label: 'Son təslim',          val: fmtAgo(s.lastDeliveredAt),               icon: Package,     color: '#3b82f6' },
             ];
             return (
               <div style={{ marginTop: 14, background: 'var(--bg-surface)', borderRadius: 16, border: '1px solid var(--border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
-                <div style={{ padding: '14px 20px', background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', color: 'white', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, fontSize: 14 }}>
+                <div style={{ padding: '14px 20px', background: 'linear-gradient(135deg, #14224F 0%, #0C1733 100%)', color: 'white', display: 'flex', alignItems: 'center', gap: 8, fontWeight: 800, fontSize: 14 }}>
                   <BarChart3 size={16} /> Statistika
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
@@ -445,7 +445,7 @@ function ServiceDetail() {
                     <h3 style={{ margin: 0, fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.4 }}>{s.title.length > 60 ? s.title.slice(0, 60) + '...' : s.title}</h3>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', fontSize: 12, color: 'var(--text-tertiary)' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Clock size={12} /> {fastest} gün</span>
-                      <span style={{ color: '#10b981', fontWeight: 700, fontSize: 14 }}>{startPrice} ₼-dən</span>
+                      <span style={{ color: '#14224F', fontWeight: 700, fontSize: 14 }}>{startPrice} ₼-dən</span>
                     </div>
                   </div>
                 </Link>
@@ -476,7 +476,7 @@ const navBtn = (side) => ({
 });
 
 const orderBtn = {
-  width: '100%', background: '#10b981', color: 'white', border: 'none', padding: 14, borderRadius: 12,
+  width: '100%', background: '#14224F', color: 'white', border: 'none', padding: 14, borderRadius: 12,
   fontSize: 16, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center',
   justifyContent: 'center', gap: 10, marginBottom: 10, transition: '0.2s',
 };
@@ -490,8 +490,8 @@ const contactBtn = {
 const TabBtn = ({ active, onClick, children }) => (
   <button onClick={onClick} style={{
     padding: '12px 18px', background: 'transparent', border: 'none',
-    borderBottom: `2px solid ${active ? '#10b981' : 'transparent'}`,
-    color: active ? '#10b981' : 'var(--text-tertiary)', fontWeight: 700,
+    borderBottom: `2px solid ${active ? '#14224F' : 'transparent'}`,
+    color: active ? '#14224F' : 'var(--text-tertiary)', fontWeight: 700,
     cursor: 'pointer', fontSize: 15,
   }}>{children}</button>
 );

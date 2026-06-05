@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+﻿import React, { useState, useEffect, useRef } from 'react';
 import { API_URL } from '../api';
 import { Link } from 'react-router-dom';
 import { Bot, Send, X as XIcon, AlertTriangle, Trash2 } from 'lucide-react';
@@ -83,7 +83,7 @@ function AIChat({ open, onClose, model = 'mid' }) {
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
             <div>
-              <strong style={{ fontSize: 16 }}>Onluq AI Köməkçi</strong>
+              <strong style={{ fontSize: 16 }}>EVDƏN AI Köməkçi</strong>
               <div style={{ fontSize: 11, opacity: 0.85 }}>
                 {isGuest ? 'Qonaq rejimi — Sadə model' : (modelLabel ? `Model: ${modelLabel}` : 'Səninlə söhbət edir')}
               </div>
@@ -112,7 +112,7 @@ function AIChat({ open, onClose, model = 'mid' }) {
               <Bot size={36} color="#8b5cf6" style={{ marginBottom: 10 }} />
               <p style={{ margin: 0, fontSize: 14 }}>Sualını yaz — AI sənə kömək edəcək.</p>
               <div style={{ marginTop: 14, display: 'flex', gap: 6, justifyContent: 'center', flexWrap: 'wrap' }}>
-                {['Onluq nədir?', 'Necə qeydiyyatdan keçim?', 'Salam, necəsən?'].map((s) => (
+                {['EVDƏN nədir?', 'Necə qeydiyyatdan keçim?', 'Salam, necəsən?'].map((s) => (
                   <button key={s} onClick={() => setQ(s)} style={{ background: 'rgba(99,102,241,0.08)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.2)', padding: '6px 12px', borderRadius: 999, fontSize: 12, cursor: 'pointer', fontWeight: 600 }}>{s}</button>
                 ))}
               </div>

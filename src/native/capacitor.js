@@ -32,9 +32,9 @@ export async function initNative() {
   }
 
   await safe(() => StatusBar.setOverlaysWebView({ overlay: false }));
-  const dark = document.body.classList.contains('dark-mode');
-  await safe(() => StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light }));
-  await safe(() => StatusBar.setBackgroundColor({ color: dark ? '#0b1220' : '#ffffff' }));
+  // EVDƏN: status bar her zaman navy (brand), icon'lar acik (Style.Light = light foreground)
+  await safe(() => StatusBar.setStyle({ style: Style.Light }));
+  await safe(() => StatusBar.setBackgroundColor({ color: '#14224F' }));
 
   await safe(() => Keyboard.addListener('keyboardWillShow', () => {
     document.body.classList.add('keyboard-open');
@@ -51,11 +51,10 @@ export async function initNative() {
   // Splash kapali olarak baslattik (launchAutoHide=false). Ilk render hazir oldugunda kapatiyoruz.
   setTimeout(() => { safe(() => SplashScreen.hide({ fadeOutDuration: 200 })); }, 350);
 
-  // Status bar temasini calismasini takip et — dark/light degisince guncelle
+  // EVDƏN: status bar her tema'da navy kalir, dark mode degisikligini takip etmeyiz.
   const observer = new MutationObserver(() => {
-    const isDark = document.body.classList.contains('dark-mode');
-    safe(() => StatusBar.setStyle({ style: isDark ? Style.Dark : Style.Light }));
-    safe(() => StatusBar.setBackgroundColor({ color: isDark ? '#0b1220' : '#ffffff' }));
+    safe(() => StatusBar.setStyle({ style: Style.Light }));
+    safe(() => StatusBar.setBackgroundColor({ color: '#14224F' }));
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 

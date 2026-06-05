@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { MessageSquare, Package, Briefcase, Wallet, ShieldCheck, LogOut, CheckCircle, Bell, Heart, Sun, Moon, ArrowRight, Menu, X, User, Lightbulb, Bot } from 'lucide-react';
@@ -160,8 +160,8 @@ function Navbar() {
     <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 5%', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', alignItems: 'center', position: 'sticky', top: 0, zIndex: 1000 }}>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-        <Link to="/" style={{ fontSize: '26px', fontWeight: '900', color: '#10b981', textDecoration: 'none', letterSpacing: '-1px' }}>
-          Onluq.
+        <Link to="/" style={{ fontSize: '26px', fontWeight: '900', color: '#14224F', textDecoration: 'none', letterSpacing: '-1px' }}>
+          EVDƏN.
         </Link>
       </div>
 
@@ -204,7 +204,7 @@ function Navbar() {
                 <div className="notif-dropdown" style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', width: '320px', maxWidth: 'calc(100vw - 24px)', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
                   <div style={{ padding: '15px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border)', fontWeight: 'bold', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Bildirişlər</span>
-                    {unreadCount > 0 && <span onClick={handleMarkAllRead} style={{fontSize: '12px', color: '#10b981', cursor: 'pointer'}}>Hamısını oxu</span>}
+                    {unreadCount > 0 && <span onClick={handleMarkAllRead} style={{fontSize: '12px', color: '#14224F', cursor: 'pointer'}}>Hamısını oxu</span>}
                   </div>
                   <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     {notifications.length === 0 ? (
@@ -220,7 +220,7 @@ function Navbar() {
                             onMouseOut={(e) => e.currentTarget.style.background = n.isRead ? 'var(--bg-elevated)' : 'var(--brand-soft)'}
                           >
                             <div style={{ display: 'flex', alignItems: 'flex-start', gap: '10px' }}>
-                              <div style={{ marginTop: '3px' }}><MessageSquare size={16} color="#10b981" /></div>
+                              <div style={{ marginTop: '3px' }}><MessageSquare size={16} color="#14224F" /></div>
                               <div style={{ flex: 1, lineHeight: '1.4' }}>{n.message}</div>
                             </div>
                           </div>
@@ -287,20 +287,20 @@ function Navbar() {
               )}
             </Link>
 
-            <Link to="/mesajlar" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
+            <Link to="/mesajlar" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#14224F'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
               <MessageSquare size={18} style={{ marginRight: '6px' }} /> Mesajlar
             </Link>
-            <Link to="/sifarislerim" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
+            <Link to="/sifarislerim" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#14224F'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
               <Package size={18} style={{ marginRight: '6px' }} /> Sifarişlər
             </Link>
-            <Link to="/xidmetlerim" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
+            <Link to="/xidmetlerim" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', fontSize: '15px', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#14224F'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>
               <Briefcase size={18} style={{ marginRight: '6px' }} /> Xidmətlərim
             </Link>
             <Link to="/beyin-yedeyi" title="Bilik bazası — Frilanserlərin paylaşdığı həllər" style={{ position: 'relative', display: 'flex', alignItems: 'center', textDecoration: 'none', color: '#6366f1', fontWeight: '700', fontSize: '15px', transition: '0.2s', background: 'rgba(99,102,241,0.08)', padding: '8px 12px', borderRadius: 8 }} onMouseOver={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.16)'} onMouseOut={(e) => e.currentTarget.style.background = 'rgba(99,102,241,0.08)'}>
               <Lightbulb size={17} style={{ marginRight: '5px' }} /> Bilik
               <span style={{ position: 'absolute', top: -6, right: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
             </Link>
-            <Link to="/cuzdan" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--brand-soft)', color: '#10b981', fontWeight: '700', padding: '8px 15px', borderRadius: '8px', border: '1px solid var(--brand-soft)' }}>
+            <Link to="/cuzdan" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--brand-soft)', color: '#14224F', fontWeight: '700', padding: '8px 15px', borderRadius: '8px', border: '1px solid var(--brand-soft)' }}>
               <Wallet size={18} style={{ marginRight: '6px' }} /> Cüzdanım
             </Link>
             
@@ -335,8 +335,8 @@ function Navbar() {
               <Bot size={17} style={{ marginRight: '5px' }} /> AI ilə danış
               <span style={{ position: 'absolute', top: -6, right: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
             </button>
-            <Link to="/giris" style={{ textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#10b981'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>Giriş Et</Link>
-            <Link to="/qeydiyyat" style={{ background: '#10b981', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)' }}>
+            <Link to="/giris" style={{ textDecoration: 'none', color: 'var(--text-secondary)', fontWeight: '600', transition: '0.2s' }} onMouseOver={(e) => e.target.style.color = '#14224F'} onMouseOut={(e) => e.target.style.color = 'var(--text-secondary)'}>Giriş Et</Link>
+            <Link to="/qeydiyyat" style={{ background: '#14224F', color: 'white', padding: '10px 20px', borderRadius: '8px', textDecoration: 'none', fontWeight: '700', boxShadow: '0 4px 6px -1px rgba(16, 185, 129, 0.2)' }}>
               Qeydiyyat
             </Link>
           </>

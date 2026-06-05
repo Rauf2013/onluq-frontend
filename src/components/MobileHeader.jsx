@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { ChevronLeft, Bell, Sun, Moon } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 import { API_URL } from '../api';
 
 const TITLES = {
-  '/':                 'Onluq',
+  '/':                 'EVDƏN',
   '/kategoriler':      'Kateqoriyalar',
   '/giris':            'Daxil ol',
   '/qeydiyyat':        'Qeydiyyat',
@@ -29,7 +29,7 @@ function titleForPath(path) {
   if (path.startsWith('/odeme/')) return 'Ödəniş';
   if (path.startsWith('/beyin-yedeyi/')) return 'Qeyd';
   if (path.startsWith('/sifre-yenile/')) return 'Şifrə yenilə';
-  return 'Onluq';
+  return 'EVDƏN';
 }
 
 const ROOT_PATHS = new Set(['/', '/kategoriler', '/sifarislerim', '/mesajlar']);
@@ -74,10 +74,10 @@ export default function MobileHeader() {
             <ChevronLeft size={24} />
           </button>
         ) : (
-          <span className="mobile-brand">Onluq</span>
+          <span className="mobile-brand">EVDƏN</span>
         )}
       </div>
-      <div className="mobile-top-title">{title !== 'Onluq' || !isRoot ? title : ''}</div>
+      <div className="mobile-top-title">{title !== 'EVDƏN' || !isRoot ? title : ''}</div>
       <div className="mobile-top-right">
         <button onClick={toggleTheme} className="mobile-icon-btn" aria-label="Tema">
           {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}

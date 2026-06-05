@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -104,7 +104,7 @@ function Categories() {
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            style={{ background: activeCategory === cat ? '#10b981' : 'var(--bg-muted)', color: activeCategory === cat ? 'white' : 'var(--text-secondary)', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap', transition: '0.2s' }}
+            style={{ background: activeCategory === cat ? '#14224F' : 'var(--bg-muted)', color: activeCategory === cat ? 'white' : 'var(--text-secondary)', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap', transition: '0.2s' }}
           >
             {cat}
           </button>
@@ -178,7 +178,7 @@ function Categories() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-primary)', fontWeight: 'bold' }}>
                         <Star size={16} fill="#fbbf24" color="#fbbf24" /> {service.rating || "0.0"} <span style={{color: 'var(--text-muted)', fontWeight: 'normal', fontSize: '13px'}}>({service.reviewsCount || 0})</span>
                       </div>
-                      <span style={{ fontWeight: 'bold', color: '#10b981', fontSize: '15px' }}>{startPrice} ₼-dən</span>
+                      <span style={{ fontWeight: 'bold', color: '#14224F', fontSize: '15px' }}>{startPrice} ₼-dən</span>
                     </div>
                   </div>
                 </Link>

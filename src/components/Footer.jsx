@@ -1,9 +1,9 @@
-import React from 'react';
+﻿import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Facebook, Twitter, Instagram, Linkedin, Mail } from 'lucide-react';
 
 const linkStyle = { color: 'var(--text-muted)', textDecoration: 'none', transition: '0.2s', cursor: 'pointer' };
-const onHoverIn = (e) => { e.target.style.color = '#10b981'; };
+const onHoverIn = (e) => { e.target.style.color = '#14224F'; };
 const onHoverOut = (e) => { e.target.style.color = '#94a3b8'; };
 
 function Footer() {
@@ -15,11 +15,11 @@ function Footer() {
   }
 
   return (
-    <footer style={{ background: '#0f172a', color: '#f8fafc', paddingTop: '60px', paddingBottom: '20px', marginTop: '60px', borderTop: '4px solid #10b981' }}>
+    <footer style={{ background: '#0f172a', color: '#f8fafc', paddingTop: '60px', paddingBottom: '20px', marginTop: '60px', borderTop: '4px solid #14224F' }}>
       <div style={{ maxWidth: '1200px', margin: '0 auto', padding: '0 20px', display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '40px', marginBottom: '40px' }}>
 
         <div>
-          <h2 style={{ color: '#10b981', fontSize: '28px', fontWeight: '900', margin: '0 0 20px 0', letterSpacing: '-1px' }}>Onluq.</h2>
+          <h2 style={{ color: '#14224F', fontSize: '28px', fontWeight: '900', margin: '0 0 20px 0', letterSpacing: '-1px' }}>EVDƏN.</h2>
           <p style={{ color: 'var(--text-muted)', lineHeight: '1.6', fontSize: '15px' }}>
             Azərbaycanın ən böyük frilanser platforması. İstedadlı mütəxəssisləri və böyük layihələri bir araya gətiririk. İşinizi peşəkarlara etibar edin.
           </p>
@@ -47,8 +47,8 @@ function Footer() {
 
         <div>
           <h3 style={{ color: 'white', fontSize: '18px', marginBottom: '20px' }}>Dəstək və Əlaqə</h3>
-          <a href="mailto:destek@onluq.az" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', marginBottom: '15px', textDecoration: 'none' }}>
-            <Mail size={18} color="#10b981" /> destek@onluq.az
+          <a href="mailto:destek@evden.az" style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-muted)', marginBottom: '15px', textDecoration: 'none' }}>
+            <Mail size={18} color="#14224F" /> destek@evden.az
           </a>
           <div style={{ display: 'flex', gap: '15px', marginTop: '20px' }}>
             <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" style={{ color: 'var(--text-muted)', transition: '0.2s' }} onMouseOver={onHoverIn} onMouseOut={onHoverOut}><Facebook size={24} /></a>
@@ -60,7 +60,7 @@ function Footer() {
       </div>
 
       <div style={{ borderTop: '1px solid #1e293b', paddingTop: '20px', textAlign: 'center', color: 'var(--text-tertiary)', fontSize: '14px' }}>
-        <p style={{ margin: 0 }}>© {new Date().getFullYear()} Onluq.az - Bütün hüquqlar qorunur.</p>
+        <p style={{ margin: 0 }}>© {new Date().getFullYear()} EVDƏN - Bütün hüquqlar qorunur.</p>
       </div>
     </footer>
   );

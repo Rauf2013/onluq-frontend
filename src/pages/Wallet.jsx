@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
@@ -81,13 +81,13 @@ function Wallet() {
   return (
     <div className="main-content" style={{ minHeight: '70vh', maxWidth: '1000px', margin: '0 auto' }}>
       <h2 className="section-title" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-        <WalletIcon size={28} color="#10b981" /> Cüzdanım və Qazanclarım
+        <WalletIcon size={28} color="#14224F" /> Cüzdanım və Qazanclarım
       </h2>
 
       <div className="wallet-grid" style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '30px', alignItems: 'start' }}>
         
         <div style={{ background: 'var(--bg-surface)', padding: '30px', borderRadius: '16px', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)', border: '1px solid var(--border)' }}>
-          <div style={{ background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)', padding: '30px', borderRadius: '12px', color: 'white', marginBottom: '30px', textAlign: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg, #14224F 0%, #0C1733 100%)', padding: '30px', borderRadius: '12px', color: 'white', marginBottom: '30px', textAlign: 'center' }}>
             <p style={{ margin: '0 0 10px 0', fontSize: '16px', opacity: '0.9' }}>Mövcud Balans</p>
             <h1 style={{ margin: 0, fontSize: '42px', fontWeight: '800' }}>{balance.toFixed(2)} AZN</h1>
           </div>
@@ -120,7 +120,7 @@ function Wallet() {
               {withdrawals.map(w => {
                 let statusColor = '#f59e0b'; 
                 let StatusIcon = Clock;
-                if (w.status === 'Tamamlandı') { statusColor = '#10b981'; StatusIcon = CheckCircle; }
+                if (w.status === 'Tamamlandı') { statusColor = '#14224F'; StatusIcon = CheckCircle; }
                 if (w.status === 'Rədd Edildi') { statusColor = '#ef4444'; StatusIcon = XCircle; }
 
                 return (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -173,7 +173,7 @@ function AdminPanel() {
 
   if (loading) return <div style={{ textAlign: 'center', padding: 100 }}>Yüklənir...</div>;
 
-  const StatCard = ({ icon: Icon, label, value, sub, color = '#10b981' }) => (
+  const StatCard = ({ icon: Icon, label, value, sub, color = '#14224F' }) => (
     <div className="admin-stat-card" style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 20 }}>
       <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 10 }}>
         <div style={{ width: 38, height: 38, borderRadius: 10, background: `${color}20`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
@@ -212,7 +212,7 @@ function AdminPanel() {
       {tab === 'overview' && stats && (
         <div className="admin-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 16, marginBottom: 24 }}>
           <StatCard icon={Users} label="İstifadəçi" value={stats.users} sub={`${stats.admins} admin`} color="#3b82f6" />
-          <StatCard icon={Briefcase} label="Xidmət" value={stats.services} color="#10b981" />
+          <StatCard icon={Briefcase} label="Xidmət" value={stats.services} color="#14224F" />
           <StatCard icon={ShoppingBag} label="Sifariş" value={stats.orders} sub={`${stats.completedOrders} tamamlanıb`} color="#f59e0b" />
           <StatCard icon={TrendingUp} label="Ümumi gəlir" value={`${stats.totalRevenue} ₼`} color="#8b5cf6" />
           <StatCard icon={Wallet} label="Ödəniş tələbi" value={stats.withdrawals} sub={`${stats.pendingWithdrawals} gözləyir`} color="#ef4444" />
@@ -268,12 +268,12 @@ function AdminPanel() {
                           {isAdmin ? 'Admin' : 'İstifadəçi'}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', textAlign: 'right', color: '#10b981', fontWeight: 700, fontSize: 13 }}>{u.balance || 0} ₼</td>
+                      <td style={{ padding: '12px 16px', textAlign: 'right', color: '#14224F', fontWeight: 700, fontSize: 13 }}>{u.balance || 0} ₼</td>
                       <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                         <div style={{ display: 'inline-flex', gap: 6, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
                           <button onClick={() => setConfirmAction({ kind: 'role', user: u, label: isAdmin ? 'Adminlikdən çıxar?' : 'Admin etmək?', desc: isAdmin ? `${u.fullName} adlı istifadəçinin adminliyi silinəcək.` : `${u.fullName} admin olacaq və bütün admin paneline çıxışı olacaq.`, confirmLabel: isAdmin ? 'Adminliyi sil' : 'Admin et', danger: false, run: () => toggleRole(u) })}
                             disabled={isMe && isAdmin}
-                            style={{ background: isAdmin ? 'var(--bg-muted)' : '#10b981', color: isAdmin ? 'var(--text-secondary)' : 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: isMe && isAdmin ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, opacity: isMe && isAdmin ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            style={{ background: isAdmin ? 'var(--bg-muted)' : '#14224F', color: isAdmin ? 'var(--text-secondary)' : 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: isMe && isAdmin ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, opacity: isMe && isAdmin ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                             {isAdmin ? <><UserMinus size={12} /> Adminliyi sil</> : <><UserPlus size={12} /> Admin et</>}
                           </button>
                           <button onClick={() => setConfirmAction({ kind: 'delete', user: u, label: 'İstifadəçini silmək?', desc: `${u.fullName} hesabı və bütün məlumatları silinəcək. Bu əməliyyat geri alına bilməz.`, confirmLabel: 'Sil', danger: true, run: () => deleteUser(u) })}
@@ -354,13 +354,13 @@ function AdminPanel() {
             </thead>
             <tbody>
               {orders.map((o) => {
-                const c = o.status === 'Tamamlandı' ? '#10b981' : o.status === 'Ləğv edildi' ? '#ef4444' : '#f59e0b';
+                const c = o.status === 'Tamamlandı' ? '#14224F' : o.status === 'Ləğv edildi' ? '#ef4444' : '#f59e0b';
                 return (
                   <tr key={o._id} style={{ borderTop: '1px solid var(--border-soft)' }}>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-tertiary)' }}>{new Date(o.createdAt).toLocaleDateString('az-AZ')}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-primary)' }}>{o.buyerId?.fullName || '—'}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-primary)' }}>{(o.serviceId?.title || '—').slice(0, 50)}</td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: '#10b981', fontWeight: 700 }}>{o.amount} ₼</td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: '#14224F', fontWeight: 700 }}>{o.amount} ₼</td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ background: `${c}20`, color: c, padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700 }}>{o.status}</span>
                     </td>
@@ -388,7 +388,7 @@ function AdminPanel() {
             </thead>
             <tbody>
               {withdrawals.map((w) => {
-                const c = w.status === 'Tamamlandı' ? '#10b981' : w.status === 'Rədd Edildi' ? '#ef4444' : '#f59e0b';
+                const c = w.status === 'Tamamlandı' ? '#14224F' : w.status === 'Rədd Edildi' ? '#ef4444' : '#f59e0b';
                 return (
                   <tr key={w._id} style={{ borderTop: '1px solid var(--border-soft)' }}>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-tertiary)' }}>{new Date(w.createdAt).toLocaleDateString('az-AZ')}</td>
@@ -397,14 +397,14 @@ function AdminPanel() {
                       <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{w.userId?.email}</div>
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-primary)', wordBreak: 'break-all', maxWidth: 200 }}>{w.iban}</td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: '#10b981', fontWeight: 700 }}>{w.amount} ₼</td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: '#14224F', fontWeight: 700 }}>{w.amount} ₼</td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ background: `${c}20`, color: c, padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>{w.status}</span>
                     </td>
                     <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                       {w.status === 'Gözləyir' ? (
                         <div style={{ display: 'inline-flex', gap: 6 }}>
-                          <button onClick={() => updateWithdrawal(w._id, 'Tamamlandı')} style={{ background: '#10b981', color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                          <button onClick={() => updateWithdrawal(w._id, 'Tamamlandı')} style={{ background: '#14224F', color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
                             <CheckCircle size={12} /> Ödə
                           </button>
                           <button onClick={() => updateWithdrawal(w._id, 'Rədd Edildi')} style={{ background: '#ef4444', color: 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
@@ -426,14 +426,14 @@ function AdminPanel() {
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           <div style={{ background: 'var(--bg-surface)', border: '1px solid var(--border)', borderRadius: 14, padding: 24 }}>
             <h3 style={{ margin: '0 0 8px', fontSize: 18, fontWeight: 800, color: 'var(--text-primary)', display: 'flex', alignItems: 'center', gap: 8 }}>
-              <Power size={18} color={siteClosed ? '#ef4444' : '#10b981'} /> Saytın vəziyyəti
+              <Power size={18} color={siteClosed ? '#ef4444' : '#14224F'} /> Saytın vəziyyəti
             </h3>
             <p style={{ margin: '0 0 18px', color: 'var(--text-tertiary)', fontSize: 14, lineHeight: 1.6 }}>
               Saytı bağlasan, sənin xaricindəki bütün istifadəçilər <strong>"Bu site admin tərəfindən bağlandı"</strong> səhifəsini görəcək. Sən bütün funksiyaları normal istifadə edə bilərsən.
             </p>
 
             <div style={{ display: 'flex', alignItems: 'center', gap: 14, padding: 16, background: siteClosed ? 'rgba(239,68,68,0.08)' : 'rgba(16,185,129,0.08)', border: `1px solid ${siteClosed ? 'rgba(239,68,68,0.3)' : 'rgba(16,185,129,0.3)'}`, borderRadius: 10, marginBottom: 18 }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: siteClosed ? '#ef4444' : '#10b981', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: 44, height: 44, borderRadius: '50%', background: siteClosed ? '#ef4444' : '#14224F', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {siteClosed ? <Lock size={22} /> : <CheckCircle size={22} />}
               </div>
               <div>
@@ -448,7 +448,7 @@ function AdminPanel() {
 
             {siteClosed ? (
               <button onClick={() => setConfirmAction({ label: 'Saytı yenidən aç?', desc: 'İstifadəçilər saytı yenidən normal istifadə edə biləcək.', confirmLabel: 'Saytı aç', danger: false, run: () => toggleSite(false) })}
-                style={{ background: '#10b981', color: 'white', border: 'none', padding: '12px 22px', borderRadius: 10, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
+                style={{ background: '#14224F', color: 'white', border: 'none', padding: '12px 22px', borderRadius: 10, fontWeight: 700, cursor: 'pointer', display: 'inline-flex', alignItems: 'center', gap: 8, fontSize: 14 }}>
                 <Power size={16} /> Saytı yenidən aç
               </button>
             ) : (
@@ -469,7 +469,7 @@ function AdminPanel() {
       {confirmAction && (
         <div className="custom-modal-overlay active" onClick={() => setConfirmAction(null)}>
           <div className="custom-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon" style={{ width: 80, height: 80, background: confirmAction.danger ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)', color: confirmAction.danger ? '#ef4444' : '#10b981', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <div className="modal-icon" style={{ width: 80, height: 80, background: confirmAction.danger ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)', color: confirmAction.danger ? '#ef4444' : '#14224F', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               {confirmAction.danger ? <Trash2 size={32} /> : <ShieldCheck size={32} />}
             </div>
             <h3 style={{ margin: '0 0 8px', textAlign: 'center', fontSize: 20, color: 'var(--text-primary)', fontWeight: 800 }}>{confirmAction.label}</h3>

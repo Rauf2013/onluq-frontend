@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -115,7 +115,7 @@ function BrainNoteDetail() {
         </div>
 
         <Block icon={AlertTriangle} title="Qarşılaşılan problem" text={note.challenge} color="#ef4444" />
-        <Block icon={Lightbulb} title="Həll yolu" text={note.solution} color="#10b981" />
+        <Block icon={Lightbulb} title="Həll yolu" text={note.solution} color="#14224F" />
         <Block icon={BookOpen} title="İstifadə olunan resurslar" text={note.resources} color="#f59e0b" />
         <Block icon={GitBranch} title="Sınanmış digər yollar" text={note.alternatives} color="#8b5cf6" />
 

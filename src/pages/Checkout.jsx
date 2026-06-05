@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -87,7 +87,7 @@ function Checkout() {
       if (response.ok) {
         toast.success(
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-            <CheckCircle size={18} color="#10b981" />
+            <CheckCircle size={18} color="#14224F" />
             Ödəniş uğurla tamamlandı! Pul Havuza köçürüldü.
           </div>
         );
@@ -117,7 +117,7 @@ function Checkout() {
     <div className="main-content" style={{ minHeight: '70vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
       <div style={{ background: 'var(--bg-surface)', padding: '40px', borderRadius: '16px', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)', maxWidth: '500px', width: '100%' }}>
         <h2 style={{ textAlign: 'center', marginBottom: '30px', color: 'var(--text-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
-          <CreditCard size={28} color="#10b981" /> Təhlükəsiz Ödəniş
+          <CreditCard size={28} color="#14224F" /> Təhlükəsiz Ödəniş
         </h2>
 
         <div style={{ background: 'var(--bg-muted)', padding: '20px', borderRadius: '12px', marginBottom: '25px', border: '1px solid var(--border)' }}>
@@ -138,7 +138,7 @@ function Checkout() {
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '10px' }}>
             <span style={{ fontWeight: 'bold', color: 'var(--text-tertiary)' }}>Toplam Məbləğ:</span>
-            <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#10b981' }}>{totalPrice} AZN</span>
+            <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#14224F' }}>{totalPrice} AZN</span>
           </div>
         </div>
 

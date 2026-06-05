@@ -1,10 +1,10 @@
-@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+﻿@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
 
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   -webkit-tap-highlight-color: transparent;
   -webkit-touch-callout: none;
 }
@@ -169,6 +169,47 @@ body.keyboard-open .mobile-tab-bar { display: none; }
   h2 { font-size: clamp(18px, 5vw, 26px) !important; }
 }
 
+/* ===== EVDƏN brand helper classes ===== */
+/* Sari CTA buton — birincil aksiyon (siparis ver, daxil ol, qeydiyyat) */
+.btn-evden-cta, .btn-accent {
+  background: var(--accent) !important;
+  color: var(--on-accent) !important;
+  border: 0 !important;
+  font-weight: 800 !important;
+  letter-spacing: 0.3px;
+  transition: background 0.15s ease, transform 0.1s ease, box-shadow 0.2s ease;
+}
+.btn-evden-cta:hover, .btn-accent:hover { background: var(--accent-hover) !important; }
+.btn-evden-cta:active, .btn-accent:active { transform: scale(0.98); }
+
+/* Navy ikincil buton */
+.btn-evden-secondary {
+  background: var(--brand) !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  font-weight: 700 !important;
+}
+.btn-evden-secondary:hover { background: var(--brand-hover) !important; }
+
+/* EVDƏN brand text */
+.evden-brand-text {
+  color: var(--brand);
+  font-weight: 900;
+  letter-spacing: -0.5px;
+}
+
+/* Mobil tab aktiv durum — yellow underline */
+.mobile-tab.active { color: var(--brand) !important; }
+.mobile-tab.active::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 25%; right: 25%;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 0 0 4px 4px;
+}
+.mobile-tab { position: relative; }
+
 /* Native'de ozellikle bottom tab bar uzerinde icerik kalmasin */
 body.native-app .app-shell > * { max-width: 100%; }
 body.native-app .ai-modal-overlay { padding: 0 !important; }
@@ -211,55 +252,72 @@ body.native-app .home-mega-menu { display: none !important; }
 /* ============================================ */
 /* TƏMA DƏYİŞƏNLƏRİ (Theme Tokens)              */
 /* ============================================ */
+/* ===== EVDƏN brand palette =====
+   Lacivərd (#14224F) — dominant brand color (headings, brand text, dark sections)
+   Sarı (#FFED00)     — vurğu / CTA buttons
+   Açıq lacivərd (#1E3A6E) — secondary brand
+   Açıq fon (#F4F6FB) — page background
+   Mətn (#0C1733)     — primary text
+*/
 :root {
-  --bg-page: #f8fafc;
+  --bg-page: #F4F6FB;
   --bg-surface: #ffffff;
   --bg-elevated: #ffffff;
-  --bg-muted: #f1f5f9;
-  --bg-input: #f8fafc;
-  --bg-hover: #f1f5f9;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-tertiary: #64748b;
-  --text-muted: #94a3b8;
-  --border: #e2e8f0;
-  --border-strong: #cbd5e1;
-  --border-soft: #f1f5f9;
-  --brand: #10b981;
-  --brand-hover: #059669;
-  --brand-soft: #f1fdf7;
+  --bg-muted: #EBEEF5;
+  --bg-input: #F4F6FB;
+  --bg-hover: #EBEEF5;
+  --text-primary: #0C1733;
+  --text-secondary: #3a4666;
+  --text-tertiary: #5b6885;
+  --text-muted: #8d97ad;
+  --border: #DDE2EC;
+  --border-strong: #C5CCDB;
+  --border-soft: #EBEEF5;
+  --brand: #14224F;
+  --brand-hover: #0C1733;
+  --brand-soft: #E8ECF5;
+  --brand-light: #1E3A6E;
+  --accent: #FFED00;
+  --accent-hover: #E6D500;
+  --accent-soft: #FFFADC;
+  --on-accent: #14224F;
   --danger: #ef4444;
   --danger-hover: #dc2626;
   --warning: #f59e0b;
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.05);
-  --overlay: rgba(15, 23, 42, 0.5);
+  --shadow-sm: 0 1px 3px rgba(20, 34, 79, 0.06);
+  --shadow-md: 0 4px 12px -2px rgba(20, 34, 79, 0.08);
+  --shadow-lg: 0 14px 32px -8px rgba(20, 34, 79, 0.12);
+  --overlay: rgba(12, 23, 51, 0.55);
 }
 
 body.dark-mode {
-  --bg-page: #0b1220;
-  --bg-surface: #111827;
-  --bg-elevated: #1e293b;
-  --bg-muted: #0f172a;
-  --bg-input: #0f172a;
-  --bg-hover: #1e293b;
-  --text-primary: #e5e7eb;
-  --text-secondary: #cbd5e1;
-  --text-tertiary: #94a3b8;
-  --text-muted: #64748b;
-  --border: #334155;
-  --border-strong: #475569;
-  --border-soft: #1e293b;
-  --brand: #10b981;
-  --brand-hover: #34d399;
-  --brand-soft: #064e3b;
+  --bg-page: #0A1230;
+  --bg-surface: #14224F;
+  --bg-elevated: #1E3A6E;
+  --bg-muted: #0C1733;
+  --bg-input: #0C1733;
+  --bg-hover: #1E3A6E;
+  --text-primary: #ECEFF7;
+  --text-secondary: #BFC8E0;
+  --text-tertiary: #8d97ad;
+  --text-muted: #5b6885;
+  --border: #2A3A6B;
+  --border-strong: #3D5290;
+  --border-soft: #1E3A6E;
+  --brand: #FFED00;
+  --brand-hover: #FFF55C;
+  --brand-soft: #1E3A6E;
+  --brand-light: #ECEFF7;
+  --accent: #FFED00;
+  --accent-hover: #FFF55C;
+  --accent-soft: #2A3A6B;
+  --on-accent: #14224F;
   --danger: #ef4444;
   --danger-hover: #f87171;
-  --warning: #fbbf24;
+  --warning: #FFED00;
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.4);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5);
-  --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.6);
+  --shadow-md: 0 4px 12px -2px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 14px 32px -8px rgba(0, 0, 0, 0.6);
   --overlay: rgba(0, 0, 0, 0.7);
   color-scheme: dark;
 }
@@ -333,7 +391,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .nav-brand {
   font-size: 26px;
   font-weight: 800;
-  color: #10b981; /* Modern zümrüt yeşili */
+  color: #14224F; /* Modern zümrüt yeşili */
   text-decoration: none;
   letter-spacing: -0.5px;
 }
@@ -373,7 +431,7 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .btn-register {
   padding: 10px 24px;
-  background-color: #10b981;
+  background-color: #14224F;
   color: white;
   border: none;
   border-radius: 9999px; /* Tam yuvarlak hap buton */
@@ -385,7 +443,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .btn-register:hover {
-  background-color: #059669;
+  background-color: #0C1733;
   transform: translateY(-1px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
@@ -412,7 +470,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .hero-highlight {
-  color: #10b981;
+  color: #14224F;
 }
 
 .hero-section p {
@@ -445,7 +503,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .hero-search button {
-  background-color: #10b981;
+  background-color: #14224F;
   color: white;
   border: none;
   padding: 0 30px;
@@ -457,7 +515,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .hero-search button:hover {
-  background-color: #059669;
+  background-color: #0C1733;
 }
 
 /* --- İçerik ve Kartlar --- */
@@ -596,7 +654,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .card-title:hover {
-  color: #10b981;
+  color: #14224F;
 }
 
 .card-footer {
@@ -696,7 +754,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .auth-input:focus {
-  border-color: #10b981;
+  border-color: #14224F;
   background-color: var(--bg-surface);
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
@@ -717,14 +775,14 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .forgot-password {
-  color: #10b981;
+  color: #14224F;
   text-decoration: none;
   font-weight: 600;
 }
 
 .auth-btn {
   padding: 14px;
-  background-color: #10b981;
+  background-color: #14224F;
   color: white;
   border: none;
   border-radius: 10px;
@@ -736,7 +794,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .auth-btn:hover {
-  background-color: #059669;
+  background-color: #0C1733;
 }
 
 .auth-footer {
@@ -747,7 +805,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .auth-link {
-  color: #10b981;
+  color: #14224F;
   font-weight: 700;
   text-decoration: none;
 }
@@ -841,8 +899,8 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .image-upload-box:hover {
-  border-color: #10b981;
-  background-color: #f1fdf7;
+  border-color: #14224F;
+  background-color: #E8ECF5;
 }
 
 .upload-icon {
@@ -879,7 +937,7 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .btn-publish {
   padding: 14px 32px;
-  background-color: #10b981;
+  background-color: #14224F;
   color: white;
   border: none;
   border-radius: 10px;
@@ -890,7 +948,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .btn-publish:hover {
-  background-color: #059669;
+  background-color: #0C1733;
 }
 /* --- Xidmət Detalları Səhifəsi (Service Detail) --- */
 .detail-container {
@@ -1016,7 +1074,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .pricing-amount {
   font-size: 24px;
   font-weight: 800;
-  color: #10b981;
+  color: #14224F;
 }
 
 .pricing-desc {
@@ -1042,7 +1100,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .btn-order {
   width: 100%;
   padding: 16px;
-  background-color: #10b981;
+  background-color: #14224F;
   color: white;
   border: none;
   border-radius: 10px;
@@ -1055,7 +1113,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .btn-order:hover {
-  background-color: #059669;
+  background-color: #0C1733;
   transform: translateY(-2px);
 }
 
@@ -1198,8 +1256,8 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .sidebar-link:hover {
   background: var(--bg-surface);
-  border-color: #10b981;
-  color: #10b981;
+  border-color: #14224F;
+  color: #14224F;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.08);
   transform: translateY(-2px);
 }
@@ -1240,7 +1298,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .menu-btn:hover {
-  color: #10b981;
+  color: #14224F;
 }
 
 .brand-container {
@@ -1250,8 +1308,8 @@ body.dark-mode .theme-toggle-btn:hover {
 
 /* Kategori Aktiflik Stili */
 .category-item.active-cat {
-  border-color: #10b981;
-  background-color: #f1fdf7;
+  border-color: #14224F;
+  background-color: #E8ECF5;
   box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
   transform: translateY(-2px);
 }
@@ -1304,11 +1362,11 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .cat-list li:hover {
   background: var(--bg-page);
-  color: #10b981;
+  color: #14224F;
 }
 
 .cat-list li.active-li {
-  background: #10b981;
+  background: #14224F;
   color: white;
 }
 
@@ -1358,7 +1416,7 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .nav-search-form:focus-within {
   background: var(--bg-surface);
-  border-color: #10b981;
+  border-color: #14224F;
   box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
 }
 
@@ -1384,7 +1442,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .nav-search-form button:hover {
-  color: #10b981;
+  color: #14224F;
 }
 /* --- Sifarişlər (Orders) Paneli Tasarımı --- */
 .orders-list {
@@ -1442,7 +1500,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .order-price {
   font-size: 22px;
   font-weight: 800;
-  color: #10b981;
+  color: #14224F;
 }
 
 .status-badge {
@@ -1459,11 +1517,11 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .status-completed {
   background: #d1fae5;
-  color: #059669;
+  color: #0C1733;
 }
 
 .btn-approve {
-  background-color: #10b981;
+  background-color: #14224F;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -1475,7 +1533,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .btn-approve:hover {
-  background-color: #059669;
+  background-color: #0C1733;
   transform: translateY(-2px);
 }
 
@@ -1577,7 +1635,7 @@ body.dark-mode .theme-toggle-btn:hover {
   padding: 12px;
   border-radius: 12px;
   border: none;
-  background: #10b981;
+  background: #14224F;
   color: white;
   font-weight: 700;
   cursor: pointer;
@@ -1586,7 +1644,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .btn-modal-confirm:hover {
-  background: #059669;
+  background: #0C1733;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
@@ -1651,7 +1709,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .btn-pay {
   width: 100%;
   padding: 16px;
-  background: #10b981;
+  background: #14224F;
   color: white;
   font-size: 18px;
   font-weight: 800;
@@ -1664,7 +1722,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .btn-pay:hover:not(:disabled) {
-  background: #059669;
+  background: #0C1733;
   transform: translateY(-2px);
   box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4);
 }
@@ -1803,7 +1861,7 @@ body.dark-mode .theme-toggle-btn:hover {
 
 .conversation-item.active-chat {
   background: var(--bg-surface);
-  border-left: 4px solid #10b981;
+  border-left: 4px solid #14224F;
 }
 
 .chat-avatar {
@@ -1877,7 +1935,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .message-mine .message-bubble {
-  background: #10b981;
+  background: #14224F;
   color: white;
   border-bottom-right-radius: 4px;
 }
@@ -1907,11 +1965,11 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .chat-input-area input:focus {
-  border-color: #10b981;
+  border-color: #14224F;
 }
 
 .chat-input-area button {
-  background: #10b981;
+  background: #14224F;
   color: white;
   border: none;
   padding: 0 25px;
@@ -1922,7 +1980,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .chat-input-area button:hover {
-  background: #059669;
+  background: #0C1733;
 }
 /* --- PROFİL SAYFASI (VİTRİN) CSS --- */
 .profile-grid {
@@ -2149,7 +2207,7 @@ body.dark-mode .theme-toggle-btn:hover {
   color: var(--text-muted);
   pointer-events: none;
 }
-.composer { caret-color: #10b981; }
+.composer { caret-color: #14224F; }
 .composer span[data-icon] { vertical-align: middle; }
 
 /* === BEYİN YEDƏYİ AI MODAL === */
@@ -2251,7 +2309,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .hiw-step { transition: transform 0.25s ease, box-shadow 0.25s ease; }
 .hiw-step:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(16,185,129,0.12); }
 .trend-card:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.08); }
-.testimonial-nav:hover { background: var(--brand-soft) !important; color: #10b981 !important; }
+.testimonial-nav:hover { background: var(--brand-soft) !important; color: #14224F !important; }
 .trend-carousel::-webkit-scrollbar { height: 6px; }
 .trend-carousel::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 3px; }
 

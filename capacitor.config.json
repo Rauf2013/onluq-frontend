@@ -1,19 +1,19 @@
 {
   "appId": "az.onluq.app",
-  "appName": "Onluq",
+  "appName": "EVDƏN",
   "webDir": "dist",
-  "backgroundColor": "#ffffff",
+  "backgroundColor": "#14224F",
   "android": {
     "allowMixedContent": false,
     "captureInput": true,
     "webContentsDebuggingEnabled": false,
-    "backgroundColor": "#ffffff"
+    "backgroundColor": "#14224F"
   },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 1500,
       "launchAutoHide": false,
-      "backgroundColor": "#10b981",
+      "backgroundColor": "#14224F",
       "androidSplashResourceName": "splash",
       "androidScaleType": "CENTER_CROP",
       "showSpinner": false,
@@ -21,8 +21,8 @@
       "splashImmersive": true
     },
     "StatusBar": {
-      "style": "DEFAULT",
-      "backgroundColor": "#ffffff",
+      "style": "DARK",
+      "backgroundColor": "#14224F",
       "overlaysWebView": false
     },
     "Keyboard": {

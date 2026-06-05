@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
@@ -222,7 +222,7 @@ function Orders() {
       case 'Havuzda (Gözləyir)': return { color: '#f59e0b', bg: '#fef3c7', icon: <Clock size={14} /> };
       case 'Təhvil Verildi': return { color: '#3b82f6', bg: '#dbeafe', icon: <UploadCloud size={14} /> };
       case 'Düzəliş Gözləyir': return { color: '#f97316', bg: '#ffedd5', icon: <RefreshCw size={14} /> };
-      case 'Tamamlandı': return { color: '#10b981', bg: '#d1fae5', icon: <CheckCircle size={14} /> };
+      case 'Tamamlandı': return { color: '#14224F', bg: '#d1fae5', icon: <CheckCircle size={14} /> };
       case 'Ləğv Edildi': return { color: '#ef4444', bg: '#fee2e2', icon: <AlertTriangle size={14} /> };
       default: return { color: 'var(--text-tertiary)', bg: '#f1f5f9', icon: <Package size={14} /> };
     }
@@ -239,7 +239,7 @@ function Orders() {
     <div className="main-content" style={{ maxWidth: '1000px', margin: '0 auto', padding: '40px 20px', minHeight: '80vh' }}>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '30px' }}>
-        <div style={{ background: '#10b981', padding: '12px', borderRadius: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)' }}>
+        <div style={{ background: '#14224F', padding: '12px', borderRadius: '12px', color: 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 6px rgba(16, 185, 129, 0.2)' }}>
           <Package size={28} />
         </div>
         <div>
@@ -310,7 +310,7 @@ function Orders() {
                     </h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-tertiary)', fontSize: '14px' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '5px', background: 'var(--bg-page)', padding: '4px 10px', borderRadius: '8px' }}>
-                        <User size={14} color="#10b981" /> 
+                        <User size={14} color="#14224F" /> 
                         <span style={{ fontWeight: '600' }}>{isSeller ? `Alıcı: ${order.buyerId?.fullName}` : `Satıcı: ${order.sellerId?.fullName}`}</span>
                       </div>
                       <span style={{ color: '#cbd5e1' }}>|</span>
@@ -318,7 +318,7 @@ function Orders() {
                     </div>
                   </div>
                   
-                  <div style={{ fontSize: '24px', fontWeight: '900', color: '#10b981' }}>
+                  <div style={{ fontSize: '24px', fontWeight: '900', color: '#14224F' }}>
                     {order.price} AZN
                   </div>
                 </div>
@@ -341,7 +341,7 @@ function Orders() {
 
                   {isBuyer && order.status === 'Təhvil Verildi' && (
                     <>
-                      <button onClick={() => { setSelectedApproveId(order._id); setIsApproveModalOpen(true); }} style={{ background: '#10b981', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
+                      <button onClick={() => { setSelectedApproveId(order._id); setIsApproveModalOpen(true); }} style={{ background: '#14224F', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
                         <CheckCircle size={16} /> Təsdiqlə
                       </button>
                       <button onClick={() => { setRevisionData({ orderId: order._id, note: '' }); setIsRevisionModalOpen(true); }} style={{ background: '#f97316', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
@@ -415,7 +415,7 @@ function Orders() {
       {isApproveModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div style={{ background: 'var(--bg-surface)', padding: '30px', borderRadius: '24px', width: '90%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <div style={{ width: '70px', height: '70px', background: '#d1fae5', color: '#10b981', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto' }}>
+            <div style={{ width: '70px', height: '70px', background: '#d1fae5', color: '#14224F', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto' }}>
               <CheckCircle size={35} />
             </div>
             <h3 style={{ color: 'var(--text-primary)', marginBottom: '10px', fontSize: '20px' }}>Sifarişi Təsdiqlə</h3>
@@ -424,7 +424,7 @@ function Orders() {
             </p>
             <div style={{ display: 'flex', gap: '10px' }}>
               <button style={{ flex: 1, background: 'var(--bg-muted)', color: 'var(--text-secondary)', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }} onClick={() => setIsApproveModalOpen(false)}>Ləğv Et</button>
-              <button style={{ flex: 1, background: '#10b981', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }} onClick={handleApprove}>Bəli, Təsdiqlə</button>
+              <button style={{ flex: 1, background: '#14224F', color: 'white', border: 'none', padding: '14px', borderRadius: '12px', fontWeight: 'bold', cursor: 'pointer' }} onClick={handleApprove}>Bəli, Təsdiqlə</button>
             </div>
           </div>
         </div>
