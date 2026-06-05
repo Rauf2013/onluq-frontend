@@ -210,14 +210,7 @@ body.keyboard-open .mobile-tab-bar { display: none; }
   [style*="padding: 60px"], [style*="padding:60px"] { padding: 24px !important; }
   [style*="padding: 80px"], [style*="padding:80px"] { padding: 32px !important; }
 
-  /* maxWidth 1200/1100 vs. kapsayicilari full-width yap */
-  [style*="maxWidth: '1200px'"],
-  [style*="maxWidth: '1100px'"],
-  [style*="maxWidth: '1000px'"] {
-    max-width: 100% !important;
-    padding-left: 16px !important;
-    padding-right: 16px !important;
-  }
+  /* (kebab-case düzəlişi aşağıdakı QLOBAL blokda — burada təkrar lazım deyil) */
 
   /* Font size scale */
   h1 { font-size: clamp(22px, 6vw, 32px) !important; }
@@ -708,20 +701,22 @@ body.dark-mode .evden-flow-circle.navy { background: #3D5290; }
   /* Body mətn okunabilirliği */
   body { font-size: 15px; line-height: 1.55; }
 
-  /* ===== QLOBAL native-feel — bütün səhifələrə tətbiq ===== */
-  /* Bütün geniş konteynerlər mobildə tam en */
-  [style*="maxWidth: '1200px'"], [style*="maxWidth: '1100px'"],
-  [style*="maxWidth: '1000px'"], [style*="maxWidth: '960px'"],
-  [style*="maxWidth: '900px'"],  [style*="maxWidth: '800px'"],
-  [style*="maxWidth: '760px'"],  [style*="maxWidth: '700px'"],
-  [style*="maxWidth: '680px'"],  [style*="maxWidth: '640px'"],
-  [style*="maxWidth: '600px'"],  [style*="maxWidth:1200px"],
-  [style*="maxWidth:900px"],     [style*="maxWidth:800px"],
-  [style*="maxWidth:600px"] {
+  /* ===== QLOBAL native-feel — bütün səhifələrə tətbiq =====
+     DİQQƏT: DOM-da inline style KEBAB-CASE və TIRNAKSIZ olur:
+     <div style={{maxWidth:'1200px'}}>  →  style="max-width: 1200px;"
+     Selektorlər ona görə kebab-case yazılır. */
+
+  /* Geniş konteynerlər mobildə tam en */
+  [style*="max-width: 1200px"], [style*="max-width: 1100px"],
+  [style*="max-width: 1000px"], [style*="max-width: 960px"],
+  [style*="max-width: 900px"],  [style*="max-width: 800px"],
+  [style*="max-width: 760px"],  [style*="max-width: 700px"],
+  [style*="max-width: 680px"],  [style*="max-width: 640px"],
+  [style*="max-width: 600px"] {
     max-width: 100% !important;
   }
 
-  /* Formlar / inputlar native — 16px iOS zoom önləyir, böyük toxunma */
+  /* Formlar / inputlar native — 16px iOS zoom önləyir */
   input:not([type="checkbox"]):not([type="radio"]),
   textarea, select {
     font-size: 16px !important;
@@ -729,37 +724,32 @@ body.dark-mode .evden-flow-circle.navy { background: #3D5290; }
     padding: 13px 14px !important;
   }
 
-  /* Böyük desktop padding'ləri mobildə makul */
-  [style*="padding: '40px"], [style*="padding:40px"] { padding: 20px !important; }
-  [style*="padding: '50px"], [style*="padding: '60px"] { padding: 24px !important; }
-  [style*="padding: '70px"], [style*="padding: '80px"] { padding: 28px !important; }
-
-  /* Çox sütunlu grid-lər mobildə 1 sütun (auto-fit/auto-fill istisna) */
-  [style*="gridTemplateColumns: 'repeat(2"],
-  [style*="gridTemplateColumns: 'repeat(3"],
-  [style*="gridTemplateColumns: 'repeat(4"],
+  /* Çox sütunlu grid-lər mobildə 1 sütun */
   [style*="grid-template-columns: repeat(2"],
   [style*="grid-template-columns: repeat(3"],
-  [style*="gridTemplateColumns: '2fr 1fr'"],
-  [style*="gridTemplateColumns: '1fr 2fr'"],
-  [style*="gridTemplateColumns: '3fr 1fr'"],
-  [style*="gridTemplateColumns: '1fr 1fr'"],
-  [style*="gridTemplateColumns: '2fr 1fr "] {
+  [style*="grid-template-columns: repeat(4"],
+  [style*="grid-template-columns: 2fr 1fr"],
+  [style*="grid-template-columns: 1fr 2fr"],
+  [style*="grid-template-columns: 3fr 1fr"],
+  [style*="grid-template-columns: 1fr 1fr"] {
     grid-template-columns: 1fr !important;
   }
+  /* Spesifik səhifə grid-ləri (className ilə — ən etibarlı) */
+  .ms-income-grid, .profile-stats, .portfolio-grid { grid-template-columns: 1fr !important; }
+  .portfolio-grid { grid-template-columns: repeat(2, 1fr) !important; }
 
   /* Sabit geniş elementlər daralsın */
-  [style*="width: '500px"], [style*="width: '600px"],
-  [style*="minWidth: '500px"], [style*="minWidth: '400px"] {
+  [style*="width: 500px"], [style*="width: 600px"],
+  [style*="min-width: 500px"], [style*="min-width: 600px"] {
     width: 100% !important;
     min-width: 0 !important;
   }
 
-  /* CTA / əsas düymələr tam en (mobil app hissi) — amma sətir-içi (inline) formlarda yox */
-  .auth-btn, .submit-btn {
-    width: 100%;
-  }
-  /* Axtar kimi sətir-içi form düymələri tam en OLMASIN */
+  /* Flex/grid uşaqları içəriyə görə şişməsin → daşmanı kəsir */
+  .evden-page *, main *, [class*="page"] * { min-width: 0; }
+
+  /* CTA düymələr tam en — sətir-içi formlar istisna */
+  .auth-btn, .submit-btn { width: 100%; }
   .evden-dash-search button, .hero-search-bar button { width: auto !important; flex-shrink: 0; }
 }
 

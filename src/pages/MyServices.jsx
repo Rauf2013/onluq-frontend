@@ -134,7 +134,7 @@ function MyServices() {
           </div>
 
           {/* Aylıq gəlir grafiki + Ən çox baxılan */}
-          <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '30px' }}>
+          <div className="ms-income-grid" style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px', marginBottom: '30px' }}>
             <div style={{ background: 'var(--bg-surface)', padding: '24px', borderRadius: '16px', border: '1px solid var(--border)', boxShadow: '0 4px 6px rgba(0,0,0,0.04)' }}>
               <h3 style={{ display: 'flex', alignItems: 'center', gap: '10px', margin: '0 0 20px 0', fontSize: '18px', color: 'var(--text-primary)' }}>
                 <BarChart3 size={22} color="#14224F" /> Son 6 ayın gəliri
