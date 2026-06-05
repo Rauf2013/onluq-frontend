@@ -124,12 +124,15 @@ function App() {
     );
   }
 
+  // Mobil shell: gerçək native VƏ YA test üçün localStorage flag (forceMobileShell=1)
+  const useMobileShell = isNative || (typeof window !== 'undefined' && window.localStorage.getItem('forceMobileShell') === '1');
+
   return (
     <ThemeProvider>
     <Router>
       <NativeBridge />
-      {isNative ? <MobileHeader /> : <Navbar />}
-      <ToastContainer position={isNative ? "bottom-center" : "top-center"} autoClose={1500} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover transition={Slide} />
+      {useMobileShell ? <MobileHeader /> : <Navbar />}
+      <ToastContainer position={useMobileShell ? "bottom-center" : "top-center"} autoClose={1500} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover transition={Slide} />
 
       <AnimatedRoutes>
       <Routes>
@@ -158,8 +161,8 @@ function App() {
         <Route path="*" element={<NotFound />} />
       </Routes>
       </AnimatedRoutes>
-      {isNative ? <MobileNav /> : <Footer />}
-      {isNative && <GlobalAI />}
+      {useMobileShell ? <MobileNav /> : <Footer />}
+      {useMobileShell && <GlobalAI />}
     </Router>
     </ThemeProvider>
   );
