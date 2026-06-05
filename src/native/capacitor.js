@@ -63,14 +63,33 @@ export async function initNative() {
   });
   observer.observe(document.body, { attributes: true, attributeFilter: ['class'] });
 
-  // Global haptic-on-tap — buton/link/role=button tiklamalarina hafif titresim
+  // Global haptic + Material ripple — buton/link/kart tiklamalarinda
   document.addEventListener('pointerdown', (e) => {
     const t = e.target;
     if (!t || !t.closest) return;
-    if (t.closest('button, a, [role="button"], .haptic')) {
-      if (t.closest('[data-no-haptic]')) return;
-      safe(() => Haptics.impact({ style: ImpactStyle.Light }));
-    }
+    const target = t.closest('button, a, [role="button"], .haptic, .evden-card, .evden-service-card, .evden-cat-chip, .mobile-menu-item');
+    if (!target) return;
+    if (t.closest('[data-no-haptic]')) return;
+
+    // Hafif titresim
+    safe(() => Haptics.impact({ style: ImpactStyle.Light }));
+
+    // Material ripple
+    try {
+      if (target.closest('[data-no-ripple]')) return;
+      const rect = target.getBoundingClientRect();
+      const size = Math.max(rect.width, rect.height);
+      const cs = getComputedStyle(target);
+      if (cs.position === 'static') target.style.position = 'relative';
+      if (cs.overflow === 'visible') target.style.overflow = 'hidden';
+      const ripple = document.createElement('span');
+      ripple.className = 'rn-ripple';
+      ripple.style.width = ripple.style.height = `${size}px`;
+      ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
+      ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
+      target.appendChild(ripple);
+      setTimeout(() => ripple.remove(), 520);
+    } catch {}
   }, { passive: true });
 }
 

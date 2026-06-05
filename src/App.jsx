@@ -67,8 +67,12 @@ function NativeBridge() {
 
 function AnimatedRoutes({ children }) {
   const location = useLocation();
+  // Native his: ana kök sayfalar fade, alt sayfalar sağdan slide-in
+  const ROOTS = ['/', '/kategoriler', '/mesajlar', '/sifarislerim'];
+  const isRoot = ROOTS.includes(location.pathname) || location.pathname.startsWith('/profil/');
+  const cls = isRoot ? 'native-page native-fade app-shell' : 'native-page native-slide app-shell';
   return (
-    <div key={location.pathname} className="native-page app-shell">
+    <div key={location.pathname} className={cls}>
       {children}
     </div>
   );

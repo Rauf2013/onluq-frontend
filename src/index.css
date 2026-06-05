@@ -46,7 +46,85 @@ button, a, [role="button"] { touch-action: manipulation; }
 @keyframes nativeSlideRight { from { transform: translateX(-30%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
 
 .native-page { animation: nativeFadeIn 220ms cubic-bezier(0.4, 0, 0.2, 1); }
+.native-fade { animation: nativeFadeIn 200ms cubic-bezier(0.4, 0, 0.2, 1); }
+.native-slide { animation: nativeSlideRight 280ms cubic-bezier(0.32, 0.72, 0, 1); }
 .native-sheet { animation: nativeSlideUp 260ms cubic-bezier(0.32, 0.72, 0, 1); }
+
+/* ============================================
+   REACT-NATIVE HİSSİ — touchable, ripple, scroll
+   (yalnız mobil app — native-app body class) ===*/
+body.native-app {
+  /* Momentum scroll + over-scroll bounce hissi */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* TOUCHABLE OPACITY — RN-də hər toxunulan element basılanda solur/kiçilir */
+body.native-app button:active,
+body.native-app a:active,
+body.native-app [role="button"]:active,
+body.native-app .evden-card:active,
+body.native-app .evden-service-card:active,
+body.native-app .evden-cat-chip:active,
+body.native-app .mobile-menu-item:active,
+body.native-app .mobile-tab:active,
+body.native-app [onclick]:active,
+body.native-app label:active {
+  opacity: 0.6 !important;
+  transition: opacity 0.05s ease, transform 0.08s ease !important;
+}
+/* Kartlar basılanda yüngülcə kiçilir (press-down) */
+body.native-app .evden-card:active,
+body.native-app .evden-service-card:active,
+body.native-app .my-service-card:active,
+body.native-app [class*="card"]:active {
+  transform: scale(0.975) !important;
+}
+/* Bütün toxunulan elementlər keçid animasiyalı */
+body.native-app button,
+body.native-app a,
+body.native-app [role="button"],
+body.native-app .evden-card,
+body.native-app .evden-service-card,
+body.native-app .evden-cat-chip {
+  transition: opacity 0.15s ease, transform 0.12s ease, background 0.15s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Material ripple (JS overlay üçün) */
+.rn-ripple {
+  position: absolute;
+  border-radius: 50%;
+  transform: scale(0);
+  background: rgba(20, 34, 79, 0.18);
+  pointer-events: none;
+  animation: rnRipple 0.5s ease-out;
+}
+@keyframes rnRipple { to { transform: scale(2.6); opacity: 0; } }
+
+/* RN-style skeleton shimmer */
+.rn-skeleton {
+  background: linear-gradient(100deg, var(--bg-muted) 30%, var(--bg-hover) 50%, var(--bg-muted) 70%);
+  background-size: 200% 100%;
+  animation: rnShimmer 1.2s ease-in-out infinite;
+  border-radius: 10px;
+}
+@keyframes rnShimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* RN-style spinner (yüklənir) */
+.rn-spinner {
+  width: 34px; height: 34px;
+  border: 3px solid var(--border);
+  border-top-color: var(--brand);
+  border-radius: 50%;
+  animation: rnSpin 0.7s linear infinite;
+  margin: 0 auto;
+}
+@keyframes rnSpin { to { transform: rotate(360deg); } }
+
+/* Native list-item touch separator (RN FlatList hissi) */
+body.native-app .evden-services-grid > * {
+  -webkit-tap-highlight-color: transparent;
+}
 
 /* ===== Capacitor / native-only kurallari ===== */
 body.native-app .footer-hide-on-native { display: none !important; }
