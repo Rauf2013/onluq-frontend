@@ -711,10 +711,19 @@ body.dark-mode .evden-flow-circle.navy { background: #3D5290; }
 
 /* Dairəvi ikon/düymələr HEÇ VAXT oval olmasın (min-height onları bozur) */
 .evden-service-fav, .mobile-icon-btn, .evden-card-icon, .evden-flow-circle,
-.favorite-btn, .theme-toggle-btn {
+.favorite-btn, .theme-toggle-btn, .msg-action-btn {
   min-height: 0 !important;
   aspect-ratio: 1 / 1;
   flex-shrink: 0;
+}
+
+/* ===== QLOBAL: bütün dairəvi elementlər (inline border-radius:50%) həmişə daire ===== */
+/* Avatar, ikon-düymə, status nöqtəsi — heç vaxt oval olmasın, sıxılmasın. */
+[style*="border-radius: 50%"],
+[style*="border-radius:50%"] {
+  aspect-ratio: 1 / 1;
+  flex-shrink: 0;
+  min-height: 0;
 }
 
 /* Native'de ozellikle bottom tab bar uzerinde icerik kalmasin */

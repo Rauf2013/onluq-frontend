@@ -525,27 +525,22 @@ function Messages() {
               </div>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <button onClick={() => callSystemRef.current?.startCall('audio')} title="Səsli zəng" aria-label="Səsli zəng"
-                  style={{ background: 'rgba(16,185,129,0.12)', color: '#14224F', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.22)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(16,185,129,0.12)'}>
-                  <Phone size={18} />
+                  className="msg-action-btn"
+                  style={{ background: 'rgba(20,34,79,0.10)', color: '#14224F', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <Phone size={20} />
                 </button>
                 <button onClick={() => callSystemRef.current?.startCall('video')} title="Görüntülü zəng" aria-label="Görüntülü zəng"
-                  style={{ background: 'rgba(59,130,246,0.12)', color: '#3b82f6', border: 'none', width: 38, height: 38, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: '0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.22)'}
-                  onMouseOut={(e) => e.currentTarget.style.background = 'rgba(59,130,246,0.12)'}>
-                  <VideoIcon size={18} />
+                  className="msg-action-btn"
+                  style={{ background: 'rgba(59,130,246,0.12)', color: '#3b82f6', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  <VideoIcon size={20} />
                 </button>
                 <button
                   onClick={handleDeleteConversation}
-                  style={{ background: '#fee2e2', color: '#ef4444', border: 'none', padding: '8px 12px', borderRadius: '8px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '5px', fontWeight: 'bold', transition: '0.2s' }}
-                  onMouseOver={(e) => e.currentTarget.style.background = '#fca5a5'}
-                  onMouseOut={(e) => e.currentTarget.style.background = '#fee2e2'}
+                  title="Söhbəti sil" aria-label="Söhbəti sil"
+                  className="msg-action-btn"
+                  style={{ background: 'rgba(239,68,68,0.12)', color: '#ef4444', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}
                 >
-                  <Trash2 size={16} /> Sil
-                </button>
-                <button style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-muted)', transition: '0.2s' }} onMouseOver={(e) => e.currentTarget.style.color = '#0f172a'} onMouseOut={(e) => e.currentTarget.style.color = '#94a3b8'}>
-                  <MoreVertical size={22} />
+                  <Trash2 size={20} />
                 </button>
               </div>
             </div>
