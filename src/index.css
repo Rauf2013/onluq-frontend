@@ -734,12 +734,17 @@ body.dark-mode .evden-flow-circle.navy { background: #3D5290; }
   [style*="padding: '50px"], [style*="padding: '60px"] { padding: 24px !important; }
   [style*="padding: '70px"], [style*="padding: '80px"] { padding: 28px !important; }
 
-  /* Çox sütunlu grid-lər mobildə 1 sütun (auth-fit/auto-fill istisna deyil) */
+  /* Çox sütunlu grid-lər mobildə 1 sütun (auto-fit/auto-fill istisna) */
   [style*="gridTemplateColumns: 'repeat(2"],
   [style*="gridTemplateColumns: 'repeat(3"],
   [style*="gridTemplateColumns: 'repeat(4"],
   [style*="grid-template-columns: repeat(2"],
-  [style*="grid-template-columns: repeat(3"] {
+  [style*="grid-template-columns: repeat(3"],
+  [style*="gridTemplateColumns: '2fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 2fr'"],
+  [style*="gridTemplateColumns: '3fr 1fr'"],
+  [style*="gridTemplateColumns: '1fr 1fr'"],
+  [style*="gridTemplateColumns: '2fr 1fr "] {
     grid-template-columns: 1fr !important;
   }
 
