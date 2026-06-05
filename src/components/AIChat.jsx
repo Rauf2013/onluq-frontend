@@ -5,7 +5,7 @@ import { Bot, Send, X as XIcon, AlertTriangle, Trash2 } from 'lucide-react';
 import BetaInfo from './BetaInfo';
 
 // Hər yerdən aça bilən AI chat widget'i
-function AIChat({ open, onClose, model = 'mid' }) {
+function AIChat({ open, onClose, model: initialModel = 'mid' }) {
   const [q, setQ] = useState('');
   const [thread, setThread] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -13,7 +13,23 @@ function AIChat({ open, onClose, model = 'mid' }) {
   const [dailyLimit, setDailyLimit] = useState(null);
   const [isGuest, setIsGuest] = useState(false);
   const [modelLabel, setModelLabel] = useState('');
+  const [model, setModel] = useState(() => localStorage.getItem('aiModel') || initialModel);
+  const [aiModels, setAiModels] = useState([]);
   const bottomRef = useRef(null);
+
+  // Mövcud AI modelləri çək (Sadə / Orta / Güclü)
+  useEffect(() => {
+    if (!open) return;
+    fetch(`${API_URL}/api/ai/models`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((d) => { if (d?.models) setAiModels(d.models); })
+      .catch(() => {});
+  }, [open]);
+
+  const selectModel = (key) => {
+    setModel(key);
+    localStorage.setItem('aiModel', key);
+  };
 
   useEffect(() => {
     if (open && bottomRef.current) {
@@ -46,14 +62,21 @@ function AIChat({ open, onClose, model = 'mid' }) {
         setIsGuest(!!d.guest);
         if (d.modelLabel) setModelLabel(d.modelLabel);
       } else {
-        const msg = d.message || `Server xətası (HTTP ${r.status})`;
+        let msg = d.message || `Server xətası (HTTP ${r.status})`;
+        if (r.status === 404) {
+          msg = 'AI xidməti serverdə hələ aktiv deyil (404). Server yenilənməlidir — dəstək komandası ilə əlaqə saxla.';
+        } else if (r.status === 503) {
+          msg = 'AI müvəqqəti əlçatmazdır (503). Bir azdan yenidən cəhd et.';
+        } else if (r.status === 429) {
+          msg = 'Günlük AI limitin doldu. Sabah yenidən cəhd et.';
+        }
         setThread((t) => [...t, { role: 'ai', content: msg, error: true, retry: userMsg }]);
       }
     } catch (e) {
       const detail = (e && e.message) ? ` (${e.message})` : '';
       setThread((t) => [...t, {
         role: 'ai',
-        content: `Bağlantı xətası${detail}. Yoxla: internet var? Server (${API_URL}) əlçatandır?`,
+        content: `Bağlantı xətası${detail}. İnternet bağlantını yoxla.`,
         error: true,
         retry: userMsg,
       }]);
@@ -104,6 +127,37 @@ function AIChat({ open, onClose, model = 'mid' }) {
             </button>
           </div>
         </div>
+
+        {/* Model seçici — qonaq deyilsə və modellər yüklənibsə */}
+        {!isGuest && aiModels.length > 0 && (
+          <div style={{ display: 'flex', gap: 6, padding: '10px 14px', borderBottom: '1px solid var(--border)', background: 'var(--bg-surface)', overflowX: 'auto' }}>
+            {aiModels.map((m) => {
+              const active = model === m.key;
+              return (
+                <button
+                  key={m.key}
+                  onClick={() => selectModel(m.key)}
+                  title={m.desc}
+                  style={{
+                    flex: '1 0 auto',
+                    background: active ? 'linear-gradient(135deg, #6366f1, #8b5cf6)' : 'var(--bg-muted)',
+                    color: active ? '#fff' : 'var(--text-secondary)',
+                    border: active ? 'none' : '1px solid var(--border)',
+                    borderRadius: 10,
+                    padding: '8px 12px',
+                    fontSize: 12.5,
+                    fontWeight: 700,
+                    cursor: 'pointer',
+                    whiteSpace: 'nowrap',
+                    transition: '0.15s',
+                  }}
+                >
+                  {m.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
 
         {/* Söhbət */}
         <div style={{ flex: 1, overflowY: 'auto', padding: 18, display: 'flex', flexDirection: 'column', gap: 14, background: 'var(--bg-page)' }}>

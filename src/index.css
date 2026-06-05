@@ -598,6 +598,54 @@ body.keyboard-open .mobile-tab-bar { display: none; }
 }
 .mobile-tab { position: relative; }
 
+/* ============================================
+   MOBİL FERAHLATMA — sıxışıq görünüşü düzəlt
+   (PDF spirit: nəfəs alan, user-friendly)
+   ============================================ */
+@media (max-width: 768px) {
+  /* Section'lar mobilde daha makul dikey boşluk */
+  .evden-section { padding: 44px 18px !important; }
+  .evden-hero { padding: 56px 22px 64px !important; }
+  .evden-section-title { font-size: 24px !important; margin-bottom: 12px !important; }
+  .evden-section-lead { font-size: 15px !important; margin-bottom: 28px !important; }
+
+  /* Kartlar — daha ferah iç boşluk + tam genişlik */
+  .evden-card { padding: 22px 20px !important; border-radius: 16px !important; }
+  .evden-card-icon { width: 54px !important; height: 54px !important; margin-bottom: 14px !important; }
+  .evden-card h3 { font-size: 17px !important; }
+  .evden-card p { font-size: 14px !important; }
+
+  /* Hero — okunabilir başlık */
+  .evden-hero-title { font-size: 44px !important; letter-spacing: 6px !important; }
+  .evden-hero-tagline { font-size: 19px !important; }
+  .evden-hero-sub { font-size: 15px !important; }
+  .evden-hero-cta { flex-direction: column !important; width: 100%; }
+  .evden-hero-btn, .evden-hero-btn-ghost { width: 100% !important; padding: 15px 24px !important; }
+
+  /* Dashboard ferah */
+  .evden-dash-hero { padding: 28px 18px 34px !important; }
+  .evden-dash-title { font-size: 22px !important; }
+  .evden-dash-search { padding: 6px 6px 6px 14px !important; }
+  .evden-dash-search button { padding: 12px 18px !important; }
+  .evden-dash-actions { gap: 8px !important; }
+  .evden-dash-action { flex: 1 0 calc(50% - 4px); justify-content: center; padding: 12px 10px !important; }
+
+  /* Servis grid — mobilde 1 sütun, ferah */
+  .evden-services-grid { grid-template-columns: 1fr !important; gap: 16px !important; }
+  .evden-service-title { font-size: 15px !important; }
+
+  /* Kateqoriya chip'lər toxunma üçün böyük */
+  .evden-cat-chip { padding: 11px 16px !important; font-size: 14px !important; }
+
+  /* Bütün düymələr min toxunma hədəfi */
+  button, .btn-evden-cta, .btn-evden-secondary, a[role="button"] {
+    min-height: 44px;
+  }
+
+  /* Body mətn okunabilirliği */
+  body { font-size: 15px; line-height: 1.55; }
+}
+
 /* Native'de ozellikle bottom tab bar uzerinde icerik kalmasin */
 body.native-app .app-shell > * { max-width: 100%; }
 body.native-app .ai-modal-overlay { padding: 0 !important; }
