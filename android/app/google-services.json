@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "397810655273",
+    "project_id": "onluq-495804",
+    "storage_bucket": "onluq-495804.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:397810655273:android:02692db2c0cf566b65bc38",
+        "android_client_info": {
+          "package_name": "az.evden.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "397810655273-kdet77p6l6lf2lkg5to7shs2vchr2oor.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCorpzx08L-zLCVjJXLdbxSJloQDkOoapU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "397810655273-kdet77p6l6lf2lkg5to7shs2vchr2oor.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
