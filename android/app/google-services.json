@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "397810655273-0jfofb9avdsritcdvqkv1gj5jo1omlh7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "az.evden.mobile",
+            "certificate_hash": "d60dcd903a869342ab2f2d94861a747597db279f"
+          }
+        },
+        {
           "client_id": "397810655273-kdet77p6l6lf2lkg5to7shs2vchr2oor.apps.googleusercontent.com",
           "client_type": 3
         }
