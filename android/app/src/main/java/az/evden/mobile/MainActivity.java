@@ -8,9 +8,8 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import com.getcapacitor.BridgeActivity;
-import ee.forgr.capacitor.social.login.ModifiedMainActivityForSocialLoginPlugin;
 
-public class MainActivity extends BridgeActivity implements ModifiedMainActivityForSocialLoginPlugin {
+public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -32,10 +31,5 @@ public class MainActivity extends BridgeActivity implements ModifiedMainActivity
         if (need) {
             ActivityCompat.requestPermissions(this, perms, 1001);
         }
-    }
-
-    @Override
-    public void IHaveModifiedTheMainActivityForTheUseWithSocialLoginPlugin() {
-        // Marker — Capgo Social Login plugin interface checki ucun.
     }
 }
