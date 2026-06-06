@@ -794,12 +794,15 @@ body.dark-mode .evden-flow-circle.navy { background: #3D5290; }
     max-width: 100% !important;
   }
 
-  /* Formlar / inputlar native — 16px iOS zoom önləyir */
+  /* Formlar / inputlar native — 16px iOS zoom önləyir.
+     DİQQƏT: yalnız üst/alt padding — sol/sağ padding-ə TOXUNMA
+     (axtarış input-larında ikon üçün paddingLeft var, onu pozmuruq). */
   input:not([type="checkbox"]):not([type="radio"]),
   textarea, select {
     font-size: 16px !important;
     border-radius: 12px !important;
-    padding: 13px 14px !important;
+    padding-top: 13px !important;
+    padding-bottom: 13px !important;
   }
 
   /* Çox sütunlu grid-lər mobildə 1 sütun */

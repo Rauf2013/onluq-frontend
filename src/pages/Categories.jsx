@@ -100,12 +100,12 @@ function Categories() {
         </div>
       </div>
 
-      <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '15px', marginBottom: '15px' }}>
+      <div style={{ display: 'flex', gap: '10px', overflowX: 'auto', paddingBottom: '15px', marginBottom: '15px', WebkitOverflowScrolling: 'touch' }}>
         {categories.map(cat => (
           <button
             key={cat}
             onClick={() => setActiveCategory(cat)}
-            style={{ background: activeCategory === cat ? '#14224F' : 'var(--bg-muted)', color: activeCategory === cat ? 'white' : 'var(--text-secondary)', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap', transition: '0.2s' }}
+            style={{ flexShrink: 0, background: activeCategory === cat ? '#14224F' : 'var(--bg-muted)', color: activeCategory === cat ? 'white' : 'var(--text-secondary)', border: 'none', padding: '10px 20px', borderRadius: '20px', cursor: 'pointer', fontWeight: 'bold', whiteSpace: 'nowrap', transition: '0.2s' }}
           >
             {cat}
           </button>
@@ -124,7 +124,7 @@ function Categories() {
           <button
             key={o.v}
             onClick={() => setLevelFilter(o.v)}
-            style={{ background: levelFilter === o.v ? '#0f172a' : 'var(--bg-surface)', color: levelFilter === o.v ? 'white' : 'var(--text-secondary)', border: '1px solid var(--border)', padding: '6px 14px', borderRadius: 999, cursor: 'pointer', fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap', transition: '0.2s' }}
+            style={{ flexShrink: 0, background: levelFilter === o.v ? '#0f172a' : 'var(--bg-surface)', color: levelFilter === o.v ? 'white' : 'var(--text-secondary)', border: '1px solid var(--border)', padding: '6px 14px', borderRadius: 999, cursor: 'pointer', fontWeight: 600, fontSize: 13, whiteSpace: 'nowrap', transition: '0.2s' }}
           >
             {o.l}
           </button>
