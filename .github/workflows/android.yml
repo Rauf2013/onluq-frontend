@@ -70,17 +70,24 @@ jobs:
         working-directory: android
         run: ./gradlew assembleDebug --no-daemon --stacktrace
 
-      - name: Print debug keystore SHA-1 (Google Cloud Console icin)
+      - name: Print APK REAL signing SHA-1 (Firebase ilə müqayisə üçün)
         if: ${{ github.event_name == 'push' || inputs.release != true }}
         run: |
-          KEYSTORE=$HOME/.android/debug.keystore
-          if [ -f "$KEYSTORE" ]; then
-            echo "## Debug keystore SHA-1 (Google Console)" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            keytool -list -v -keystore "$KEYSTORE" -alias androiddebugkey -storepass android -keypass android 2>/dev/null | grep -Ei "SHA1:|SHA-1:|SHA256:" >> $GITHUB_STEP_SUMMARY || true
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            echo "Package: az.evden.app" >> $GITHUB_STEP_SUMMARY
+          APK=android/app/build/outputs/apk/debug/app-debug.apk
+          echo "## APK-nın HƏQİQİ imza SHA-1-i" >> $GITHUB_STEP_SUMMARY
+          echo "Bu, APK-nın əslində imzalandığı sertifikatdır. Firebase-dəki SHA-1 ilə EYNİ olmalıdır." >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          # apksigner ilə APK-nın əsl sertifikatını çıxar
+          APKSIGNER=$(find $ANDROID_HOME/build-tools -name apksigner 2>/dev/null | sort -r | head -1)
+          if [ -n "$APKSIGNER" ] && [ -f "$APK" ]; then
+            "$APKSIGNER" verify --print-certs "$APK" 2>/dev/null | grep -Ei "SHA-1|SHA-256" >> $GITHUB_STEP_SUMMARY || echo "apksigner SHA tapılmadı" >> $GITHUB_STEP_SUMMARY
+          else
+            # fallback: keytool ilə
+            keytool -printcert -jarfile "$APK" 2>/dev/null | grep -Ei "SHA1:|SHA-1:|SHA256:" >> $GITHUB_STEP_SUMMARY || echo "keytool SHA tapılmadı" >> $GITHUB_STEP_SUMMARY
           fi
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "Package: az.evden.mobile" >> $GITHUB_STEP_SUMMARY
+          echo "Firebase-də olmalı: D6:0D:CD:90:3A:86:93:42:AB:2F:2D:94:86:1A:74:75:97:DB:27:9F" >> $GITHUB_STEP_SUMMARY
 
       - name: Upload DEBUG APK
         if: ${{ github.event_name == 'push' || inputs.release != true }}
