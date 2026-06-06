@@ -7,6 +7,7 @@ import { App as CapApp } from '@capacitor/app';
 import { Network } from '@capacitor/network';
 import { Haptics, ImpactStyle, NotificationType } from '@capacitor/haptics';
 import { FirebaseAuthentication } from '@capacitor-firebase/authentication';
+import { PushNotifications } from '@capacitor/push-notifications';
 
 export const isNative = Capacitor.isNativePlatform();
 export const platform = Capacitor.getPlatform();
@@ -127,4 +128,46 @@ export async function firebaseGoogleSignIn() {
 export async function firebaseSignOut() {
   if (!isNative) return;
   await safe(() => FirebaseAuthentication.signOut());
+}
+
+// ===== Push bildiriş (FCM) =====
+// Login-dən sonra çağırılmalıdır (token-i backend-ə yazmaq üçün auth lazımdır).
+let _pushInited = false;
+export async function initPush(apiUrl, getAuthToken) {
+  if (!isNative || _pushInited) return;
+  _pushInited = true;
+
+  let perm = await safe(() => PushNotifications.checkPermissions());
+  if (!perm || perm.receive !== 'granted') {
+    perm = await safe(() => PushNotifications.requestPermissions());
+  }
+  if (!perm || perm.receive !== 'granted') { _pushInited = false; return; }
+
+  await safe(() => PushNotifications.register());
+
+  // FCM token alındıqda backend-ə qeydiyyat
+  await safe(() => PushNotifications.addListener('registration', async (t) => {
+    try {
+      const authToken = getAuthToken && getAuthToken();
+      if (!authToken || !t?.value) return;
+      await fetch(`${apiUrl}/api/push/register-token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${authToken}` },
+        body: JSON.stringify({ token: t.value }),
+      });
+    } catch {}
+  }));
+
+  // Bildirişə toxunulduqda ilgili səhifəyə yönləndir
+  await safe(() => PushNotifications.addListener('pushNotificationActionPerformed', (action) => {
+    const data = action?.notification?.data || {};
+    if (data.type === 'message') window.location.href = '/mesajlar';
+    else if (data.type === 'call') window.location.href = '/mesajlar';
+    else window.location.href = '/bildirisler';
+  }));
+
+  // App açıkkən bildiriş gəldikdə — istəsən in-app toast göstərə bilərsən
+  await safe(() => PushNotifications.addListener('pushNotificationReceived', (notif) => {
+    window.dispatchEvent(new CustomEvent('app:pushReceived', { detail: notif }));
+  }));
 }

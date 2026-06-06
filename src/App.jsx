@@ -4,7 +4,7 @@ import { ToastContainer, Slide, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { API_URL } from './api';
 import { Lock } from 'lucide-react';
-import { attachBackButton, isNative } from './native/capacitor';
+import { attachBackButton, isNative, initPush } from './native/capacitor';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -62,6 +62,16 @@ function NativeBridge() {
   }, [navigate]);
   // Sayfa degisince scroll'u en uste al (native his)
   useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [location.pathname]);
+
+  // Push bildiriş — giriş etmiş istifadəçi üçün FCM token qeydiyyatı
+  useEffect(() => {
+    if (!isNative) return;
+    const tok = localStorage.getItem('token') || sessionStorage.getItem('token');
+    if (tok) {
+      initPush(API_URL, () => localStorage.getItem('token') || sessionStorage.getItem('token'));
+    }
+  }, [location.pathname]);
+
   return null;
 }
 
