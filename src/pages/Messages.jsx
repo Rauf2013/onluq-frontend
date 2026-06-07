@@ -7,7 +7,7 @@ import { Search, Send, Paperclip, Smile, MoreVertical, Check, CheckCheck, User, 
   Heart, ThumbsUp, ThumbsDown, Star, Flame, Sparkles, PartyPopper, Trophy, Crown, Award, Rocket, Lightbulb, CheckCircle, XCircle, AlertTriangle,
   Coffee, Music, Gift, Gem, Zap, Sun, Moon, Cloud, Phone, Mail, MapPin, Clock, Bell, BookOpen, Cake, Camera, ShieldCheck, Smile as SmileIcon, Laugh, HandHeart } from 'lucide-react';
 import { Video as VideoIcon } from 'lucide-react';
-import { io } from 'socket.io-client';
+import { getSocket } from '../socket';
 import { PACKAGE_TIERS } from '../constants/seller';
 import CallSystem from '../components/CallSystem';
 
@@ -141,35 +141,33 @@ function Messages() {
   }, [location]);
 
   useEffect(() => {
-    if (userId) {
-      socketRef.current = io(API_URL, {
-        auth: { token: localStorage.getItem('token') || sessionStorage.getItem('token') },
-      });
-      setSocketReady(true);
+    if (!userId) return;
+    const s = getSocket();
+    if (!s) return;
+    socketRef.current = s;
+    setSocketReady(true);
+    s.emit("user_connected", userId);
 
-      socketRef.current.emit("user_connected", userId);
+    const onReceive = (data) => {
+      fetchConversations(true);
+      if (activeChatRef.current && (activeChatRef.current.partnerId === data.senderId || data.senderId === userId)) {
+        fetchMessagesForChat(activeChatRef.current.partnerId, true);
+      }
+    };
+    const onOnline = () => fetchConversations(true);
+    const onTyping = ({ from, isTyping }) => {
+      if (activeChatRef.current && activeChatRef.current.partnerId === from) setPartnerTyping(!!isTyping);
+    };
 
-      socketRef.current.on("receive_message", (data) => {
-        fetchConversations(true); 
-        
-        if (activeChatRef.current && (activeChatRef.current.partnerId === data.senderId || data.senderId === userId)) {
-          fetchMessagesForChat(activeChatRef.current.partnerId, true);
-        }
-      });
-
-      socketRef.current.on("online_users_updated", () => {
-        fetchConversations(true);
-      });
-
-      socketRef.current.on("typing_indicator", ({ from, isTyping }) => {
-        if (activeChatRef.current && activeChatRef.current.partnerId === from) {
-          setPartnerTyping(!!isTyping);
-        }
-      });
-    }
+    s.on("receive_message", onReceive);
+    s.on("online_users_updated", onOnline);
+    s.on("typing_indicator", onTyping);
 
     return () => {
-      if (socketRef.current) socketRef.current.disconnect();
+      // Paylaşılan socket-i disconnect ETMƏ (presence App-də qalır) — yalnız listener-ləri çıxar
+      s.off("receive_message", onReceive);
+      s.off("online_users_updated", onOnline);
+      s.off("typing_indicator", onTyping);
     };
   }, [userId]);
 

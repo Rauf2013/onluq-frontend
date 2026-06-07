@@ -6,6 +6,7 @@ import {
   Brain, Shield, LogOut, LogIn, UserPlus, User as UserIcon,
 } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
+import { disconnectSocket } from '../socket';
 import { API_URL } from '../api';
 
 const TITLES = {
@@ -82,6 +83,7 @@ export default function MobileHeader() {
   const logout = () => {
     localStorage.removeItem('token'); localStorage.removeItem('user');
     sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
+    disconnectSocket();
     window.dispatchEvent(new Event('userUpdated'));
     setMenuOpen(false);
     navigate('/giris');

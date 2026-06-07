@@ -5,6 +5,7 @@ import 'react-toastify/dist/ReactToastify.css';
 import { API_URL } from './api';
 import { Lock } from 'lucide-react';
 import { attachBackButton, isNative, initPush } from './native/capacitor';
+import { getSocket, disconnectSocket } from './socket';
 
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
@@ -72,6 +73,23 @@ function NativeBridge() {
     }
   }, [location.pathname]);
 
+  return null;
+}
+
+// Qlobal online presence — istifadəçi giriş edibsə HƏR səhifədə socket bağlı qalır,
+// beləcə Mesajlar-a girmədən də online görünür. Çıxış edəndə socket qopur.
+function PresenceSocket() {
+  const location = useLocation();
+  useEffect(() => {
+    const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
+    let user = null;
+    try { user = userStr ? JSON.parse(userStr) : null; } catch { user = null; }
+    if (!user?.id) { disconnectSocket(); return; }
+    const s = getSocket();
+    if (!s) return;
+    const announce = () => s.emit('user_connected', user.id);
+    if (s.connected) announce(); else s.once('connect', announce);
+  }, [location.pathname]);
   return null;
 }
 
@@ -145,6 +163,7 @@ function App() {
     <ThemeProvider>
     <Router>
       <NativeBridge />
+      <PresenceSocket />
       {useMobileShell ? <MobileHeader /> : <Navbar />}
       <ToastContainer position={useMobileShell ? "bottom-center" : "top-center"} autoClose={1500} hideProgressBar={false} newestOnTop={true} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover transition={Slide} />
 

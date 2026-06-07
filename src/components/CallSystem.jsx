@@ -55,6 +55,8 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   const localVideoRef = useRef(null);
   const remoteAudioRef = useRef(null); // remote SƏS — həmişə (səsli + görüntülü çağrı)
   const remoteVideoRef = useRef(null); // remote GÖRÜNTÜ — yalnız görüntülü (MUTED → autoplay işləsin)
+  const localStreamRef = useRef(null); // cleanup-da state stale olmasın deyə — kamera/mikrofon TAM sönsün
+  const remoteStreamRef = useRef(null);
   const timerRef = useRef(null);
   const pendingIceRef = useRef([]);
   const audioCtxRef = useRef(null);    // ringtone üçün Web Audio context
@@ -126,11 +128,17 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       try { pcRef.current.close(); } catch {}
       pcRef.current = null;
     }
+    // Stream-ləri HƏMİŞƏ ref-dən dayandır (state stale ola bilər) — kamera/mikrofon işığı SÖNSÜN
+    stopAllTracks(localStreamRef.current); localStreamRef.current = null;
+    stopAllTracks(remoteStreamRef.current); remoteStreamRef.current = null;
     setLocalStream((s) => { stopAllTracks(s); return null; });
     setRemoteStream((s) => { stopAllTracks(s); return null; });
-    if (localVideoRef.current) { try { localVideoRef.current.srcObject = null; } catch {} }
-    if (remoteAudioRef.current) { try { remoteAudioRef.current.srcObject = null; } catch {} }
-    if (remoteVideoRef.current) { try { remoteVideoRef.current.srcObject = null; } catch {} }
+    // Media element-ləri tam boşalt (pause + srcObject null)
+    for (const el of [localVideoRef.current, remoteAudioRef.current, remoteVideoRef.current]) {
+      if (el) { try { el.pause(); } catch {} try { el.srcObject = null; } catch {} }
+    }
+    // AudioContext-i BAĞLA — yoxsa Android telefonu "zəng səs rejimi"ndə qalır, səs boğuq olur
+    if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} audioCtxRef.current = null; }
     pendingIceRef.current = [];
     setState('idle');
     setKind('audio');
@@ -187,6 +195,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     // ⚡ KRİTİK FIX: ontrack yalnız stream-i state-ə yaz, render olduqdan sonra srcObject useEffect-də qoşulur
     pc.ontrack = (e) => {
       const stream = e.streams[0];
+      remoteStreamRef.current = stream;
       setRemoteStream(stream);
     };
 
@@ -219,6 +228,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       toast.error(peerKind === 'video' ? 'Kamera/Mikrofon icazəsi rədd edildi.' : 'Mikrofon icazəsi rədd edildi.');
       throw e;
     }
+    localStreamRef.current = stream;
     setLocalStream(stream);
     stream.getTracks().forEach((t) => pc.addTrack(t, stream));
 

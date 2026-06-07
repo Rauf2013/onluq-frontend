@@ -5,6 +5,7 @@ import { MessageSquare, Package, Briefcase, Wallet, ShieldCheck, LogOut, CheckCi
 import AIChat from './AIChat';
 import { toast } from 'react-toastify';
 import { useTheme } from '../context/ThemeContext';
+import { disconnectSocket } from '../socket';
 
 function Navbar() {
   const navigate = useNavigate();
@@ -148,6 +149,7 @@ function Navbar() {
     localStorage.removeItem('user');
     sessionStorage.removeItem('token');
     sessionStorage.removeItem('user');
+    disconnectSocket();
     setUser(null);
     setNotifications([]);
     setShowNotifs(false);
