@@ -53,11 +53,54 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   const pcRef = useRef(null);
   const localVideoRef = useRef(null);
-  const remoteMediaRef = useRef(null); // həm <audio>, həm <video> üçün eyni ref
+  const remoteAudioRef = useRef(null); // remote SƏS — həmişə (səsli + görüntülü çağrı)
+  const remoteVideoRef = useRef(null); // remote GÖRÜNTÜ — yalnız görüntülü (MUTED → autoplay işləsin)
   const timerRef = useRef(null);
   const pendingIceRef = useRef([]);
+  const audioCtxRef = useRef(null);    // ringtone üçün Web Audio context
+  const ringRef = useRef(null);        // aktiv ringtone interval-i
 
   const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+
+  // ─── Ringtone (Web Audio — fayl lazım deyil) ───
+  const stopRing = () => {
+    if (ringRef.current) { try { ringRef.current.stop(); } catch {} ringRef.current = null; }
+    try { if (navigator.vibrate) navigator.vibrate(0); } catch {}
+  };
+  const playRing = (mode) => {
+    // mode: 'outgoing' (zəng edirik — diiirt diiirt) | 'incoming' (bizə zəng gəlir — fərqli zəng)
+    stopRing();
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!Ctx) return;
+      const ctx = audioCtxRef.current || new Ctx();
+      audioCtxRef.current = ctx;
+      if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+      const beep = (freq, dur, vol = 0.18) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.value = freq;
+        const t = ctx.currentTime;
+        gain.gain.setValueAtTime(0.0001, t);
+        gain.gain.exponentialRampToValueAtTime(vol, t + 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+        osc.connect(gain); gain.connect(ctx.destination);
+        osc.start(t); osc.stop(t + dur + 0.03);
+      };
+      let timer;
+      if (mode === 'outgoing') {
+        // "diiirt ... diiirt" — hər 2.4 san-də uzun ringback tonu
+        const tick = () => beep(425, 0.9, 0.16);
+        tick(); timer = setInterval(tick, 2400);
+      } else {
+        // gələn zəng — iki tonlu, daha diqqət çəkən + titrəyiş
+        const tick = () => { beep(587, 0.3); setTimeout(() => beep(440, 0.3), 350); try { if (navigator.vibrate) navigator.vibrate([300, 200]); } catch {} };
+        tick(); timer = setInterval(tick, 1600);
+      }
+      ringRef.current = { stop: () => { clearInterval(timer); } };
+    } catch {}
+  };
 
   const startTimer = () => {
     if (timerRef.current) clearInterval(timerRef.current);
@@ -72,6 +115,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   };
 
   const cleanup = () => {
+    stopRing();
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     // peer-in göndərənlərinin də tracklarını dayandır
     if (pcRef.current) {
@@ -85,7 +129,8 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     setLocalStream((s) => { stopAllTracks(s); return null; });
     setRemoteStream((s) => { stopAllTracks(s); return null; });
     if (localVideoRef.current) { try { localVideoRef.current.srcObject = null; } catch {} }
-    if (remoteMediaRef.current) { try { remoteMediaRef.current.srcObject = null; } catch {} }
+    if (remoteAudioRef.current) { try { remoteAudioRef.current.srcObject = null; } catch {} }
+    if (remoteVideoRef.current) { try { remoteVideoRef.current.srcObject = null; } catch {} }
     pendingIceRef.current = [];
     setState('idle');
     setKind('audio');
@@ -106,15 +151,29 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     }
   }, [localStream, kind, state]);
 
+  // Remote stream-i SƏS (audio) və GÖRÜNTÜ (video) elementlərinə AYRICA bağla.
+  // Video element MUTED-dir (səs ayrı <audio>-dan gəlir) — belə Android WebView
+  // autoplay-i bloklamır və ortadakı böyük "play" overlay-i ÇIXMIR (sənin gördüyün bug).
   useEffect(() => {
-    if (remoteStream && remoteMediaRef.current) {
-      try {
-        remoteMediaRef.current.srcObject = remoteStream;
-        const playP = remoteMediaRef.current.play();
-        if (playP && typeof playP.catch === 'function') playP.catch(() => {});
-      } catch {}
+    if (!remoteStream) return;
+    const a = remoteAudioRef.current;
+    if (a) {
+      try { a.srcObject = remoteStream; const p = a.play(); if (p?.catch) p.catch(() => {}); } catch {}
+    }
+    if (kind === 'video') {
+      const v = remoteVideoRef.current;
+      if (v) {
+        try { v.srcObject = remoteStream; const p = v.play(); if (p?.catch) p.catch(() => {}); } catch {}
+      }
     }
   }, [remoteStream, kind, state]);
+
+  // Ringtone — vəziyyətə görə: zəng edirik (outgoing), bizə zəng gəlir (incoming), digər → sus
+  useEffect(() => {
+    if (state === 'calling') playRing('outgoing');
+    else if (state === 'ringing') playRing('incoming');
+    else stopRing();
+  }, [state]);
 
   // === Peer connection qur ===
   const setupPeer = async (peerKind, peerId) => {
@@ -318,12 +377,12 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', zIndex: 3000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-      {/* TƏK remote media element — video çağrı üçün <video>, səsli üçün <audio> */}
-      {isVideo ? (
-        <video ref={remoteMediaRef} autoPlay playsInline
+      {/* Remote SƏS — həmişə var (səsli + görüntülü çağrı). Gizli audio elementi. */}
+      <audio ref={remoteAudioRef} autoPlay playsInline />
+      {/* Remote GÖRÜNTÜ — yalnız görüntülü çağrı. MUTED → autoplay işləyir, ortadakı böyük ▶ overlay çıxmır. */}
+      {isVideo && (
+        <video ref={remoteVideoRef} autoPlay playsInline muted
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#000', display: isActive ? 'block' : 'none' }} />
-      ) : (
-        <audio ref={remoteMediaRef} autoPlay playsInline style={{ display: 'none' }} />
       )}
 
       {/* Local video preview — yalnız görüntülü aktiv zaman */}
