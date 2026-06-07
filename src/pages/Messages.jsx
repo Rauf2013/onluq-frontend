@@ -650,6 +650,14 @@ function Messages() {
                   aria-label="Mesaj yazın"
                   data-placeholder="Bir mesaj yazın..."
                   className={`composer ${composerEmpty ? 'composer-empty' : ''}`}
+                  /* AZ hərfləri (ə ş ç ğ ı ö ü) — Android Gboard autocorrect/autocapitalize
+                     bu hərfləri ingiliscəyə "düzəldib" itirir. Söndürürük + lang=az veririk. */
+                  lang="az"
+                  spellCheck={false}
+                  autoCorrect="off"
+                  autoCapitalize="off"
+                  autoComplete="off"
+                  inputMode="text"
                   onInput={handleComposerInput}
                   onKeyDown={(e) => {
                     if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage(); }

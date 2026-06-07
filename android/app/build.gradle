@@ -29,14 +29,35 @@ android {
                 keyPassword 'android'
             }
         }
+        // RELEASE imza — Play Store üçün. Dəyərlər CI env-dən (GitHub Secrets) oxunur.
+        // Workflow: ANDROID_KEYSTORE_B64 → release.keystore + ONLUQ_* env-lər.
+        // Env yoxdursa (lokal debug) bu config boş qalır, release build sadəcə imzasız olar.
+        release {
+            def ksPath = System.getenv('ONLUQ_KEYSTORE_PATH')
+            if (ksPath) {
+                def ksFile = file(ksPath)
+                if (ksFile.exists()) {
+                    storeFile ksFile
+                    storePassword System.getenv('ONLUQ_KEYSTORE_PASS')
+                    keyAlias System.getenv('ONLUQ_KEY_ALIAS')
+                    keyPassword System.getenv('ONLUQ_KEY_PASS')
+                }
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // Yalnız release keystore env-i varsa imzala (CI). Yoxdursa imzasız buraxır.
+            if (System.getenv('ONLUQ_KEYSTORE_PATH')) {
+                signingConfig signingConfigs.release
+            }
+            // R8/ProGuard ilə kod kiçildilir + qarışdırılır (reverse-engineering çətinləşir).
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
 }

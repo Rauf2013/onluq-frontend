@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
+        android:fullBackupContent="false"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
@@ -44,4 +47,9 @@
 
     <!-- Push bildiriş (Android 13+ POST_NOTIFICATIONS) -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Reklam ID-si İSTİFADƏ EDİLMİR. Firebase/play-services SDK-ları bu icazəni
+         avtomatik əlavə edir; onu manifest-dən silirik ki, Play Console "Data Safety"
+         bəyanı uyğunsuz olmasın və tətbiq rədd edilməsin. -->
+    <uses-permission android:name="com.google.android.gms.permission.AD_ID" tools:node="remove" />
 </manifest>

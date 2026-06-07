@@ -1,0 +1,14 @@
+# EVDƏN frontend — Netlify (PULSUZ) konfiqurasiyası
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# SPA fallback — react-router client-side route-lar üçün ŞƏRTDİR.
+# Bu olmasa /mesajlar, /profil/123 kimi linklər birbaşa açılanda 404 verər.
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

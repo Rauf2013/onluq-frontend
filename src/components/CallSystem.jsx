@@ -2,11 +2,33 @@
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User } from 'lucide-react';
 import { toast } from 'react-toastify';
 
-const ICE = {
-  iceServers: [
+// ICE/TURN server konfiqurasiyası.
+// ⚠ TURN ŞƏRTDİR: yalnız STUN ilə symmetric NAT (əksər mobil operatorlar, bəzi ev
+// routerları) arxasında media (səs/görüntü) çata bilmir — "bəzən gəlir, bəzən gəlmir,
+// tək tərəfli" probleminin əsl səbəbi budur. TURN relay olmadan P2P qurulmur.
+// Dəyərlər build vaxtı env-dən oxunur (.env.production):
+//   VITE_TURN_URLS=turn:host:3478,turns:host:5349   (vergüllə ayır)
+//   VITE_TURN_USERNAME=...     VITE_TURN_CREDENTIAL=...
+const buildIceServers = () => {
+  const servers = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-  ],
+  ];
+  const turnUrls = (import.meta.env.VITE_TURN_URLS || '')
+    .split(',').map((s) => s.trim()).filter(Boolean);
+  if (turnUrls.length) {
+    servers.push({
+      urls: turnUrls,
+      username: import.meta.env.VITE_TURN_USERNAME || '',
+      credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+    });
+  }
+  return servers;
+};
+
+const ICE = {
+  iceServers: buildIceServers(),
+  iceCandidatePoolSize: 10,
 };
 
 // state: 'idle' | 'calling' | 'ringing' | 'active'
@@ -307,12 +329,12 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       {/* Local video preview — yalnız görüntülü aktiv zaman */}
       {isVideo && isActive && (
         <video ref={localVideoRef} autoPlay playsInline muted
-          style={{ position: 'absolute', top: 20, right: 20, width: 140, height: 100, objectFit: 'cover', borderRadius: 12, border: '2px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', background: '#0f172a', zIndex: 1 }} />
+          style={{ position: 'absolute', top: 'calc(16px + env(safe-area-inset-top))', right: 16, width: 'clamp(96px, 28vw, 140px)', height: 'clamp(128px, 37vw, 186px)', objectFit: 'cover', borderRadius: 12, border: '2px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', background: '#0f172a', zIndex: 1 }} />
       )}
 
       {/* Üst informasiya overlay (video çağrı aktivdə) */}
       {isVideo && isActive && (
-        <div style={{ position: 'absolute', top: 20, left: 20, background: 'rgba(0,0,0,0.55)', padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, zIndex: 2 }}>
+        <div style={{ position: 'absolute', top: 'calc(16px + env(safe-area-inset-top))', left: 16, maxWidth: '55vw', background: 'rgba(0,0,0,0.55)', padding: '6px 14px', borderRadius: 999, fontSize: 14, fontWeight: 700, zIndex: 2, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
           {remoteName} · {fmtTime(duration)}
         </div>
       )}
@@ -333,7 +355,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       )}
 
       {/* Düymələr */}
-      <div style={{ position: 'absolute', bottom: 40, left: 0, right: 0, display: 'flex', justifyContent: 'center', gap: 18, padding: '0 20px', zIndex: 2 }}>
+      <div style={{ position: 'absolute', bottom: 'calc(28px + env(safe-area-inset-bottom))', left: 0, right: 0, display: 'flex', justifyContent: 'center', flexWrap: 'wrap', gap: 'clamp(14px, 5vw, 22px)', padding: '0 16px', zIndex: 2 }}>
         {isRinging && (
           <>
             <button onClick={reject} style={btnRed}><PhoneOff size={26} /></button>
@@ -371,7 +393,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   );
 });
 
-const btnBase = { width: 64, height: 64, borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'white', transition: '0.2s', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' };
+const btnBase = { width: 'clamp(54px, 16vw, 64px)', height: 'clamp(54px, 16vw, 64px)', flexShrink: 0, borderRadius: '50%', border: 'none', cursor: 'pointer', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: 'white', transition: '0.2s', boxShadow: '0 8px 24px rgba(0,0,0,0.3)' };
 const btnGreen = { ...btnBase, background: '#14224F' };
 const btnRed = { ...btnBase, background: '#ef4444' };
 const btnGray = (active) => ({ ...btnBase, background: active ? '#ef4444' : 'rgba(255,255,255,0.18)' });

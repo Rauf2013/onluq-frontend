@@ -1,0 +1,9 @@
+<svg width="120" height="120" viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+  <!-- EVDƏN brand favicon: navy fon + sarı ev+insan logo -->
+  <rect width="120" height="120" rx="26" fill="#14224F"/>
+  <g fill="none" stroke="#FFED00" stroke-width="9" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M28 64 L60 32 L92 64"/>
+  </g>
+  <circle cx="60" cy="66" r="10" fill="#FFED00"/>
+  <path d="M40 94 Q60 72 80 94 Z" fill="#FFED00"/>
+</svg>

@@ -1,6 +1,6 @@
 {
-  "name": "bacariq-app",
-  "version": "0.0.0",
+  "name": "evden",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
