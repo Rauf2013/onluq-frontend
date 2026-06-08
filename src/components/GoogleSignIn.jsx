@@ -11,6 +11,52 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
   const navigate = useNavigate();
   const [busy, setBusy] = useState(false);
 
+  // Web Google SDK init — Hook KOŞULSUZ çağrılmalıdır (react-hooks/rules-of-hooks).
+  // Əvvəl bu useEffect `if (isNative) return`-dən SONRA idi → şərti hook → səhv.
+  // İndi yuxarıdadır, native-də guard ilə erkən çıxır.
+  useEffect(() => {
+    if (isNative || !CLIENT_ID) return;
+    let tries = 0;
+    const init = () => {
+      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
+        if (tries++ < 30) return setTimeout(init, 200);
+        return;
+      }
+      window.google.accounts.id.initialize({
+        client_id: CLIENT_ID,
+        callback: async (resp) => {
+          const t = toast.loading('Google ilə daxil olunur...');
+          try {
+            const r = await fetch(`${API_URL}/api/auth/google`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ idToken: resp.credential }),
+            });
+            const d = await r.json();
+            if (!r.ok) {
+              toast.update(t, { render: d.message || 'Xəta', type: 'error', isLoading: false, autoClose: 2500 });
+              return;
+            }
+            const store = rememberMe ? localStorage : sessionStorage;
+            store.setItem('token', d.token);
+            store.setItem('user', JSON.stringify(d.user));
+            toast.update(t, { render: `Xoş gəldiniz, ${d.user.fullName}!`, type: 'success', isLoading: false, autoClose: 1500 });
+            if (onSuccess) onSuccess(d.user);
+            setTimeout(() => { navigate('/'); window.location.reload(); }, 800);
+          } catch (e) {
+            toast.update(t, { render: 'Bağlantı xətası', type: 'error', isLoading: false, autoClose: 2500 });
+          }
+        },
+      });
+      if (btnRef.current) {
+        window.google.accounts.id.renderButton(btnRef.current, {
+          theme: 'outline', size: 'large', width: btnRef.current.offsetWidth || 320, text: 'continue_with', shape: 'rectangular',
+        });
+      }
+    };
+    init();
+  }, [rememberMe, onSuccess, navigate]);
+
   // Native (Capacitor) — Capgo Social Login plugin ile native dialog ac
   if (isNative) {
     const handleNativeSignIn = async () => {
@@ -66,50 +112,6 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
       </button>
     );
   }
-
-  // Web — eski Google web SDK akisi
-  useEffect(() => {
-    if (!CLIENT_ID) return;
-    let tries = 0;
-    const init = () => {
-      if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-        if (tries++ < 30) return setTimeout(init, 200);
-        return;
-      }
-      window.google.accounts.id.initialize({
-        client_id: CLIENT_ID,
-        callback: async (resp) => {
-          const t = toast.loading('Google ilə daxil olunur...');
-          try {
-            const r = await fetch(`${API_URL}/api/auth/google`, {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ idToken: resp.credential }),
-            });
-            const d = await r.json();
-            if (!r.ok) {
-              toast.update(t, { render: d.message || 'Xəta', type: 'error', isLoading: false, autoClose: 2500 });
-              return;
-            }
-            const store = rememberMe ? localStorage : sessionStorage;
-            store.setItem('token', d.token);
-            store.setItem('user', JSON.stringify(d.user));
-            toast.update(t, { render: `Xoş gəldiniz, ${d.user.fullName}!`, type: 'success', isLoading: false, autoClose: 1500 });
-            if (onSuccess) onSuccess(d.user);
-            setTimeout(() => { navigate('/'); window.location.reload(); }, 800);
-          } catch (e) {
-            toast.update(t, { render: 'Bağlantı xətası', type: 'error', isLoading: false, autoClose: 2500 });
-          }
-        },
-      });
-      if (btnRef.current) {
-        window.google.accounts.id.renderButton(btnRef.current, {
-          theme: 'outline', size: 'large', width: btnRef.current.offsetWidth || 320, text: 'continue_with', shape: 'rectangular',
-        });
-      }
-    };
-    init();
-  }, [rememberMe, onSuccess, navigate]);
 
   if (!CLIENT_ID) {
     return (
