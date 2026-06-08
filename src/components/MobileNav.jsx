@@ -41,7 +41,7 @@ export default function MobileNav() {
   return (
     <nav
       className="mobile-tab-bar"
-      style={{ gridTemplateColumns: `repeat(${tabs.length}, 1fr)` }}
+      style={{ '--mtab-count': tabs.length }}
       aria-label="Əsas naviqasiya"
     >
       {tabs.map((tab) => {

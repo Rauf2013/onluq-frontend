@@ -237,6 +237,10 @@ body.keyboard-open .app-shell { padding-bottom: 0 !important; }
   height: calc(64px + env(safe-area-inset-bottom));
   padding-bottom: env(safe-area-inset-bottom);
   display: grid;
+  /* Tab sayı CSS dəyişəni ilə gəlir (inline-da "grid-template-columns" stringi YOXDUR) —
+     belə qlobal [style*="grid-template-columns: repeat(4"] responsive qaydası tab-bar-ı
+     tək sütuna salıb tab-ları üst-üstə BİNDİRMİR. (guest=4 tab bug-u). */
+  grid-template-columns: repeat(var(--mtab-count, 5), 1fr);
   background: var(--bg-surface);
   border-top: 1px solid var(--border-soft);
   z-index: 1000;
