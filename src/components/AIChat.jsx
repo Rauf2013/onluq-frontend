@@ -101,8 +101,8 @@ function AIChat({ open, onClose, model: initialModel = 'mid' }) {
       <div onClick={(e) => e.stopPropagation()} className="ai-modal"
         style={{ background: 'var(--bg-surface)', width: '100%', maxWidth: 640, height: 'min(85vh, 720px)', borderRadius: 18, display: 'flex', flexDirection: 'column', boxShadow: '0 25px 60px rgba(0,0,0,0.3)', overflow: 'hidden' }}>
 
-        {/* Başlıq */}
-        <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: '16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        {/* Başlıq — paddingTop safe-area: native full-screen-də status bar-ın altında qalmasın */}
+        <div style={{ background: 'linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%)', color: 'white', padding: 'calc(16px + env(safe-area-inset-top)) 20px 16px 20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ background: 'rgba(255,255,255,0.18)', borderRadius: 10, padding: 8, display: 'inline-flex' }}><Bot size={20} /></div>
             <div>
@@ -207,11 +207,12 @@ function AIChat({ open, onClose, model: initialModel = 'mid' }) {
           </div>
         )}
 
-        {/* Input */}
-        <div style={{ padding: 14, borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
+        {/* Input — paddingBottom safe-area: Android naviqasiya düymələrinin altında qalmasın */}
+        <div style={{ padding: 14, paddingBottom: 'calc(14px + env(safe-area-inset-bottom))', borderTop: '1px solid var(--border)', background: 'var(--bg-surface)' }}>
           <form onSubmit={(e) => { e.preventDefault(); ask(); }} style={{ display: 'flex', gap: 8 }}>
             <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Sualınızı yazın..." maxLength={isGuest ? 300 : 800}
-              className="auth-input" style={{ flex: 1, marginBottom: 0 }} autoFocus disabled={loading} />
+              className="auth-input" style={{ flex: 1, marginBottom: 0 }} autoFocus disabled={loading}
+              lang="az" spellCheck={false} autoCorrect="off" autoCapitalize="off" autoComplete="off" inputMode="text" />
             <button type="submit" disabled={loading || !q.trim()}
               style={{ background: '#6366f1', color: 'white', border: 'none', padding: '0 18px', borderRadius: 8, cursor: loading || !q.trim() ? 'not-allowed' : 'pointer', opacity: loading || !q.trim() ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: 6, fontWeight: 700 }}>
               <Send size={16} />

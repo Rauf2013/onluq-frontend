@@ -2706,6 +2706,15 @@ body.dark-mode .theme-toggle-btn:hover {
 .Toastify__toast-container {
   z-index: 999999 !important;
 }
+/* Mobil: alt-mərkəz toast/xəta mesajları Android naviqasiya düymələrinin və safe-area-nın
+   ÜSTÜNDƏ qalsın — altında gizlənməsin. */
+@media (max-width: 768px) {
+  .Toastify__toast-container--bottom-center,
+  .Toastify__toast-container--bottom-left,
+  .Toastify__toast-container--bottom-right {
+    bottom: calc(env(safe-area-inset-bottom) + 14px) !important;
+  }
+}
 
 /* === GLOBAL MOBİL UYUMLULUK === */
 @media (max-width: 768px) {
