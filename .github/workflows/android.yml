@@ -43,11 +43,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # .env.production repoda saxlanmır (təhlükəsizlik). Build üçün burada yaradılır.
+      # GitHub repo Variables qoyulubsa onlar, yoxsa açıq (client-side) defolt dəyərlər istifadə olunur.
+      - name: Create .env.production
+        run: |
+          cat > .env.production <<'EOF'
+          VITE_API_URL=${{ vars.VITE_API_URL || 'https://evden-backend.onrender.com' }}
+          VITE_GOOGLE_CLIENT_ID=${{ vars.VITE_GOOGLE_CLIENT_ID || '397810655273-kdet77p6l6lf2lkg5to7shs2vchr2oor.apps.googleusercontent.com' }}
+          VITE_TURN_URLS=${{ vars.VITE_TURN_URLS || 'turn:free.expressturn.com:3478,turn:free.expressturn.com:3478?transport=tcp' }}
+          VITE_TURN_USERNAME=${{ vars.VITE_TURN_USERNAME || '000000002096222293' }}
+          VITE_TURN_CREDENTIAL=${{ vars.VITE_TURN_CREDENTIAL || 'IqJM8Xin2Ad6NOtRrg8fKAurxU4=' }}
+          EOF
+          echo "VITE_API_URL=$(grep VITE_API_URL .env.production)"
+
       - name: Build web (production)
         run: npm run build
-        # NOT: VITE_* dəyişənlər .env.production-dan oxunur. Burada override etmirik
-        # cünki bos vars onlari sifirlayardi. Override lazımdırsa repo Variables/Secrets-da
-        # VITE_API_URL_OVERRIDE qoy və burada istifade et.
 
       - name: Capacitor sync (android)
         run: npx cap sync android
