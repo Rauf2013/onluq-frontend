@@ -42,9 +42,11 @@ function Login() {
         // "Məni xatırla" seçilibsə kalıcı hafızaya (localStorage), seçilməyibsə keçici hafızaya (sessionStorage) yazırıq
         if (rememberMe) {
           localStorage.setItem('token', data.token);
+          if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
           localStorage.setItem('user', JSON.stringify(data.user));
         } else {
           sessionStorage.setItem('token', data.token);
+          if (data.refreshToken) sessionStorage.setItem('refreshToken', data.refreshToken);
           sessionStorage.setItem('user', JSON.stringify(data.user));
         }
 

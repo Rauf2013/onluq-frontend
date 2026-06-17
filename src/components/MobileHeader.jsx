@@ -81,8 +81,8 @@ export default function MobileHeader() {
   const go = (path) => { setMenuOpen(false); navigate(path); };
 
   const logout = () => {
-    localStorage.removeItem('token'); localStorage.removeItem('user');
-    sessionStorage.removeItem('token'); sessionStorage.removeItem('user');
+    localStorage.removeItem('token'); localStorage.removeItem('user'); localStorage.removeItem('refreshToken');
+    sessionStorage.removeItem('token'); sessionStorage.removeItem('user'); sessionStorage.removeItem('refreshToken');
     disconnectSocket();
     window.dispatchEvent(new Event('userUpdated'));
     setMenuOpen(false);

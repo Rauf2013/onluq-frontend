@@ -39,6 +39,7 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
             }
             const store = rememberMe ? localStorage : sessionStorage;
             store.setItem('token', d.token);
+            if (d.refreshToken) store.setItem('refreshToken', d.refreshToken);
             store.setItem('user', JSON.stringify(d.user));
             toast.update(t, { render: `Xoş gəldiniz, ${d.user.fullName}!`, type: 'success', isLoading: false, autoClose: 1500 });
             if (onSuccess) onSuccess(d.user);
@@ -79,6 +80,7 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
         }
         const store = rememberMe ? localStorage : sessionStorage;
         store.setItem('token', d.token);
+        if (d.refreshToken) store.setItem('refreshToken', d.refreshToken);
         store.setItem('user', JSON.stringify(d.user));
         toast.update(t, { render: `Xoş gəldin, ${d.user.fullName}!`, type: 'success', isLoading: false, autoClose: 1500 });
         if (onSuccess) onSuccess(d.user);
