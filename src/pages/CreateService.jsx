@@ -1,5 +1,5 @@
 ﻿import React, { useState } from 'react';
-import { API_URL } from '../api';
+import { API_URL, uploadImageSafe } from '../api';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PlusCircle, UploadCloud, X, HelpCircle, Trash2, Plus } from 'lucide-react';
@@ -95,6 +95,10 @@ function CreateService() {
     setIsSubmitting(true);
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     try {
+      // base64 şəkilləri Cloudinary-yə yüklə → DB-də yalnız URL (#4)
+      const uploadedImages = await Promise.all(images.map((img) =>
+        (typeof img === 'string' && img.startsWith('data:image/')) ? uploadImageSafe(img, 'service') : img
+      ));
       const response = await fetch(`${API_URL}/api/services`, {
         method: 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
@@ -102,8 +106,8 @@ function CreateService() {
           title,
           category: subCategory,
           description,
-          image: images[0],
-          images,
+          image: uploadedImages[0],
+          images: uploadedImages,
           packages: pkgList,
           faq: faq.filter((f) => f.question.trim() && f.answer.trim()),
         }),

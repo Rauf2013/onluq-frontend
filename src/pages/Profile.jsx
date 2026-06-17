@@ -1,5 +1,5 @@
 ﻿import React, { useState, useEffect, useRef } from 'react';
-import { API_URL } from '../api';
+import { API_URL, uploadImageSafe } from '../api';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { User, Star, MapPin, Calendar, Edit3, MessageSquare, Image as ImageIcon, UserPlus, UserCheck, Eye, Users, Award, ShoppingBag, Camera, Clock, Globe, Languages, Plus, Trash2, X, Repeat } from 'lucide-react';
@@ -171,6 +171,18 @@ function Profile() {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
     const t = toast.loading('Yadda saxlanılır...');
     try {
+      // base64 şəkilləri əvvəlcə Cloudinary-yə yüklə (DB-də yalnız URL saxlanılsın — #4)
+      if (typeof patch.avatar === 'string' && patch.avatar.startsWith('data:image/')) {
+        patch = { ...patch, avatar: await uploadImageSafe(patch.avatar, 'avatar') };
+      }
+      if (Array.isArray(patch.portfolio)) {
+        patch = {
+          ...patch,
+          portfolio: await Promise.all(patch.portfolio.map((p) =>
+            (typeof p === 'string' && p.startsWith('data:image/')) ? uploadImageSafe(p, 'portfolio') : p
+          )),
+        };
+      }
       const r = await fetch(`${API_URL}/api/users/profile`, {
         method: 'PUT',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
