@@ -324,7 +324,16 @@ function Orders() {
                 </div>
 
                 <div style={{ display: 'flex', gap: '10px', marginTop: '10px', justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                  
+
+                  {(order.buyerId?._id && order.sellerId?._id) && (
+                    <button
+                      onClick={() => navigate('/mesajlar', { state: { partnerId: isSeller ? order.buyerId?._id : order.sellerId?._id, partnerName: isSeller ? order.buyerId?.fullName : order.sellerId?.fullName } })}
+                      title="Qarşı tərəfə mesaj yaz"
+                      style={{ background: 'var(--bg-page)', color: '#14224F', border: '1px solid var(--border)', padding: '10px 18px', borderRadius: 8, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                      <MessageSquare size={16} /> Mesaj yaz
+                    </button>
+                  )}
+
                   {isSeller && (order.status === 'Havuzda (Gözləyir)' || order.status === 'Düzəliş Gözləyir') && (
                     <button onClick={() => { setDeliveryData({ orderId: order._id, note: '', url: '' }); setIsDeliveryModalOpen(true); }} style={{ background: '#3b82f6', color: 'white', border: 'none', padding: '10px 20px', borderRadius: '8px', fontWeight: 'bold', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: '6px', fontSize: '14px' }}>
                       <UploadCloud size={16} /> İşi Təhvil Ver

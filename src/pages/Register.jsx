@@ -42,18 +42,21 @@ function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        // Əgər qeydiyyat uğurlu oldusa
-        toast.update(loadingToast, { 
-          render: "Qeydiyyat uğurla tamamlandı! İndi giriş edə bilərsiniz. ", 
-          type: "success", 
-          isLoading: false, 
-          autoClose: 3000 
+        // Qeydiyyatdan sonra AVTOMATİK giriş — token onsuz da gəlir, təkrar login lazım deyil
+        localStorage.setItem('token', data.token);
+        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+        toast.update(loadingToast, {
+          render: `Xoş gəldiniz, ${data.user?.fullName || ''}!`,
+          type: "success",
+          isLoading: false,
+          autoClose: 2000
         });
-        
-        // 1.5 saniyə sonra istifadəçini Giriş səhifəsinə avtomatik yönləndiririk
+        // Birbaşa ana səhifəyə (giriş edilmiş halda)
         setTimeout(() => {
-          navigate('/giris');
-        }, 1500);
+          navigate('/');
+          window.location.reload();
+        }, 1200);
 
       } else {
         // Əgər e-poçt artıq varsa və ya başqa xəta çıxarsa
