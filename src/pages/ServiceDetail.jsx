@@ -310,6 +310,11 @@ function ServiceDetail() {
           <div style={{ background: 'var(--bg-surface)', borderRadius: 16, border: '1px solid var(--border)', boxShadow: '0 10px 30px rgba(0,0,0,0.05)', overflow: 'hidden' }}>
             {packages.length > 0 ? (
               <>
+                {packages.length > 1 && (
+                  <div style={{ padding: '12px 16px 0', fontSize: 12, color: 'var(--text-tertiary)', textAlign: 'center' }}>
+                    Paket seçin — hər birinin qiyməti, müddəti və daxil olan xidmətləri fərqlidir
+                  </div>
+                )}
                 <div style={{ display: 'flex', borderBottom: '1px solid var(--border)' }}>
                   {PACKAGE_TIERS.filter((t) => packages.find((p) => p.tier === t.tier)).map((t) => (
                     <button key={t.tier} onClick={() => setActivePkg(t.tier)}
