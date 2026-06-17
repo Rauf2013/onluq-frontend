@@ -12,8 +12,6 @@ function Login() {
     password: ''
   });
   
-  // "Məni xatırla" üçün xüsusi state
-  const [rememberMe, setRememberMe] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -46,16 +44,10 @@ function Login() {
       }
 
       if (response.ok) {
-        // "Məni xatırla" seçilibsə kalıcı hafızaya (localStorage), seçilməyibsə keçici hafızaya (sessionStorage) yazırıq
-        if (rememberMe) {
-          localStorage.setItem('token', data.token);
-          if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-          localStorage.setItem('user', JSON.stringify(data.user));
-        } else {
-          sessionStorage.setItem('token', data.token);
-          if (data.refreshToken) sessionStorage.setItem('refreshToken', data.refreshToken);
-          sessionStorage.setItem('user', JSON.stringify(data.user));
-        }
+        // Həmişə kalıcı saxla (localStorage) — istifadəçi özü çıxış edənə qədər giriş qalır
+        localStorage.setItem('token', data.token);
+        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+        localStorage.setItem('user', JSON.stringify(data.user));
 
         toast.update(loadingToast, { 
           render: `Xoş gəldiniz, ${data.user.fullName}! `, 
@@ -127,14 +119,7 @@ function Login() {
             />
           </div>
 
-          <div className="form-options">
-            <label className="remember-me">
-              <input 
-                type="checkbox" 
-                checked={rememberMe}
-                onChange={(e) => setRememberMe(e.target.checked)}
-              /> Məni xatırla
-            </label>
+          <div className="form-options" style={{ justifyContent: 'flex-end' }}>
             <Link to="/sifreni-unutdun" className="forgot-password">Şifrəni unutmusan?</Link>
           </div>
 
@@ -147,7 +132,7 @@ function Login() {
           <div style={{ flex: 1, height: 1, background: 'var(--border)' }} />
         </div>
 
-        <GoogleSignIn rememberMe={rememberMe} />
+        <GoogleSignIn />
 
         <div className="auth-footer">
           Hesabınız yoxdur? <Link to="/qeydiyyat" className="auth-link">Qeydiyyatdan keçin</Link>

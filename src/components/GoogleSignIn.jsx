@@ -37,7 +37,7 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
               toast.update(t, { render: d.message || 'Xəta', type: 'error', isLoading: false, autoClose: 2500 });
               return;
             }
-            const store = rememberMe ? localStorage : sessionStorage;
+            const store = localStorage;
             store.setItem('token', d.token);
             if (d.refreshToken) store.setItem('refreshToken', d.refreshToken);
             store.setItem('user', JSON.stringify(d.user));
@@ -78,7 +78,7 @@ function GoogleSignIn({ rememberMe = true, onSuccess }) {
           setBusy(false);
           return;
         }
-        const store = rememberMe ? localStorage : sessionStorage;
+        const store = localStorage;
         store.setItem('token', d.token);
         if (d.refreshToken) store.setItem('refreshToken', d.refreshToken);
         store.setItem('user', JSON.stringify(d.user));
