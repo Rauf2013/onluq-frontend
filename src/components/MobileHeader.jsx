@@ -58,6 +58,13 @@ export default function MobileHeader() {
   const isRoot = ROOT_PATHS.has(location.pathname) || location.pathname.startsWith('/profil/');
   const title = titleForPath(location.pathname);
 
+  // Geri: SPA tarixçəsi varsa bir addım geri, yoxdursa (birbaşa açılış/reload) ana səhifəyə.
+  // Bu, "bəzi səhifələrdə geri qayıda bilmədim" problemini həll edir (#7).
+  const goBack = () => {
+    if (location.key && location.key !== 'default') navigate(-1);
+    else navigate('/');
+  };
+
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
   useEffect(() => {
@@ -113,7 +120,7 @@ export default function MobileHeader() {
       <header className="mobile-top-header" aria-label="Səhifə başlığı">
         <div className="mobile-top-left">
           {!isRoot ? (
-            <button onClick={() => navigate(-1)} className="mobile-icon-btn" aria-label="Geri">
+            <button onClick={goBack} className="mobile-icon-btn" aria-label="Geri">
               <ChevronLeft size={24} />
             </button>
           ) : (

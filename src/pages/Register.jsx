@@ -42,16 +42,18 @@ function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        // Email təsdiqi (#1): token verilmir — emailə kod gedir, təsdiq səhifəsinə yönləndir
-        toast.update(loadingToast, {
-          render: "Təsdiq kodu emailinizə göndərildi. Kodu daxil edin.",
-          type: "success",
-          isLoading: false,
-          autoClose: 2500
-        });
-        setTimeout(() => {
-          navigate('/email-tesdiq', { state: { email: data.email || formData.email } });
-        }, 1200);
+        if (data.token) {
+          // Email konfiqurasiya yoxdur → birbaşa giriş (avtomatik)
+          localStorage.setItem('token', data.token);
+          if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
+          if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+          toast.update(loadingToast, { render: `Xoş gəldiniz, ${data.user?.fullName || ''}!`, type: "success", isLoading: false, autoClose: 2000 });
+          setTimeout(() => { navigate('/'); window.location.reload(); }, 1200);
+        } else {
+          // Email təsdiqi: emailə kod gedir → təsdiq səhifəsinə yönləndir
+          toast.update(loadingToast, { render: "Təsdiq kodu emailinizə göndərildi. Kodu daxil edin.", type: "success", isLoading: false, autoClose: 2500 });
+          setTimeout(() => { navigate('/email-tesdiq', { state: { email: data.email || formData.email } }); }, 1200);
+        }
 
       } else {
         // Əgər e-poçt artıq varsa və ya başqa xəta çıxarsa
