@@ -2,7 +2,7 @@
 import { API_URL } from '../api';
 import { Link, useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { Briefcase, Plus, Trash2, Tag, ImageIcon, AlertTriangle, TrendingUp, DollarSign, Eye, Package, Star, BarChart3, Award } from 'lucide-react';
+import { Briefcase, Plus, Trash2, Tag, ImageIcon, AlertTriangle, TrendingUp, DollarSign, Eye, Package, Star, BarChart3, Award, Pencil } from 'lucide-react';
 
 function MyServices() {
   const [services, setServices] = useState([]);
@@ -264,9 +264,15 @@ function MyServices() {
                 </div>
               </div>
               <div className="service-actions">
-                {/* YENİ: Sil butonuna basınca artık tarayıcı promt'u değil, kendi özel modalımız açılır */}
-                <button 
-                  onClick={() => handleDeleteClick(service._id)} 
+                <button
+                  onClick={() => navigate(`/xidmet-duzenle/${service._id}`)}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(20,34,79,0.08)', color: '#14224F', border: '1px solid var(--border)', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s' }}
+                >
+                  <Pencil size={16} /> Redaktə
+                </button>
+                {/* Sil butonuna basınca özel modal açılır */}
+                <button
+                  onClick={() => handleDeleteClick(service._id)}
                   style={{ display: 'flex', alignItems: 'center', gap: '8px', background: '#fee2e2', color: '#ef4444', border: '1px solid #fecaca', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s' }}
                 >
                   <Trash2 size={16} /> Sil

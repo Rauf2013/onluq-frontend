@@ -42,20 +42,15 @@ function Register() {
       const data = await response.json();
 
       if (response.ok) {
-        // Qeydiyyatdan sonra AVTOMATİK giriş — token onsuz da gəlir, təkrar login lazım deyil
-        localStorage.setItem('token', data.token);
-        if (data.refreshToken) localStorage.setItem('refreshToken', data.refreshToken);
-        if (data.user) localStorage.setItem('user', JSON.stringify(data.user));
+        // Email təsdiqi (#1): token verilmir — emailə kod gedir, təsdiq səhifəsinə yönləndir
         toast.update(loadingToast, {
-          render: `Xoş gəldiniz, ${data.user?.fullName || ''}!`,
+          render: "Təsdiq kodu emailinizə göndərildi. Kodu daxil edin.",
           type: "success",
           isLoading: false,
-          autoClose: 2000
+          autoClose: 2500
         });
-        // Birbaşa ana səhifəyə (giriş edilmiş halda)
         setTimeout(() => {
-          navigate('/');
-          window.location.reload();
+          navigate('/email-tesdiq', { state: { email: data.email || formData.email } });
         }, 1200);
 
       } else {

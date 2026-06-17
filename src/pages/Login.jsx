@@ -38,6 +38,13 @@ function Login() {
 
       const data = await response.json();
 
+      // Email təsdiqlənməyibsə (#1) — təsdiq səhifəsinə yönləndir
+      if (response.status === 403 && data.needVerify) {
+        toast.update(loadingToast, { render: 'Email təsdiqlənməyib. Təsdiq kodu göndərildi.', type: 'info', isLoading: false, autoClose: 2500 });
+        setTimeout(() => navigate('/email-tesdiq', { state: { email: data.email || formData.email } }), 1000);
+        return;
+      }
+
       if (response.ok) {
         // "Məni xatırla" seçilibsə kalıcı hafızaya (localStorage), seçilməyibsə keçici hafızaya (sessionStorage) yazırıq
         if (rememberMe) {

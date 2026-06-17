@@ -16,6 +16,7 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
+import VerifyEmail from './pages/VerifyEmail';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import CreateService from './pages/CreateService';
@@ -173,6 +174,7 @@ function App() {
         <Route path="/kategoriler" element={<Categories />} />
         <Route path="/qeydiyyat" element={<Register />} />
         <Route path="/giris" element={<Login />} />
+        <Route path="/email-tesdiq" element={<VerifyEmail />} />
         <Route path="/sifreni-unutdun" element={<ForgotPassword />} />
         <Route path="/sifre-yenile/:token" element={<ResetPassword />} />
         <Route path="/xidmet/:id" element={<ServiceDetail />} />
@@ -180,6 +182,7 @@ function App() {
 
         <Route path="/sevimliler" element={<ProtectedRoute><Favorites /></ProtectedRoute>} />
         <Route path="/yeni-xidmet" element={<ProtectedRoute><CreateService /></ProtectedRoute>} />
+        <Route path="/xidmet-duzenle/:id" element={<ProtectedRoute><CreateService /></ProtectedRoute>} />
         <Route path="/sifarislerim" element={<ProtectedRoute><Orders /></ProtectedRoute>} />
         <Route path="/xidmetlerim" element={<ProtectedRoute><MyServices /></ProtectedRoute>} />
         <Route path="/odeme/:id" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />

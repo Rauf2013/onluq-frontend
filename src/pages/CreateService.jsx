@@ -1,6 +1,6 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import { API_URL, uploadImageSafe } from '../api';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import { toast } from 'react-toastify';
 import { PlusCircle, UploadCloud, X, HelpCircle, Trash2, Plus } from 'lucide-react';
 import { CATEGORY_DATA } from '../constants/categories';
@@ -14,6 +14,8 @@ const blankPackages = () => ({
 
 function CreateService() {
   const navigate = useNavigate();
+  const { id: editId } = useParams();
+  const isEdit = !!editId;
   const userStr = localStorage.getItem('user') || sessionStorage.getItem('user');
   const currentUser = userStr ? JSON.parse(userStr) : null;
 
@@ -29,6 +31,42 @@ function CreateService() {
 
   const selected = CATEGORY_DATA.find((c) => c.name === mainCategory);
   const subs = selected ? selected.subcategories : [];
+
+  // Redaktə rejimi: mövcud xidməti yüklə və formu doldur (#4)
+  useEffect(() => {
+    if (!editId) return;
+    (async () => {
+      try {
+        const r = await fetch(`${API_URL}/api/services/${editId}`);
+        if (!r.ok) { toast.error('Xidmət tapılmadı.'); return; }
+        const s = await r.json();
+        setTitle(s.title || '');
+        setDescription(s.description || '');
+        setSubCategory(s.category || '');
+        const mc = CATEGORY_DATA.find((c) => c.subcategories.includes(s.category));
+        if (mc) setMainCategory(mc.name);
+        setImages(Array.isArray(s.images) && s.images.length ? s.images : (s.image ? [s.image] : []));
+        setFaq(Array.isArray(s.faq) && s.faq.length ? s.faq.map((f) => ({ question: f.question || '', answer: f.answer || '' })) : [{ question: '', answer: '' }]);
+        const base = blankPackages();
+        (s.packages || []).forEach((p) => {
+          if (base[p.tier]) {
+            base[p.tier] = {
+              tier: p.tier,
+              title: p.title || base[p.tier].title,
+              description: p.description || base[p.tier].description,
+              price: p.price != null ? String(p.price) : '',
+              deliveryDays: p.deliveryDays != null ? String(p.deliveryDays) : '',
+              revisions: p.revisions != null ? p.revisions : base[p.tier].revisions,
+              features: Array.isArray(p.features) && p.features.length ? p.features : ['', '', ''],
+            };
+          }
+        });
+        setPackages(base);
+      } catch {
+        toast.error('Xidmət yüklənmədi.');
+      }
+    })();
+  }, [editId]);
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files || []);
@@ -99,8 +137,8 @@ function CreateService() {
       const uploadedImages = await Promise.all(images.map((img) =>
         (typeof img === 'string' && img.startsWith('data:image/')) ? uploadImageSafe(img, 'service') : img
       ));
-      const response = await fetch(`${API_URL}/api/services`, {
-        method: 'POST',
+      const response = await fetch(`${API_URL}/api/services${isEdit ? '/' + editId : ''}`, {
+        method: isEdit ? 'PUT' : 'POST',
         headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify({
           title,
@@ -113,7 +151,7 @@ function CreateService() {
         }),
       });
       if (response.ok) {
-        toast.success('Xidmət uğurla yaradıldı!');
+        toast.success(isEdit ? 'Xidmət yeniləndi!' : 'Xidmət uğurla yaradıldı!');
         navigate('/xidmetlerim');
       } else {
         const data = await response.json();
