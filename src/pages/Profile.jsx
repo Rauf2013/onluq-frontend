@@ -406,6 +406,16 @@ function Profile() {
                 </button>
               </div>
             )}
+
+            {/* Admin moderasiya: istifadəçinin şəxsi mesajlarını gör (yalnız admin, öz profili deyil) */}
+            {currentUser?.role === 'admin' && !isMyProfile && (
+              <button
+                onClick={() => navigate('/admin', { state: { msgUserId: user._id, msgUserName: user.fullName } })}
+                style={{ width: '100%', marginTop: 10, padding: '10px', background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', borderRadius: 10, cursor: 'pointer', fontWeight: 700, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, fontSize: 13 }}
+              >
+                <Eye size={15} /> Mesajlarını gör (admin)
+              </button>
+            )}
             
             <hr className="profile-divider" />
             

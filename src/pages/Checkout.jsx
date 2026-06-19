@@ -138,7 +138,7 @@ function Checkout() {
           )}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid var(--border)', paddingTop: '10px', marginTop: '10px' }}>
             <span style={{ fontWeight: 'bold', color: 'var(--text-tertiary)' }}>Toplam Məbləğ:</span>
-            <span style={{ fontSize: '24px', fontWeight: 'bold', color: '#14224F' }}>{totalPrice} AZN</span>
+            <span style={{ fontSize: '24px', fontWeight: 'bold', color: 'var(--brand)' }}>{totalPrice} AZN</span>
           </div>
         </div>
 

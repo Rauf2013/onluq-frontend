@@ -188,7 +188,7 @@ function App() {
         <Route path="/odeme/:id" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
         <Route path="/mesajlar" element={<ProtectedRoute><Messages /></ProtectedRoute>} />
         <Route path="/cuzdan" element={<ProtectedRoute><Wallet /></ProtectedRoute>} />
-        <Route path="/admin" element={<ProtectedRoute><AdminPanel /></ProtectedRoute>} />
+        <Route path="/admin" element={<ProtectedRoute adminOnly><AdminPanel /></ProtectedRoute>} />
         <Route path="/bildirisler" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
         <Route path="/beyin-yedeyi" element={<BrainNotes />} />
         <Route path="/beyin-yedeyi/yeni" element={<ProtectedRoute><BrainNoteCreate /></ProtectedRoute>} />

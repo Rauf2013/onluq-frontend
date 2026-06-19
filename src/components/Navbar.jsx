@@ -164,7 +164,7 @@ function Navbar() {
     <nav style={{ display: 'flex', justifyContent: 'space-between', padding: '15px 5%', background: 'var(--bg-surface)', borderBottom: '1px solid var(--border)', alignItems: 'center', position: 'sticky', top: 0, zIndex: 1000 }}>
       
       <div style={{ display: 'flex', alignItems: 'center', gap: '30px' }}>
-        <Link to="/" style={{ fontSize: '26px', fontWeight: '900', color: '#14224F', textDecoration: 'none', letterSpacing: '-1px' }}>
+        <Link to="/" style={{ fontSize: '26px', fontWeight: '900', color: 'var(--brand)', textDecoration: 'none', letterSpacing: '-1px' }}>
           EVDƏN.
         </Link>
       </div>
@@ -189,8 +189,6 @@ function Navbar() {
         </button>
         {user ? (
           <>
-            {user.role === 'admin' && null}
-
             <div style={{ position: 'relative' }}>
               <button 
                 onClick={() => setShowNotifs(!showNotifs)}
@@ -208,7 +206,7 @@ function Navbar() {
                 <div className="notif-dropdown" style={{ position: 'absolute', top: '40px', left: '50%', transform: 'translateX(-50%)', background: 'var(--bg-elevated)', border: '1px solid var(--border)', borderRadius: '12px', width: '320px', maxWidth: 'calc(100vw - 24px)', boxShadow: '0 10px 40px rgba(0,0,0,0.15)', overflow: 'hidden' }}>
                   <div style={{ padding: '15px', background: 'var(--bg-muted)', borderBottom: '1px solid var(--border)', fontWeight: 'bold', color: 'var(--text-primary)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <span>Bildirişlər</span>
-                    {unreadCount > 0 && <span onClick={handleMarkAllRead} style={{fontSize: '12px', color: '#14224F', cursor: 'pointer'}}>Hamısını oxu</span>}
+                    {unreadCount > 0 && <span onClick={handleMarkAllRead} style={{fontSize: '12px', color: 'var(--brand)', cursor: 'pointer'}}>Hamısını oxu</span>}
                   </div>
                   <div style={{ maxHeight: '300px', overflowY: 'auto' }}>
                     {notifications.length === 0 ? (
@@ -304,7 +302,7 @@ function Navbar() {
               <Lightbulb size={17} style={{ marginRight: '5px' }} /> Bilik
               <span style={{ position: 'absolute', top: -6, right: -6, background: '#fbbf24', color: 'white', fontSize: 9, fontWeight: 900, padding: '2px 6px', borderRadius: 4, transform: 'rotate(35deg)', boxShadow: '0 2px 4px rgba(0,0,0,0.2)', letterSpacing: 0.6, pointerEvents: 'none' }}>BETA</span>
             </Link>
-            <Link to="/cuzdan" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--brand-soft)', color: '#14224F', fontWeight: '700', padding: '8px 15px', borderRadius: '8px', border: '1px solid var(--brand-soft)' }}>
+            <Link to="/cuzdan" style={{ display: 'flex', alignItems: 'center', textDecoration: 'none', background: 'var(--brand-soft)', color: 'var(--brand)', fontWeight: '700', padding: '8px 15px', borderRadius: '8px', border: '1px solid var(--brand-soft)' }}>
               <Wallet size={18} style={{ marginRight: '6px' }} /> Cüzdanım
             </Link>
             

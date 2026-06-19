@@ -17,14 +17,14 @@ function BetaInfo({ variant = 'full' }) {
 
   const guestText = (
     <>
-      <p style={{ margin: '0 0 8px', fontWeight: 700, color: '#0f172a' }}>BETA — Test versiyası</p>
+      <p style={{ margin: '0 0 8px', fontWeight: 700, color: 'var(--text-primary)' }}>BETA — Test versiyası</p>
       <p style={{ margin: 0 }}>AI hələ test mərhələsindədir, bəzən səhv edə bilər. Qeydiyyatdan keçmədiyin üçün bəzi funksiyalar (söhbət xatirəsi, bilik bazası, geniş cavab, daha çox sorğu) məhduddur. Tam erişim üçün <strong>qeydiyyatdan keç</strong>.</p>
     </>
   );
 
   const fullText = (
     <>
-      <p style={{ margin: '0 0 8px', fontWeight: 700, color: '#0f172a' }}>BETA — Test mərhələsi</p>
+      <p style={{ margin: '0 0 8px', fontWeight: 700, color: 'var(--text-primary)' }}>BETA — Test mərhələsi</p>
       <p style={{ margin: '0 0 8px' }}>Bu AI köməkçi hələ təcrübə mərhələsindədir, bəzən səhv cavab verə, mövzunu çaşa, və ya yavaşlaya bilər. Xüsusi məhdudiyyətlər:</p>
       <ul style={{ margin: '0 0 8px', paddingLeft: 18 }}>
         <li>Cavabları kor-koranə qəbul etmə — vacib qərarlardan əvvəl mənbədən yoxla</li>

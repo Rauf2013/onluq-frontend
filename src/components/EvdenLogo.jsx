@@ -2,7 +2,7 @@ import React from 'react';
 
 // EVDƏN house+person logo — fill icin currentColor istifade edir.
 // Sari rəng üçün: <EvdenLogo style={{ color: '#FFED00' }} />
-// Navy rəng üçün: <EvdenLogo style={{ color: '#14224F' }} />
+// Navy rəng üçün: <EvdenLogo style={{ color: 'var(--brand)' }} />
 export default function EvdenLogo({ size = 96, ...rest }) {
   return (
     <svg

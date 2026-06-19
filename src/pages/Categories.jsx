@@ -179,7 +179,7 @@ function Categories() {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '4px', color: 'var(--text-primary)', fontWeight: 'bold' }}>
                         <Star size={16} fill="#fbbf24" color="#fbbf24" /> {service.rating || "0.0"} <span style={{color: 'var(--text-muted)', fontWeight: 'normal', fontSize: '13px'}}>({service.reviewsCount || 0})</span>
                       </div>
-                      <span style={{ fontWeight: 'bold', color: '#14224F', fontSize: '15px' }}>{startPrice} ₼-dən</span>
+                      <span style={{ fontWeight: 'bold', color: 'var(--brand)', fontSize: '15px' }}>{startPrice} ₼-dən</span>
                     </div>
                   </div>
                 </Link>

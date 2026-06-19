@@ -1,6 +1,7 @@
 ﻿import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
-import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User } from 'lucide-react';
+import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, Volume2, Volume1 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity } from '../native/capacitor';
 
 // ICE/TURN server konfiqurasiyası.
 // ⚠ TURN ŞƏRTDİR: yalnız STUN ilə symmetric NAT (əksər mobil operatorlar, bəzi ev
@@ -39,6 +40,10 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   const [remoteName, setRemoteName] = useState('');
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
+  // Səs marşrutu: false = qulaq üstü dinamik (earpiece), true = ana (ucadan) dinamik.
+  // Video zəngdə default spiker açıq; səsli zəngdə default earpiece (telefon kimi).
+  const [speakerOn, setSpeakerOn] = useState(false);
+  const proximityStopRef = useRef(null);
   const [duration, setDuration] = useState(0);
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
@@ -61,6 +66,8 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   const pendingIceRef = useRef([]);
   const audioCtxRef = useRef(null);    // ringtone üçün Web Audio context
   const ringRef = useRef(null);        // aktiv ringtone interval-i
+  const reInviteRef = useRef(null);    // çıxan zəng: dəvəti təkrar göndərmə (qarşı tərəf sonra onlayn olsa tutsun)
+  const noAnswerRef = useRef(null);    // çıxan zəng: cavab yoxdursa avtomatik bitirmə taymeri
 
   const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
@@ -92,13 +99,19 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       };
       let timer;
       if (mode === 'outgoing') {
-        // "diiirt ... diiirt" — hər 2.4 san-də uzun ringback tonu
-        const tick = () => beep(425, 0.9, 0.16);
-        tick(); timer = setInterval(tick, 2400);
+        // Klassik telefon ringback — cüt ton (440+480 Hz), 1 san. səslənir, sonra fasilə.
+        // Daha yumşaq və "telefon zəngi" hissi (əvvəlki quru tək "diit"dən gözəl).
+        const tick = () => { beep(440, 1.0, 0.13); beep(480, 1.0, 0.11); };
+        tick(); timer = setInterval(tick, 3000);
       } else {
-        // gələn zəng — iki tonlu, daha diqqət çəkən + titrəyiş
-        const tick = () => { beep(587, 0.3); setTimeout(() => beep(440, 0.3), 350); try { if (navigator.vibrate) navigator.vibrate([300, 200]); } catch {} };
-        tick(); timer = setInterval(tick, 1600);
+        // Gələn zəng — melodik, diqqət çəkən "zəng" naxışı + titrəyiş (telefon zəngi hissi).
+        const ring = () => {
+          beep(660, 0.4, 0.18);
+          setTimeout(() => beep(880, 0.4, 0.18), 300);
+          setTimeout(() => beep(660, 0.4, 0.18), 600);
+          try { if (navigator.vibrate) navigator.vibrate([400, 200, 400]); } catch {}
+        };
+        ring(); timer = setInterval(ring, 2000);
       }
       ringRef.current = { stop: () => { clearInterval(timer); } };
     } catch {}
@@ -118,6 +131,8 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   const cleanup = () => {
     stopRing();
+    if (reInviteRef.current) { clearInterval(reInviteRef.current); reInviteRef.current = null; }
+    if (noAnswerRef.current) { clearTimeout(noAnswerRef.current); noAnswerRef.current = null; }
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
     // peer-in göndərənlərinin də tracklarını dayandır
     if (pcRef.current) {
@@ -181,6 +196,24 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     if (state === 'calling') playRing('outgoing');
     else if (state === 'ringing') playRing('incoming');
     else stopRing();
+  }, [state]);
+
+  // Aktiv zəngdə SƏS MARŞRUTU: native zəng rejimi (earpiece üçün şərt) + proximity + ilkin dinamik.
+  // Səsli zəng → default qulaq üstü (earpiece); video → ucadan (speaker).
+  // Proximity: telefon qulağa yaxınlaşanda avtomatik earpiece-ə keç (qaldıranda earpiece-də qalır).
+  useEffect(() => {
+    if (state !== 'active') return;
+    startCallAudio();
+    const initSpeaker = kindRef.current === 'video';
+    setSpeakerOn(initSpeaker);
+    setSpeakerphone(initSpeaker);
+    proximityStopRef.current = startProximity((near) => {
+      if (near) { setSpeakerphone(false); setSpeakerOn(false); }
+    });
+    return () => {
+      if (proximityStopRef.current) { proximityStopRef.current(); proximityStopRef.current = null; }
+      stopCallAudio();
+    };
   }, [state]);
 
   // === Peer connection qur ===
@@ -272,7 +305,19 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       setRemoteId(partnerId);
       setRemoteName(partnerName || 'İstifadəçi');
       setState('calling');
+      // Zəng "offline" deyə BLOKLANMIR — dəvət göndərilir və qarşı tərəf cavab verənə qədər
+      // davam edir. Hər 4 san. dəvəti təkrar göndər→ qarşı tərəf bir az sonra onlayn olsa da tutsun.
       socket.emit('call:invite', { to: partnerId, kind: k });
+      if (reInviteRef.current) clearInterval(reInviteRef.current);
+      reInviteRef.current = setInterval(() => {
+        if (stateRef.current === 'calling') socket.emit('call:invite', { to: partnerId, kind: k });
+        else { clearInterval(reInviteRef.current); reInviteRef.current = null; }
+      }, 4000);
+      // 60 san. cavab gəlməsə avtomatik bitir ("cavab vermədi")
+      if (noAnswerRef.current) clearTimeout(noAnswerRef.current);
+      noAnswerRef.current = setTimeout(() => {
+        if (stateRef.current === 'calling') { toast.info('Cavab vermədi.'); hangup(); }
+      }, 60000);
     },
   }));
 
@@ -294,6 +339,9 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
     const onAccept = async ({ from }) => {
       if (stateRef.current !== 'calling' || from !== remoteIdRef.current) return;
+      // Qarşı tərəf cavab verdi — təkrar-dəvət və cavab-yoxdur taymerlərini dayandır
+      if (reInviteRef.current) { clearInterval(reInviteRef.current); reInviteRef.current = null; }
+      if (noAnswerRef.current) { clearTimeout(noAnswerRef.current); noAnswerRef.current = null; }
       await startAsCaller();
     };
 
@@ -303,11 +351,9 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       cleanup();
     };
 
-    const onUnavailable = ({ to }) => {
-      if (to !== remoteIdRef.current) return;
-      toast.warn('İstifadəçi oflayndır.');
-      cleanup();
-    };
+    // Qarşı tərəf offline ola bilər — AMMA zəngi BLOKLAMIRIQ. Çalmağa davam edir,
+    // push bildirişi gedir, təkrar-dəvət göndərilir. Cavab gəlməsə 60 san. sonra avtomatik bitir.
+    const onUnavailable = () => { /* məqsədli olaraq heç nə etmə — zəng çalmağa davam etsin */ };
 
     const onOffer = async ({ from, sdp, type }) => {
       if (from !== remoteIdRef.current) return;
@@ -370,6 +416,12 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     const next = !muted;
     localStream.getAudioTracks().forEach((t) => (t.enabled = !next));
     setMuted(next);
+  };
+  // Spiker düyməsi: ana (ucadan) dinamik ↔ qulaq üstü dinamik (earpiece) arası keçid.
+  const toggleSpeaker = () => {
+    const next = !speakerOn;
+    setSpeakerOn(next);
+    setSpeakerphone(next);
   };
   const toggleCam = () => {
     if (!localStream) return;
@@ -440,6 +492,10 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
           <>
             <button onClick={toggleMute} title={muted ? 'Səssizliyi aç' : 'Səssiz et'} style={btnGray(muted)}>
               {muted ? <MicOff size={22} /> : <Mic size={22} />}
+            </button>
+            <button onClick={toggleSpeaker} title={speakerOn ? 'Ucadan dinamik (açıq)' : 'Qulaq dinamiki'}
+              style={{ ...btnBase, background: speakerOn ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.18)' }}>
+              {speakerOn ? <Volume2 size={22} /> : <Volume1 size={22} />}
             </button>
             {isVideo && (
               <button onClick={toggleCam} title={camOff ? 'Kameranı aç' : 'Kameranı bağla'} style={btnGray(camOff)}>

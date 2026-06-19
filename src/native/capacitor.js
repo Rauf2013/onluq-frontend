@@ -130,6 +130,42 @@ export async function firebaseSignOut() {
   await safe(() => FirebaseAuthentication.signOut());
 }
 
+// ===== Zəng səs marşrutu (spiker / qulaq üstü dinamik) =====
+// Həqiqi earpiece↔speaker keçidi və proximity Android-də native AudioManager tələb edir.
+// Native plugin (EvdenAudio) qeydiyyatdadırsa onu işlədirik; yoxdursa graceful no-op.
+function _audioPlugin() {
+  return (typeof Capacitor !== 'undefined' && Capacitor.Plugins && Capacitor.Plugins.EvdenAudio) || null;
+}
+
+// Zəng rejimini başlat/bitir (Android MODE_IN_COMMUNICATION — earpiece marşrutu üçün şərt).
+export async function startCallAudio() {
+  const p = _audioPlugin();
+  if (p && p.startCall) await safe(() => p.startCall());
+}
+export async function stopCallAudio() {
+  const p = _audioPlugin();
+  if (p && p.stopCall) await safe(() => p.stopCall());
+}
+
+// Spiker on=ana (ucadan) dinamik, off=qulaq üstü dinamik (earpiece).
+export async function setSpeakerphone(on) {
+  const p = _audioPlugin();
+  if (p && p.setSpeakerphone) await safe(() => p.setSpeakerphone({ on: !!on }));
+}
+
+// Proximity sensoru: telefon qulağa yaxınlaşanda onNear(true), uzaqlaşanda onNear(false).
+// Native plugin varsa hadisəni dinləyir; yoxdursa heç nə (graceful).
+export function startProximity(onNear) {
+  const p = _audioPlugin();
+  if (p && p.addListener) {
+    let handle;
+    safe(() => { handle = p.addListener('proximity', (e) => { try { onNear(!!(e && e.near)); } catch {} }); });
+    safe(() => p.startProximity && p.startProximity());
+    return () => { safe(() => p.stopProximity && p.stopProximity()); if (handle) safe(() => handle.remove && handle.remove()); };
+  }
+  return () => {};
+}
+
 // ===== Push bildiriş (FCM) =====
 // Login-dən sonra çağırılmalıdır (token-i backend-ə yazmaq üçün auth lazımdır).
 let _pushInited = false;

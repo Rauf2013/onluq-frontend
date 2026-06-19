@@ -80,7 +80,7 @@ function VerifyEmail() {
           </button>
         </form>
         <button onClick={handleResend}
-          style={{ marginTop: 16, background: 'none', border: 'none', color: '#14224F', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
+          style={{ marginTop: 16, background: 'none', border: 'none', color: 'var(--brand)', fontWeight: 600, cursor: 'pointer', textDecoration: 'underline' }}>
           Kod gəlmədi? Yenidən göndər
         </button>
       </div>

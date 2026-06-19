@@ -1,20 +1,22 @@
 ﻿import React, { useState, useEffect } from 'react';
 import { API_URL } from '../api';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { ShieldCheck, CheckCircle, XCircle, Users, Briefcase, ShoppingBag, Wallet, TrendingUp, Search, UserPlus, UserMinus, Trash2, Star, BarChart3, Power, Lock, AlertTriangle } from 'lucide-react';
+import { ShieldCheck, CheckCircle, XCircle, Users, Briefcase, ShoppingBag, Wallet, TrendingUp, Search, UserPlus, UserMinus, Trash2, Star, BarChart3, Power, Lock, AlertTriangle, MessageSquare, X, ArrowLeft } from 'lucide-react';
 
 const BASE_TABS = [
   { id: 'overview', label: 'Xülasə', icon: BarChart3 },
   { id: 'users', label: 'İstifadəçilər', icon: Users },
   { id: 'services', label: 'Xidmətlər', icon: Briefcase },
   { id: 'orders', label: 'Sifarişlər', icon: ShoppingBag },
-  { id: 'withdrawals', label: 'Ödənişlər', icon: Wallet },
 ];
+// Ödənişlər + Sistem yalnız SİSTEM admini (master) üçün — normal admin görə bilməz.
+const WITHDRAW_TAB = { id: 'withdrawals', label: 'Ödənişlər', icon: Wallet };
 const SYS_TAB = { id: 'system', label: 'Sistem', icon: Power };
 
 function AdminPanel() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [tab, setTab] = useState('overview');
   const [loading, setLoading] = useState(true);
   const [stats, setStats] = useState(null);
@@ -29,8 +31,34 @@ function AdminPanel() {
 
   const me = JSON.parse(localStorage.getItem('user') || sessionStorage.getItem('user') || '{}');
   const isSys = !!me._s;
-  const TABS = isSys ? [...BASE_TABS, SYS_TAB] : BASE_TABS;
+  const TABS = isSys ? [...BASE_TABS, WITHDRAW_TAB, SYS_TAB] : BASE_TABS;
   const [siteClosed, setSiteClosed] = useState(false);
+
+  // Admin mesaj-görüntüləmə (moderasiya) — bütün adminlər
+  const [msgUser, setMsgUser] = useState(null);       // mesajlarına baxılan istifadəçi
+  const [msgConvos, setMsgConvos] = useState([]);     // onun söhbətləri
+  const [msgActivePartner, setMsgActivePartner] = useState(null);
+  const [msgList, setMsgList] = useState([]);
+  const [msgLoading, setMsgLoading] = useState(false);
+
+  const openUserMessages = async (u) => {
+    setMsgUser(u); setMsgConvos([]); setMsgActivePartner(null); setMsgList([]); setMsgLoading(true);
+    try {
+      const r = await fetch(`${API_URL}/api/admin/users/${u._id}/conversations`, { headers: apiHeaders() });
+      if (r.ok) { const d = await r.json(); setMsgConvos(d.conversations || []); }
+      else toast.error('Söhbətlər yüklənmədi.');
+    } catch { toast.error('Bağlantı xətası.'); }
+    setMsgLoading(false);
+  };
+
+  const loadConversation = async (partnerId) => {
+    setMsgActivePartner(partnerId); setMsgList([]); setMsgLoading(true);
+    try {
+      const r = await fetch(`${API_URL}/api/admin/users/${msgUser._id}/messages/${partnerId}`, { headers: apiHeaders() });
+      if (r.ok) setMsgList(await r.json());
+    } catch { toast.error('Mesajlar yüklənmədi.'); }
+    setMsgLoading(false);
+  };
 
   const apiHeaders = () => {
     const token = localStorage.getItem('token') || sessionStorage.getItem('token');
@@ -72,6 +100,16 @@ function AdminPanel() {
       await fetchStats();
       setLoading(false);
     })();
+  }, []);
+
+  // Profildən "mesajları gör" ilə gəlinibsə, həmin istifadəçinin mesajlarını avtomatik aç
+  useEffect(() => {
+    const st = location.state;
+    if (st && st.msgUserId) {
+      openUserMessages({ _id: st.msgUserId, fullName: st.msgUserName || 'İstifadəçi', email: st.msgUserEmail || '' });
+      window.history.replaceState({}, document.title);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchSiteStatus = async () => {
@@ -215,7 +253,9 @@ function AdminPanel() {
           <StatCard icon={Briefcase} label="Xidmət" value={stats.services} color="#14224F" />
           <StatCard icon={ShoppingBag} label="Sifariş" value={stats.orders} sub={`${stats.completedOrders} tamamlanıb`} color="#f59e0b" />
           <StatCard icon={TrendingUp} label="Ümumi gəlir" value={`${stats.totalRevenue} ₼`} color="#8b5cf6" />
-          <StatCard icon={Wallet} label="Ödəniş tələbi" value={stats.withdrawals} sub={`${stats.pendingWithdrawals} gözləyir`} color="#ef4444" />
+          {isSys && stats.withdrawals != null && (
+            <StatCard icon={Wallet} label="Ödəniş tələbi" value={stats.withdrawals} sub={`${stats.pendingWithdrawals} gözləyir`} color="#ef4444" />
+          )}
         </div>
       )}
 
@@ -268,19 +308,29 @@ function AdminPanel() {
                           {isAdmin ? 'Admin' : 'İstifadəçi'}
                         </span>
                       </td>
-                      <td style={{ padding: '12px 16px', textAlign: 'right', color: '#14224F', fontWeight: 700, fontSize: 13 }}>{u.balance || 0} ₼</td>
+                      <td style={{ padding: '12px 16px', textAlign: 'right', color: 'var(--brand)', fontWeight: 700, fontSize: 13 }}>{u.balance || 0} ₼</td>
                       <td style={{ padding: '12px 16px', textAlign: 'right' }}>
                         <div style={{ display: 'inline-flex', gap: 6, justifyContent: 'flex-end', flexWrap: 'wrap' }}>
-                          <button onClick={() => setConfirmAction({ kind: 'role', user: u, label: isAdmin ? 'Adminlikdən çıxar?' : 'Admin etmək?', desc: isAdmin ? `${u.fullName} adlı istifadəçinin adminliyi silinəcək.` : `${u.fullName} admin olacaq və bütün admin paneline çıxışı olacaq.`, confirmLabel: isAdmin ? 'Adminliyi sil' : 'Admin et', danger: false, run: () => toggleRole(u) })}
-                            disabled={isMe && isAdmin}
-                            style={{ background: isAdmin ? 'var(--bg-muted)' : '#14224F', color: isAdmin ? 'var(--text-secondary)' : 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: isMe && isAdmin ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, opacity: isMe && isAdmin ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            {isAdmin ? <><UserMinus size={12} /> Adminliyi sil</> : <><UserPlus size={12} /> Admin et</>}
+                          {/* Mesajları gör — BÜTÜN adminlər (moderasiya) */}
+                          <button onClick={() => openUserMessages(u)}
+                            style={{ background: 'rgba(99,102,241,0.1)', color: '#6366f1', border: '1px solid rgba(99,102,241,0.3)', padding: '6px 10px', borderRadius: 6, cursor: 'pointer', fontSize: 12, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                            <MessageSquare size={12} /> Mesajlar
                           </button>
-                          <button onClick={() => setConfirmAction({ kind: 'delete', user: u, label: 'İstifadəçini silmək?', desc: `${u.fullName} hesabı və bütün məlumatları silinəcək. Bu əməliyyat geri alına bilməz.`, confirmLabel: 'Sil', danger: true, run: () => deleteUser(u) })}
-                            disabled={isMe}
-                            style={{ background: 'transparent', color: '#ef4444', border: '1px solid #fecaca', padding: '6px 10px', borderRadius: 6, cursor: isMe ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, opacity: isMe ? 0.4 : 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
-                            <Trash2 size={12} /> Sil
-                          </button>
+                          {/* Rol dəyiş + sil — yalnız SİSTEM admini */}
+                          {isSys && (
+                            <>
+                              <button onClick={() => setConfirmAction({ kind: 'role', user: u, label: isAdmin ? 'Adminlikdən çıxar?' : 'Admin etmək?', desc: isAdmin ? `${u.fullName} adlı istifadəçinin adminliyi silinəcək.` : `${u.fullName} admin olacaq və bütün admin paneline çıxışı olacaq.`, confirmLabel: isAdmin ? 'Adminliyi sil' : 'Admin et', danger: false, run: () => toggleRole(u) })}
+                                disabled={isMe && isAdmin}
+                                style={{ background: isAdmin ? 'var(--bg-muted)' : '#14224F', color: isAdmin ? 'var(--text-secondary)' : 'white', border: 'none', padding: '6px 10px', borderRadius: 6, cursor: isMe && isAdmin ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, opacity: isMe && isAdmin ? 0.5 : 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                {isAdmin ? <><UserMinus size={12} /> Adminliyi sil</> : <><UserPlus size={12} /> Admin et</>}
+                              </button>
+                              <button onClick={() => setConfirmAction({ kind: 'delete', user: u, label: 'İstifadəçini silmək?', desc: `${u.fullName} hesabı və bütün məlumatları silinəcək. Bu əməliyyat geri alına bilməz.`, confirmLabel: 'Sil', danger: true, run: () => deleteUser(u) })}
+                                disabled={isMe}
+                                style={{ background: 'transparent', color: '#ef4444', border: '1px solid #fecaca', padding: '6px 10px', borderRadius: 6, cursor: isMe ? 'not-allowed' : 'pointer', fontSize: 12, fontWeight: 700, opacity: isMe ? 0.4 : 1, display: 'inline-flex', alignItems: 'center', gap: 4 }}>
+                                <Trash2 size={12} /> Sil
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -360,7 +410,7 @@ function AdminPanel() {
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-tertiary)' }}>{new Date(o.createdAt).toLocaleDateString('az-AZ')}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-primary)' }}>{o.buyerId?.fullName || '—'}</td>
                     <td style={{ padding: '12px 16px', fontSize: 13, color: 'var(--text-primary)' }}>{(o.serviceId?.title || '—').slice(0, 50)}</td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: '#14224F', fontWeight: 700 }}>{o.amount} ₼</td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: 'var(--brand)', fontWeight: 700 }}>{o.amount} ₼</td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ background: `${c}20`, color: c, padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700 }}>{o.status}</span>
                     </td>
@@ -397,7 +447,7 @@ function AdminPanel() {
                       <div style={{ color: 'var(--text-muted)', fontSize: 11 }}>{w.userId?.email}</div>
                     </td>
                     <td style={{ padding: '12px 16px', fontSize: 12, color: 'var(--text-primary)', wordBreak: 'break-all', maxWidth: 200 }}>{w.iban}</td>
-                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: '#14224F', fontWeight: 700 }}>{w.amount} ₼</td>
+                    <td style={{ padding: '12px 16px', textAlign: 'right', fontSize: 13, color: 'var(--brand)', fontWeight: 700 }}>{w.amount} ₼</td>
                     <td style={{ padding: '12px 16px' }}>
                       <span style={{ background: `${c}20`, color: c, padding: '4px 10px', borderRadius: 999, fontSize: 12, fontWeight: 700, whiteSpace: 'nowrap' }}>{w.status}</span>
                     </td>
@@ -480,6 +530,60 @@ function AdminPanel() {
                 onClick={() => { const fn = confirmAction.run; setConfirmAction(null); fn(); }}>
                 {confirmAction.confirmLabel}
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MESAJ MODERASİYA MODALI — admin istifadəçinin söhbətlərini görür */}
+      {msgUser && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(15,23,42,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999, padding: 16 }}
+          onClick={() => setMsgUser(null)}>
+          <div onClick={(e) => e.stopPropagation()} style={{ background: 'var(--bg-surface)', borderRadius: 16, width: '100%', maxWidth: 620, maxHeight: '85vh', display: 'flex', flexDirection: 'column', border: '1px solid var(--border)', overflow: 'hidden' }}>
+            <div style={{ padding: '16px 20px', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 10 }}>
+              {msgActivePartner ? (
+                <button onClick={() => { setMsgActivePartner(null); setMsgList([]); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-secondary)', display: 'inline-flex' }}><ArrowLeft size={20} /></button>
+              ) : <MessageSquare size={20} color="#6366f1" />}
+              <div style={{ flex: 1 }}>
+                <div style={{ fontWeight: 800, color: 'var(--text-primary)', fontSize: 15 }}>{msgUser.fullName} — söhbətlər</div>
+                <div style={{ fontSize: 12, color: 'var(--text-muted)' }}>{msgUser.email} · admin moderasiya</div>
+              </div>
+              <button onClick={() => setMsgUser(null)} style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: 'var(--text-tertiary)' }}><X size={22} /></button>
+            </div>
+
+            <div style={{ overflowY: 'auto', padding: 12, flex: 1 }}>
+              {msgLoading && <div style={{ textAlign: 'center', padding: 30, color: 'var(--text-muted)' }}>Yüklənir...</div>}
+
+              {/* Söhbət siyahısı */}
+              {!msgLoading && !msgActivePartner && (
+                msgConvos.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 30, color: 'var(--text-muted)' }}>Bu istifadəçinin heç bir mesajı yoxdur.</div>
+                ) : msgConvos.map((c) => (
+                  <button key={c.partnerId} onClick={() => loadConversation(c.partnerId)}
+                    style={{ width: '100%', textAlign: 'left', background: 'var(--bg-page)', border: '1px solid var(--border)', borderRadius: 10, padding: '12px 14px', marginBottom: 8, cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 10 }}>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontWeight: 700, color: 'var(--text-primary)', fontSize: 14 }}>{c.partnerName}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: 360 }}>{c.lastMessage}</div>
+                    </div>
+                    <span style={{ background: 'var(--bg-muted)', color: 'var(--text-secondary)', borderRadius: 999, padding: '3px 9px', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>{c.count}</span>
+                  </button>
+                ))
+              )}
+
+              {/* Seçilmiş söhbətin mesajları */}
+              {!msgLoading && msgActivePartner && (
+                msgList.length === 0 ? (
+                  <div style={{ textAlign: 'center', padding: 30, color: 'var(--text-muted)' }}>Mesaj yoxdur.</div>
+                ) : msgList.map((m) => (
+                  <div key={m._id} style={{ display: 'flex', justifyContent: m.fromTarget ? 'flex-end' : 'flex-start', marginBottom: 8 }}>
+                    <div style={{ maxWidth: '78%', background: m.fromTarget ? 'var(--brand-soft)' : 'var(--bg-muted)', color: 'var(--text-primary)', padding: '8px 12px', borderRadius: 12, fontSize: 13 }}>
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 2, fontWeight: 700 }}>{m.fromTarget ? msgUser.fullName : 'Qarşı tərəf'}</div>
+                      {m.type === 'text' ? m.text : <em style={{ color: 'var(--text-tertiary)' }}>[{m.type}]</em>}
+                      <div style={{ fontSize: 10, color: 'var(--text-muted)', marginTop: 3, textAlign: 'right' }}>{new Date(m.createdAt).toLocaleString('az-AZ')}</div>
+                    </div>
+                  </div>
+                ))
+              )}
             </div>
           </div>
         </div>

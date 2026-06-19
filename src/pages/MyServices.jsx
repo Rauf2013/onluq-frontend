@@ -230,7 +230,7 @@ function MyServices() {
                             <Star size={14} fill="#f59e0b" color="#f59e0b" /> {s.rating}
                           </span>
                         </td>
-                        <td style={{ padding: '14px 8px', textAlign: 'right', color: '#14224F', fontWeight: '900', fontSize: '15px' }}>{s.revenue} AZN</td>
+                        <td style={{ padding: '14px 8px', textAlign: 'right', color: 'var(--brand)', fontWeight: '900', fontSize: '15px' }}>{s.revenue} AZN</td>
                       </tr>
                     ))}
                   </tbody>
@@ -260,13 +260,13 @@ function MyServices() {
                 <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: 'var(--text-primary)' }}>{service.title}</h3>
                 <div style={{ display: 'flex', gap: '15px', color: 'var(--text-tertiary)', fontSize: '14px' }}>
                   <span style={{ display: 'flex', alignItems: 'center', gap: '5px' }}><Tag size={14} /> Kateqoriya: {service.category}</span>
-                  <span style={{ fontWeight: 'bold', color: '#14224F' }}>Qiymət: {service.price} AZN</span>
+                  <span style={{ fontWeight: 'bold', color: 'var(--brand)' }}>Qiymət: {service.price} AZN</span>
                 </div>
               </div>
               <div className="service-actions">
                 <button
                   onClick={() => navigate(`/xidmet-duzenle/${service._id}`)}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(20,34,79,0.08)', color: '#14224F', border: '1px solid var(--border)', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s' }}
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', background: 'rgba(20,34,79,0.08)', color: 'var(--brand)', border: '1px solid var(--border)', padding: '10px 15px', borderRadius: '8px', cursor: 'pointer', fontWeight: 'bold', transition: '0.2s' }}
                 >
                   <Pencil size={16} /> Redaktə
                 </button>

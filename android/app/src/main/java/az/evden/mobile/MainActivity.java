@@ -13,6 +13,8 @@ public class MainActivity extends BridgeActivity {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
+        // Native zəng səs marşrutu plugin-i (earpiece/speaker + proximity) — super.onCreate-dən ƏVVƏL
+        registerPlugin(EvdenAudio.class);
         super.onCreate(savedInstanceState);
 
         // WebRTC səsli/görüntülü zəng üçün mikrofon + kamera icazəsi

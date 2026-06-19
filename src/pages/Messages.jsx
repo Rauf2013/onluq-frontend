@@ -524,7 +524,7 @@ function Messages() {
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
                 <button onClick={() => callSystemRef.current?.startCall('audio')} title="Səsli zəng" aria-label="Səsli zəng"
                   className="msg-action-btn"
-                  style={{ background: 'rgba(20,34,79,0.10)', color: '#14224F', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                  style={{ background: 'rgba(20,34,79,0.10)', color: 'var(--brand)', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Phone size={20} />
                 </button>
                 <button onClick={() => callSystemRef.current?.startCall('video')} title="Görüntülü zəng" aria-label="Görüntülü zəng"

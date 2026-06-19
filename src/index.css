@@ -1386,7 +1386,7 @@ body.dark-mode .theme-toggle-btn:hover {
 .form-group label {
   font-size: 14px;
   font-weight: 600;
-  color: #334155;
+  color: var(--text-secondary);
 }
 
 .auth-input {
@@ -1421,7 +1421,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .forgot-password {
-  color: #14224F;
+  color: var(--brand);
   text-decoration: none;
   font-weight: 600;
 }
@@ -1443,6 +1443,16 @@ body.dark-mode .theme-toggle-btn:hover {
   background-color: #0C1733;
 }
 
+/* DARK MODE: kart fonu (#16244F) navy düyməyə (#14224F) demək olar eyni idi → düymə
+   görünmürdü. Dark-da CTA-nı brend sarısına çevir (navy mətn) — həm görünür, həm brend. */
+body.dark-mode .auth-btn {
+  background-color: #FFED00 !important;
+  color: #14224F !important;
+}
+body.dark-mode .auth-btn:hover {
+  background-color: #E6D500 !important;
+}
+
 .auth-footer {
   margin-top: 24px;
   text-align: center;
@@ -1451,7 +1461,7 @@ body.dark-mode .theme-toggle-btn:hover {
 }
 
 .auth-link {
-  color: #14224F;
+  color: var(--brand);
   font-weight: 700;
   text-decoration: none;
 }
@@ -2837,6 +2847,16 @@ body.dark-mode .theme-toggle-btn:hover {
   .navbar-actions > div:last-child { flex-direction: column !important; align-items: stretch !important; padding-left: 0 !important; border-left: none !important; border-top: 1px solid var(--border) !important; padding-top: 14px !important; margin-top: 6px !important; gap: 10px !important; }
   .navbar-actions > div:last-child > span { padding: 8px 4px; }
   .navbar-actions > div:last-child > button { width: 100%; justify-content: center; }
+  /* Tema düyməsi .navbar-actions-ın birbaşa övladıdır: stretch onu tam enə dağıdırdı
+     (nəhəng "eşşek kadar" bar). Kvadrat ölçüyə sabitlə, sağ küncə yığ. */
+  .navbar-actions > .theme-toggle-btn {
+    width: 44px !important;
+    height: 44px !important;
+    flex: 0 0 auto !important;
+    align-self: flex-end !important;
+    border: 1px solid var(--border) !important;
+    border-radius: 10px !important;
+  }
 }
 
 /* === NAVBAR ARA EKRAN (901-1200px): YERƏ SIĞMAQ ÜÇÜN SIXIŞDIR === */

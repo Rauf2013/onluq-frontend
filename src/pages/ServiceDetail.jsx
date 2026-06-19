@@ -138,7 +138,7 @@ function ServiceDetail() {
     <div className="main-content" style={{ maxWidth: 1200, margin: '40px auto', padding: '0 5%' }}>
 
       <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-tertiary)', fontSize: 14, marginBottom: 20 }}>
-        <Link to="/" style={{ color: '#14224F', textDecoration: 'none', fontWeight: 700 }}>Ana Səhifə</Link>
+        <Link to="/" style={{ color: 'var(--brand)', textDecoration: 'none', fontWeight: 700 }}>Ana Səhifə</Link>
         <ChevronRight size={14} />
         <span>{service.category}</span>
       </div>
@@ -262,7 +262,7 @@ function ServiceDetail() {
                         {rv.sellerReply?.text ? (
                           <div style={{ marginTop: 10, padding: 12, background: 'var(--bg-page)', borderRadius: 10, borderLeft: '3px solid #14224F' }}>
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
-                              <strong style={{ fontSize: 13, color: '#14224F', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                              <strong style={{ fontSize: 13, color: 'var(--brand)', display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                                 <Reply size={13} /> Satıcının cavabı
                               </strong>
                               {isAuthor && (
@@ -286,7 +286,7 @@ function ServiceDetail() {
                               </div>
                             </div>
                           ) : (
-                            <button onClick={() => { setReplyingTo(rv._id); setReplyText(''); }} style={{ marginTop: 8, background: 'transparent', border: '1px solid var(--border-strong)', color: '#14224F', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                            <button onClick={() => { setReplyingTo(rv._id); setReplyText(''); }} style={{ marginTop: 8, background: 'transparent', border: '1px solid var(--border-strong)', color: 'var(--brand)', padding: '6px 12px', borderRadius: 8, cursor: 'pointer', fontSize: 13, fontWeight: 700, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                               <Reply size={13} /> Cavabla
                             </button>
                           )
@@ -299,7 +299,7 @@ function ServiceDetail() {
               {currentUser && !isAuthor && reviewsLoaded && (
                 <div style={{ marginTop: 18, padding: 14, background: 'var(--bg-page)', borderRadius: 10, fontSize: 13, color: 'var(--text-tertiary)', display: 'flex', gap: 10, alignItems: 'flex-start' }}>
                   <ShoppingCart size={16} color="#14224F" style={{ marginTop: 2, flexShrink: 0 }} />
-                  <span>Yalnız bu xidməti sifariş edib tamamladıqdan sonra rəy yaza bilərsən. <Link to="/sifarislerim" style={{ color: '#14224F', fontWeight: 700, textDecoration: 'none' }}>Sifarişlərimə bax →</Link></span>
+                  <span>Yalnız bu xidməti sifariş edib tamamladıqdan sonra rəy yaza bilərsən. <Link to="/sifarislerim" style={{ color: 'var(--brand)', fontWeight: 700, textDecoration: 'none' }}>Sifarişlərimə bax →</Link></span>
                 </div>
               )}
             </div>
@@ -327,7 +327,7 @@ function ServiceDetail() {
                   <div style={{ padding: 24 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 8 }}>
                       <span style={{ color: 'var(--text-primary)', fontWeight: 700, fontSize: 16 }}>{selectedPkg.title || 'Paket'}</span>
-                      <span style={{ fontSize: 30, color: '#14224F', fontWeight: 900 }}>{selectedPkg.price} ₼</span>
+                      <span style={{ fontSize: 30, color: 'var(--brand)', fontWeight: 900 }}>{selectedPkg.price} ₼</span>
                     </div>
                     {selectedPkg.description && (
                       <p style={{ color: 'var(--text-secondary)', fontSize: 14, lineHeight: 1.6, margin: '4px 0 18px 0' }}>{selectedPkg.description}</p>
@@ -362,7 +362,7 @@ function ServiceDetail() {
               <div style={{ padding: 24 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 18 }}>
                   <span style={{ fontSize: 16, color: 'var(--text-primary)', fontWeight: 700 }}>Qiymət</span>
-                  <span style={{ fontSize: 30, color: '#14224F', fontWeight: 900 }}>{service.price} ₼</span>
+                  <span style={{ fontSize: 30, color: 'var(--brand)', fontWeight: 900 }}>{service.price} ₼</span>
                 </div>
                 <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: 'var(--text-secondary)', fontSize: 14, marginBottom: 18 }}>
                   <Clock size={18} color="#14224F" /> {service.deliveryDays} gün
@@ -399,11 +399,11 @@ function ServiceDetail() {
             const rows = [
               { label: 'İlan tarixi',         val: fmtAgo(service.createdAt),               icon: Calendar,    color: '#6366f1' },
               { label: 'Cəmi sifariş',        val: s.ordersTotal,                           icon: ShoppingBag, color: '#f59e0b' },
-              { label: 'Tamamlanmış',         val: s.ordersCompleted,                       icon: CheckCircle, color: '#14224F' },
+              { label: 'Tamamlanmış',         val: s.ordersCompleted,                       icon: CheckCircle, color: 'var(--brand)' },
               { label: 'Ləğv edilmiş',        val: s.ordersCanceled,                        icon: XCircle,     color: '#ef4444' },
               { label: 'Son baxış',           val: `${service.views || 0} dəfə`,            icon: Eye,         color: '#8b5cf6' },
               { label: 'Ort. cavab müddəti',  val: fmtResp(s.authorResponseMinutes),        icon: Clock,       color: '#06b6d4' },
-              { label: 'Son aktivlik',        val: fmtAgo(s.authorLastActive),              icon: Activity,    color: '#14224F' },
+              { label: 'Son aktivlik',        val: fmtAgo(s.authorLastActive),              icon: Activity,    color: 'var(--brand)' },
               { label: 'Son təslim',          val: fmtAgo(s.lastDeliveredAt),               icon: Package,     color: '#3b82f6' },
             ];
             return (
@@ -451,7 +451,7 @@ function ServiceDetail() {
                     <h3 style={{ margin: 0, fontSize: 14, color: 'var(--text-primary)', lineHeight: 1.4 }}>{s.title.length > 60 ? s.title.slice(0, 60) + '...' : s.title}</h3>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 'auto', fontSize: 12, color: 'var(--text-tertiary)' }}>
                       <span style={{ display: 'inline-flex', alignItems: 'center', gap: 4 }}><Clock size={12} /> {fastest} gün</span>
-                      <span style={{ color: '#14224F', fontWeight: 700, fontSize: 14 }}>{startPrice} ₼-dən</span>
+                      <span style={{ color: 'var(--brand)', fontWeight: 700, fontSize: 14 }}>{startPrice} ₼-dən</span>
                     </div>
                   </div>
                 </Link>

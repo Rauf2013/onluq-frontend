@@ -222,7 +222,7 @@ function Orders() {
       case 'Havuzda (Gözləyir)': return { color: '#f59e0b', bg: '#fef3c7', icon: <Clock size={14} /> };
       case 'Təhvil Verildi': return { color: '#3b82f6', bg: '#dbeafe', icon: <UploadCloud size={14} /> };
       case 'Düzəliş Gözləyir': return { color: '#f97316', bg: '#ffedd5', icon: <RefreshCw size={14} /> };
-      case 'Tamamlandı': return { color: '#14224F', bg: '#d1fae5', icon: <CheckCircle size={14} /> };
+      case 'Tamamlandı': return { color: 'var(--brand)', bg: '#d1fae5', icon: <CheckCircle size={14} /> };
       case 'Ləğv Edildi': return { color: '#ef4444', bg: '#fee2e2', icon: <AlertTriangle size={14} /> };
       default: return { color: 'var(--text-tertiary)', bg: '#f1f5f9', icon: <Package size={14} /> };
     }
@@ -318,7 +318,7 @@ function Orders() {
                     </div>
                   </div>
                   
-                  <div style={{ fontSize: '24px', fontWeight: '900', color: '#14224F' }}>
+                  <div style={{ fontSize: '24px', fontWeight: '900', color: 'var(--brand)' }}>
                     {order.price} AZN
                   </div>
                 </div>
@@ -329,7 +329,7 @@ function Orders() {
                     <button
                       onClick={() => navigate('/mesajlar', { state: { partnerId: isSeller ? order.buyerId?._id : order.sellerId?._id, partnerName: isSeller ? order.buyerId?.fullName : order.sellerId?.fullName } })}
                       title="Qarşı tərəfə mesaj yaz"
-                      style={{ background: 'var(--bg-page)', color: '#14224F', border: '1px solid var(--border)', padding: '10px 18px', borderRadius: 8, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
+                      style={{ background: 'var(--bg-page)', color: 'var(--brand)', border: '1px solid var(--border)', padding: '10px 18px', borderRadius: 8, fontWeight: 700, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}>
                       <MessageSquare size={16} /> Mesaj yaz
                     </button>
                   )}
@@ -424,7 +424,7 @@ function Orders() {
       {isApproveModalOpen && (
         <div style={{ position: 'fixed', top: 0, left: 0, width: '100%', height: '100%', background: 'rgba(15, 23, 42, 0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999 }}>
           <div style={{ background: 'var(--bg-surface)', padding: '30px', borderRadius: '24px', width: '90%', maxWidth: '400px', boxShadow: '0 20px 25px -5px rgba(0,0,0,0.1)', textAlign: 'center' }}>
-            <div style={{ width: '70px', height: '70px', background: '#d1fae5', color: '#14224F', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto' }}>
+            <div style={{ width: '70px', height: '70px', background: '#d1fae5', color: 'var(--brand)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 15px auto' }}>
               <CheckCircle size={35} />
             </div>
             <h3 style={{ color: 'var(--text-primary)', marginBottom: '10px', fontSize: '20px' }}>Sifarişi Təsdiqlə</h3>
