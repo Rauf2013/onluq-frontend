@@ -153,6 +153,17 @@ export async function setSpeakerphone(on) {
   if (p && p.setSpeakerphone) await safe(() => p.setSpeakerphone({ on: !!on }));
 }
 
+// Gələn zəngdə telefonun ƏSL default ringtone-unu çal/dayandır (native RingtoneManager).
+export async function playNativeRingtone() {
+  const p = _audioPlugin();
+  if (p && p.playRingtone) { await safe(() => p.playRingtone()); return true; }
+  return false;
+}
+export async function stopNativeRingtone() {
+  const p = _audioPlugin();
+  if (p && p.stopRingtone) await safe(() => p.stopRingtone());
+}
+
 // Proximity sensoru: telefon qulağa yaxınlaşanda onNear(true), uzaqlaşanda onNear(false).
 // Native plugin varsa hadisəni dinləyir; yoxdursa heç nə (graceful).
 export function startProximity(onNear) {

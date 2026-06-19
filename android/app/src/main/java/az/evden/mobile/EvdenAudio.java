@@ -6,6 +6,9 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.media.AudioManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -13,7 +16,8 @@ import com.getcapacitor.PluginCall;
 import com.getcapacitor.PluginMethod;
 import com.getcapacitor.annotation.CapacitorPlugin;
 
-// Zəng səs marşrutu: earpiece (qulaq üstü) ↔ speaker (ucadan) + proximity sensoru.
+// Zəng səs marşrutu: earpiece (qulaq üstü) ↔ speaker (ucadan) + proximity sensoru
+// + gələn zəngdə telefonun ƏSL default ringtone-u (RingtoneManager).
 // JS tərəfdən capacitor.js → Capacitor.Plugins.EvdenAudio çağırır.
 @CapacitorPlugin(name = "EvdenAudio")
 public class EvdenAudio extends Plugin implements SensorEventListener {
@@ -21,6 +25,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     private AudioManager audioManager;
     private SensorManager sensorManager;
     private Sensor proximitySensor;
+    private Ringtone ringtone;
 
     @Override
     public void load() {
@@ -75,6 +80,25 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         if (sensorManager != null) {
             sensorManager.unregisterListener(this);
         }
+        call.resolve();
+    }
+
+    // Gələn zəngdə telefonun ƏSL default ringtone-unu çal.
+    @PluginMethod
+    public void playRingtone(final PluginCall call) {
+        try {
+            if (ringtone != null && ringtone.isPlaying()) { call.resolve(); return; }
+            Uri uri = RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_RINGTONE);
+            if (uri == null) uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            ringtone = RingtoneManager.getRingtone(getContext(), uri);
+            if (ringtone != null) ringtone.play();
+        } catch (Exception ignored) {}
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void stopRingtone(PluginCall call) {
+        try { if (ringtone != null) { ringtone.stop(); ringtone = null; } } catch (Exception ignored) {}
         call.resolve();
     }
 

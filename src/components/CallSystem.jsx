@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, Volume2, Volume1 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity } from '../native/capacitor';
+import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNativeRingtone, stopNativeRingtone, isNative } from '../native/capacitor';
 
 // ICE/TURN server konfiqurasiyası.
 // ⚠ TURN ŞƏRTDİR: yalnız STUN ilə symmetric NAT (əksər mobil operatorlar, bəzi ev
@@ -74,6 +74,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   // ─── Ringtone (Web Audio — fayl lazım deyil) ───
   const stopRing = () => {
     if (ringRef.current) { try { ringRef.current.stop(); } catch {} ringRef.current = null; }
+    try { stopNativeRingtone(); } catch {}
     try { if (navigator.vibrate) navigator.vibrate(0); } catch {}
   };
   const playRing = (mode) => {
@@ -193,20 +194,39 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   // Ringtone — vəziyyətə görə: zəng edirik (outgoing), bizə zəng gəlir (incoming), digər → sus
   useEffect(() => {
-    if (state === 'calling') playRing('outgoing');
-    else if (state === 'ringing') playRing('incoming');
-    else stopRing();
+    if (state === 'calling') {
+      playRing('outgoing');
+    } else if (state === 'ringing') {
+      // Gələn zəng: telefonun ƏSL ringtone-unu çal (native). Alınmasa (web) → Web Audio melodiyası.
+      if (isNative) {
+        playNativeRingtone().then((ok) => { if (!ok) playRing('incoming'); });
+        try { if (navigator.vibrate) navigator.vibrate([600, 400, 600, 400]); } catch {}
+      } else {
+        playRing('incoming');
+      }
+    } else {
+      stopRing();
+      stopNativeRingtone();
+    }
   }, [state]);
 
-  // Aktiv zəngdə SƏS MARŞRUTU: native zəng rejimi (earpiece üçün şərt) + proximity + ilkin dinamik.
-  // Səsli zəng → default qulaq üstü (earpiece); video → ucadan (speaker).
-  // Proximity: telefon qulağa yaxınlaşanda avtomatik earpiece-ə keç (qaldıranda earpiece-də qalır).
+  // Aktiv zəngdə SƏS MARŞRUTU.
+  // VİDEO zəng → HƏMİŞƏ ana (ucadan) dinamik. Earpiece/proximity/spiker düyməsi YOX.
+  // SƏSLİ zəng → default qulaq üstü (earpiece) + proximity (qulağa qoyanda earpiece) + spiker düyməsi.
   useEffect(() => {
     if (state !== 'active') return;
-    startCallAudio();
-    const initSpeaker = kindRef.current === 'video';
-    setSpeakerOn(initSpeaker);
-    setSpeakerphone(initSpeaker);
+    startCallAudio(); // native zəng rejimi (MODE_IN_COMMUNICATION) — earpiece marşrutu üçün şərt
+
+    if (kindRef.current === 'video') {
+      setSpeakerOn(true);
+      setSpeakerphone(true); // video → ana dinamik
+      return () => { stopCallAudio(); };
+    }
+
+    // Səsli zəng: default earpiece
+    setSpeakerOn(false);
+    setSpeakerphone(false);
+    // Proximity: qulağa yaxınlaşanda earpiece-ə keç (spiker açıq idisə də)
     proximityStopRef.current = startProximity((near) => {
       if (near) { setSpeakerphone(false); setSpeakerOn(false); }
     });
@@ -218,6 +238,9 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   // === Peer connection qur ===
   const setupPeer = async (peerKind, peerId) => {
+    // Səsli zəngdə native zəng rejimini (MODE_IN_COMMUNICATION) getUserMedia-dan ƏVVƏL qur —
+    // belə WebView WebRTC səsi voice-call marşrutuna düşür və earpiece/proximity işləyir.
+    if (peerKind !== 'video') { startCallAudio(); setSpeakerphone(false); }
     const pc = new RTCPeerConnection(ICE);
     pcRef.current = pc;
 
@@ -327,6 +350,10 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
     const onInvite = ({ from, kind: k }) => {
       if (stateRef.current !== 'idle') {
+        // Həmin nəfərdən TƏKRAR dəvət (re-invite) — artıq onun zəngi çalır/aktivdir → IGNORE.
+        // (Əvvəl burada "busy" göndərilirdi → zəng edən 5 san.-də "məşğuldur" alıb bağlanırdı. BUG.)
+        if (from === remoteIdRef.current) return;
+        // BAŞQA nəfər zəng edir, biz məşğuluq → busy
         socket.emit('call:reject', { to: from, reason: 'busy' });
         return;
       }
@@ -493,10 +520,13 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
             <button onClick={toggleMute} title={muted ? 'Səssizliyi aç' : 'Səssiz et'} style={btnGray(muted)}>
               {muted ? <MicOff size={22} /> : <Mic size={22} />}
             </button>
-            <button onClick={toggleSpeaker} title={speakerOn ? 'Ucadan dinamik (açıq)' : 'Qulaq dinamiki'}
-              style={{ ...btnBase, background: speakerOn ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.18)' }}>
-              {speakerOn ? <Volume2 size={22} /> : <Volume1 size={22} />}
-            </button>
+            {/* Spiker düyməsi YALNIZ səsli zəngdə — video zəngdə səs həmişə ana dinamikdən gəlir */}
+            {!isVideo && (
+              <button onClick={toggleSpeaker} title={speakerOn ? 'Ucadan dinamik (açıq)' : 'Qulaq dinamiki'}
+                style={{ ...btnBase, background: speakerOn ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.18)' }}>
+                {speakerOn ? <Volume2 size={22} /> : <Volume1 size={22} />}
+              </button>
+            )}
             {isVideo && (
               <button onClick={toggleCam} title={camOff ? 'Kameranı aç' : 'Kameranı bağla'} style={btnGray(camOff)}>
                 {camOff ? <VideoOff size={22} /> : <Video size={22} />}
