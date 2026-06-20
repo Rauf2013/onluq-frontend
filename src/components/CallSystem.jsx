@@ -370,6 +370,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     if (!socket) return;
 
     const onInvite = ({ from, kind: k, fromName }) => {
+      try { console.log('[EVDENCALL] invite received from', from, fromName, 'state=', stateRef.current); } catch {}
       if (stateRef.current !== 'idle') {
         // Həmin nəfərdən TƏKRAR dəvət (re-invite) — artıq onun zəngi çalır/aktivdir → IGNORE.
         // (Əvvəl burada "busy" göndərilirdi → zəng edən 5 san.-də "məşğuldur" alıb bağlanırdı. BUG.)

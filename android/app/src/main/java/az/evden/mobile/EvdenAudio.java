@@ -35,7 +35,24 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     private AudioManager audioManager;
     private SensorManager sensorManager;
     private Sensor proximitySensor;
-    private Ringtone ringtone;
+    private static Ringtone ringtone;
+
+    // Telefonun ƏSL zəng səsini LOOP ilə çal (gələn zəng kimi). Həm app açıq, həm FCM (bağlı) işlədir.
+    public static void startRingtone(Context ctx) {
+        try {
+            if (ringtone != null && ringtone.isPlaying()) return;
+            Uri uri = RingtoneManager.getActualDefaultRingtoneUri(ctx, RingtoneManager.TYPE_RINGTONE);
+            if (uri == null) uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
+            ringtone = RingtoneManager.getRingtone(ctx, uri);
+            if (ringtone != null) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) ringtone.setLooping(true);
+                ringtone.play();
+            }
+        } catch (Exception ignored) {}
+    }
+    public static void stopRingtoneStatic() {
+        try { if (ringtone != null) { ringtone.stop(); ringtone = null; } } catch (Exception ignored) {}
+    }
 
     private static EvdenAudio instance;
     private static final String CALL_CHANNEL = "evden_calls";
@@ -82,6 +99,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         try {
             if (caller == null || caller.isEmpty()) caller = "EVDƏN zəng";
             if (kind == null) kind = "audio";
+            startRingtone(ctx); // telefonun ƏSL zəng səsi (loop) — bildiriş "ding"i yox
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -124,6 +142,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     }
 
     public static void dismiss(Context ctx) {
+        stopRingtoneStatic();
         try {
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
             nm.cancel(CALL_NOTIF_ID);
@@ -213,19 +232,13 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     // Gələn zəngdə telefonun ƏSL default ringtone-unu çal.
     @PluginMethod
     public void playRingtone(final PluginCall call) {
-        try {
-            if (ringtone != null && ringtone.isPlaying()) { call.resolve(); return; }
-            Uri uri = RingtoneManager.getActualDefaultRingtoneUri(getContext(), RingtoneManager.TYPE_RINGTONE);
-            if (uri == null) uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE);
-            ringtone = RingtoneManager.getRingtone(getContext(), uri);
-            if (ringtone != null) ringtone.play();
-        } catch (Exception ignored) {}
+        startRingtone(getContext());
         call.resolve();
     }
 
     @PluginMethod
     public void stopRingtone(PluginCall call) {
-        try { if (ringtone != null) { ringtone.stop(); ringtone = null; } } catch (Exception ignored) {}
+        stopRingtoneStatic();
         call.resolve();
     }
 
