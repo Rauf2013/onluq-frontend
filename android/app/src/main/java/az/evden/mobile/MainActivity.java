@@ -1,6 +1,7 @@
 package az.evden.mobile;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 
@@ -17,6 +18,8 @@ public class MainActivity extends BridgeActivity {
         registerPlugin(EvdenAudio.class);
         super.onCreate(savedInstanceState);
 
+        handleCallIntent(getIntent());
+
         // WebRTC səsli/görüntülü zəng üçün mikrofon + kamera icazəsi
         String[] perms = {
             Manifest.permission.CAMERA,
@@ -32,6 +35,22 @@ public class MainActivity extends BridgeActivity {
         }
         if (need) {
             ActivityCompat.requestPermissions(this, perms, 1001);
+        }
+    }
+
+    // Bildirişdəki "Cavabla" → bu Activity açılır. Pending-accept qoy + zəng bildirişini bağla;
+    // web GlobalCall socket-ə qoşulub re-invite gələndə zəngi avtomatik qəbul edir.
+    @Override
+    public void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleCallIntent(intent);
+    }
+
+    private void handleCallIntent(Intent intent) {
+        if (intent != null && intent.getBooleanExtra("evden_call_accept", false)) {
+            EvdenAudio.markPendingAccept();
+            EvdenAudio.dismiss(this);
         }
     }
 }

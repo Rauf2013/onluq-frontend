@@ -118,10 +118,14 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) piFlags |= PendingIntent.FLAG_IMMUTABLE;
             PendingIntent fullPi = PendingIntent.getActivity(ctx, 100, full, piFlags);
 
-            // Qəbul / Rədd action düymələri → CallActionReceiver (broadcast)
-            Intent acceptI = new Intent(ctx, CallActionReceiver.class).setAction(CallActionReceiver.ACTION_ACCEPT);
+            // CAVABLA → BİRBAŞA MainActivity açır (Android 10+ broadcast-dan Activity aça bilmir!).
+            // Tıklananda app önə gəlir + "accept" extra-sı → web zəngi avtomatik qəbul edir.
+            Intent acceptI = new Intent(ctx, MainActivity.class)
+                .putExtra("evden_call_accept", true)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            PendingIntent acceptPi = PendingIntent.getActivity(ctx, 101, acceptI, piFlags);
+            // RƏDD → broadcast (Activity açmağa ehtiyac yox, sadəcə dayandır + dismiss)
             Intent declineI = new Intent(ctx, CallActionReceiver.class).setAction(CallActionReceiver.ACTION_DECLINE);
-            PendingIntent acceptPi = PendingIntent.getBroadcast(ctx, 101, acceptI, piFlags);
             PendingIntent declinePi = PendingIntent.getBroadcast(ctx, 102, declineI, piFlags);
 
             NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, CALL_CHANNEL)
