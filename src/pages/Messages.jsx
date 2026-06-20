@@ -9,7 +9,6 @@ import { Search, Send, Paperclip, Smile, MoreVertical, Check, CheckCheck, User, 
 import { Video as VideoIcon } from 'lucide-react';
 import { getSocket } from '../socket';
 import { PACKAGE_TIERS } from '../constants/seller';
-import CallSystem from '../components/CallSystem';
 
 // Mesajda inline göstəriləcək icon-lar. Picker-də klik edincə `:adı:` token-i mətnə əlavə olunur,
 // mesaj göstərilərkən token-lər Lucide icon-a çevrilir.
@@ -115,7 +114,6 @@ function Messages() {
   const docInputRef = useRef(null);
   const typingTimerRef = useRef(null);
   const composerRef = useRef(null);
-  const callSystemRef = useRef(null);
   const [composerEmpty, setComposerEmpty] = useState(true);
 
   const messagesEndRef = useRef(null);
@@ -522,12 +520,12 @@ function Messages() {
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-                <button onClick={() => callSystemRef.current?.startCall('audio')} title="Səsli zəng" aria-label="Səsli zəng"
+                <button onClick={() => window.dispatchEvent(new CustomEvent('evden:startCall', { detail: { partnerId: activeChat?.partnerId, partnerName: activeChat?.partnerName, kind: 'audio' } }))} title="Səsli zəng" aria-label="Səsli zəng"
                   className="msg-action-btn"
                   style={{ background: 'rgba(20,34,79,0.10)', color: 'var(--brand)', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <Phone size={20} />
                 </button>
-                <button onClick={() => callSystemRef.current?.startCall('video')} title="Görüntülü zəng" aria-label="Görüntülü zəng"
+                <button onClick={() => window.dispatchEvent(new CustomEvent('evden:startCall', { detail: { partnerId: activeChat?.partnerId, partnerName: activeChat?.partnerName, kind: 'video' } }))} title="Görüntülü zəng" aria-label="Görüntülü zəng"
                   className="msg-action-btn"
                   style={{ background: 'rgba(59,130,246,0.12)', color: '#3b82f6', border: 'none', width: 42, height: 42, minWidth: 42, borderRadius: '50%', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                   <VideoIcon size={20} />
@@ -767,15 +765,8 @@ function Messages() {
         </div>
       </div>
 
-      {socketReady && (
-        <CallSystem
-          ref={callSystemRef}
-          socket={socketRef.current}
-          myId={userId}
-          partnerId={activeChat?.partnerId}
-          partnerName={activeChat?.partnerName}
-        />
-      )}
+      {/* CallSystem artıq QLOBALDIR (App.jsx → GlobalCall) — burada mount edilmir.
+          Zəng düymələri 'evden:startCall' event-i göndərir. */}
     </div>
   );
 }

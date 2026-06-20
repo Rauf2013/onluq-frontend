@@ -12,6 +12,7 @@ import Footer from './components/Footer';
 import MobileNav from './components/MobileNav';
 import MobileHeader from './components/MobileHeader';
 import AIChat from './components/AIChat';
+import GlobalCall from './components/GlobalCall';
 import ProtectedRoute from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Register from './pages/Register';
@@ -199,6 +200,8 @@ function App() {
       </AnimatedRoutes>
       {useMobileShell ? <MobileNav /> : <Footer />}
       {useMobileShell && <GlobalAI />}
+      {/* Qlobal zəng — hər səhifədə gələn zəngi tutur (desktop + mobil) */}
+      <GlobalCall />
     </Router>
     </ThemeProvider>
   );

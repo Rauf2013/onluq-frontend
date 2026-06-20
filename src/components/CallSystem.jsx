@@ -322,18 +322,21 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   // === Imperative API (parent-dən çağrılır) ===
   useImperativeHandle(ref, () => ({
-    startCall: (k) => {
-      if (stateRef.current !== 'idle' || !partnerId || !socket) return;
+    startCall: (k, pId, pName) => {
+      // Qlobal mount: partner zəng anında ötürülür (props yox). Yoxdursa prop-a düş.
+      const targetId = pId || partnerId;
+      const targetName = pName || partnerName;
+      if (stateRef.current !== 'idle' || !targetId || !socket) return;
       setKind(k);
-      setRemoteId(partnerId);
-      setRemoteName(partnerName || 'İstifadəçi');
+      setRemoteId(targetId);
+      setRemoteName(targetName || 'İstifadəçi');
       setState('calling');
       // Zəng "offline" deyə BLOKLANMIR — dəvət göndərilir və qarşı tərəf cavab verənə qədər
       // davam edir. Hər 4 san. dəvəti təkrar göndər→ qarşı tərəf bir az sonra onlayn olsa da tutsun.
-      socket.emit('call:invite', { to: partnerId, kind: k });
+      socket.emit('call:invite', { to: targetId, kind: k });
       if (reInviteRef.current) clearInterval(reInviteRef.current);
       reInviteRef.current = setInterval(() => {
-        if (stateRef.current === 'calling') socket.emit('call:invite', { to: partnerId, kind: k });
+        if (stateRef.current === 'calling') socket.emit('call:invite', { to: targetId, kind: k });
         else { clearInterval(reInviteRef.current); reInviteRef.current = null; }
       }, 4000);
       // 60 san. cavab gəlməsə avtomatik bitir ("cavab vermədi")
@@ -348,7 +351,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   useEffect(() => {
     if (!socket) return;
 
-    const onInvite = ({ from, kind: k }) => {
+    const onInvite = ({ from, kind: k, fromName }) => {
       if (stateRef.current !== 'idle') {
         // Həmin nəfərdən TƏKRAR dəvət (re-invite) — artıq onun zəngi çalır/aktivdir → IGNORE.
         // (Əvvəl burada "busy" göndərilirdi → zəng edən 5 san.-də "məşğuldur" alıb bağlanırdı. BUG.)
@@ -360,7 +363,8 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       const nk = k === 'video' ? 'video' : 'audio';
       setKind(nk);
       setRemoteId(from);
-      setRemoteName(partnerName && partnerId === from ? partnerName : 'Bilinməyən');
+      // Zəng edənin adı backend-dən gəlir (qlobal mount-da partnerName prop yoxdur)
+      setRemoteName(fromName || (partnerName && partnerId === from ? partnerName : 'Zəng'));
       setState('ringing');
     };
 
