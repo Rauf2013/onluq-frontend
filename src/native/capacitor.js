@@ -153,6 +153,26 @@ export async function setSpeakerphone(on) {
   if (p && p.setSpeakerphone) await safe(() => p.setSpeakerphone({ on: !!on }));
 }
 
+// Native full-screen gələn zəng ekranı (kilid ekranında, başqa app-dayken).
+export async function showIncomingCall(caller, kind) {
+  const p = _audioPlugin();
+  if (p && p.showIncomingCall) await safe(() => p.showIncomingCall({ caller: caller || 'EVDƏN zəng', kind: kind || 'audio' }));
+}
+export async function dismissIncomingCall() {
+  const p = _audioPlugin();
+  if (p && p.dismissIncomingCall) await safe(() => p.dismissIncomingCall());
+}
+// Native ekrandakı Cavabla/Rədd et → callback(action: 'accept'|'decline')
+export function onCallAction(cb) {
+  const p = _audioPlugin();
+  if (p && p.addListener) {
+    let handle;
+    safe(() => { handle = p.addListener('callAction', (e) => { try { cb(e && e.action); } catch {} }); });
+    return () => { if (handle) safe(() => handle.remove && handle.remove()); };
+  }
+  return () => {};
+}
+
 // Gələn zəngdə telefonun ƏSL default ringtone-unu çal/dayandır (native RingtoneManager).
 export async function playNativeRingtone() {
   const p = _audioPlugin();

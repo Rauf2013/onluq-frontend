@@ -1,6 +1,10 @@
 package az.evden.mobile;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,6 +15,8 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+
+import androidx.core.app.NotificationCompat;
 
 import java.util.List;
 
@@ -31,13 +37,76 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     private Sensor proximitySensor;
     private Ringtone ringtone;
 
+    private static EvdenAudio instance;
+    private static final String CALL_CHANNEL = "evden_calls";
+    private static final int CALL_NOTIF_ID = 7711;
+
     @Override
     public void load() {
+        instance = this;
         audioManager = (AudioManager) getContext().getSystemService(Context.AUDIO_SERVICE);
         sensorManager = (SensorManager) getContext().getSystemService(Context.SENSOR_SERVICE);
         if (sensorManager != null) {
             proximitySensor = sensorManager.getDefaultSensor(Sensor.TYPE_PROXIMITY);
         }
+    }
+
+    // IncomingCallActivity-dən accept/decline → web GlobalCall-a ötür
+    public static void deliverCallAction(String action) {
+        if (instance != null) {
+            JSObject d = new JSObject();
+            d.put("action", action);
+            instance.notifyListeners("callAction", d);
+        }
+    }
+
+    // Native full-screen gələn zəng bildirişi (kilid ekranında IncomingCallActivity açılır)
+    @PluginMethod
+    public void showIncomingCall(PluginCall call) {
+        try {
+            String caller = call.getString("caller", "EVDƏN zəng");
+            String kind = call.getString("kind", "audio");
+            Context ctx = getContext();
+            NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel ch = new NotificationChannel(CALL_CHANNEL, "Zənglər", NotificationManager.IMPORTANCE_HIGH);
+                ch.setDescription("Gələn zənglər");
+                ch.setLockscreenVisibility(android.app.Notification.VISIBILITY_PUBLIC);
+                nm.createNotificationChannel(ch);
+            }
+
+            Intent full = new Intent(ctx, IncomingCallActivity.class);
+            full.putExtra(IncomingCallActivity.EXTRA_CALLER, caller);
+            full.putExtra(IncomingCallActivity.EXTRA_KIND, kind);
+            full.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
+            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_IMMUTABLE;
+            PendingIntent pi = PendingIntent.getActivity(ctx, 100, full, flags);
+
+            NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, CALL_CHANNEL)
+                .setSmallIcon(ctx.getApplicationInfo().icon)
+                .setContentTitle(caller)
+                .setContentText("video".equals(kind) ? "Görüntülü zəng gəlir..." : "Zəng gəlir...")
+                .setPriority(NotificationCompat.PRIORITY_MAX)
+                .setCategory(NotificationCompat.CATEGORY_CALL)
+                .setOngoing(true)
+                .setAutoCancel(false)
+                .setFullScreenIntent(pi, true);
+
+            nm.notify(CALL_NOTIF_ID, b.build());
+        } catch (Exception ignored) {}
+        call.resolve();
+    }
+
+    @PluginMethod
+    public void dismissIncomingCall(PluginCall call) {
+        try {
+            NotificationManager nm = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.cancel(CALL_NOTIF_ID);
+        } catch (Exception ignored) {}
+        call.resolve();
     }
 
     // Səsi marşrutla: speaker=true → ucadan dinamik, false → qulaq üstü (earpiece).
