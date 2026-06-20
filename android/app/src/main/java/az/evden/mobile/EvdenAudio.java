@@ -5,10 +5,14 @@ import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
+import android.media.AudioDeviceInfo;
 import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Build;
+
+import java.util.List;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;
@@ -36,13 +40,34 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         }
     }
 
-    // Zəng başlayanda: MODE_IN_COMMUNICATION (earpiece marşrutu üçün şərt), default earpiece.
+    // Səsi marşrutla: speaker=true → ucadan dinamik, false → qulaq üstü (earpiece).
+    // Android 12+ (API 31): MODERN setCommunicationDevice — WebView WebRTC səsini ETİBARLI yönləndirir
+    // (köhnə setSpeakerphoneOn yeni telefonlarda işləmir). Köhnə Android-də fallback.
+    private void routeAudio(boolean speaker) {
+        if (audioManager == null) return;
+        audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            try {
+                int wanted = speaker ? AudioDeviceInfo.TYPE_BUILTIN_SPEAKER : AudioDeviceInfo.TYPE_BUILTIN_EARPIECE;
+                AudioDeviceInfo target = null;
+                List<AudioDeviceInfo> devices = audioManager.getAvailableCommunicationDevices();
+                for (AudioDeviceInfo d : devices) {
+                    if (d.getType() == wanted) { target = d; break; }
+                }
+                audioManager.clearCommunicationDevice();
+                if (target != null) {
+                    audioManager.setCommunicationDevice(target);
+                    return;
+                }
+            } catch (Exception ignored) {}
+        }
+        try { audioManager.setSpeakerphoneOn(speaker); } catch (Exception ignored) {}
+    }
+
+    // Zəng başlayanda: zəng rejimi + default earpiece (qulaq üstü).
     @PluginMethod
     public void startCall(PluginCall call) {
-        if (audioManager != null) {
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            audioManager.setSpeakerphoneOn(false);
-        }
+        routeAudio(false);
         call.resolve();
     }
 
@@ -50,7 +75,10 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     @PluginMethod
     public void stopCall(PluginCall call) {
         if (audioManager != null) {
-            try { audioManager.setSpeakerphoneOn(false); } catch (Exception ignored) {}
+            try {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) audioManager.clearCommunicationDevice();
+                else audioManager.setSpeakerphoneOn(false);
+            } catch (Exception ignored) {}
             audioManager.setMode(AudioManager.MODE_NORMAL);
         }
         call.resolve();
@@ -60,10 +88,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     @PluginMethod
     public void setSpeakerphone(PluginCall call) {
         boolean on = Boolean.TRUE.equals(call.getBoolean("on", false));
-        if (audioManager != null) {
-            audioManager.setMode(AudioManager.MODE_IN_COMMUNICATION);
-            audioManager.setSpeakerphoneOn(on);
-        }
+        routeAudio(on);
         call.resolve();
     }
 
