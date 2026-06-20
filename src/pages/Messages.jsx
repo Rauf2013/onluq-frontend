@@ -16,7 +16,7 @@ const STICKERS = [
   { n: 'heart',     I: Heart,         c: '#ef4444', f: true },
   { n: 'smile',     I: SmileIcon,     c: '#fbbf24' },
   { n: 'laugh',     I: Laugh,         c: '#fbbf24' },
-  { n: 'thumbs-up', I: ThumbsUp,      c: '#14224F' },
+  { n: 'thumbs-up', I: ThumbsUp,      c: 'var(--brand)' },
   { n: 'thumbs-down', I: ThumbsDown,  c: '#94a3b8' },
   { n: 'star',      I: Star,          c: '#fbbf24', f: true },
   { n: 'flame',     I: Flame,         c: '#f97316', f: true },
@@ -24,13 +24,13 @@ const STICKERS = [
   { n: 'party',     I: PartyPopper,   c: '#ec4899' },
   { n: 'trophy',    I: Trophy,        c: '#fbbf24' },
   { n: 'crown',     I: Crown,         c: '#fbbf24' },
-  { n: 'award',     I: Award,         c: '#14224F' },
+  { n: 'award',     I: Award,         c: 'var(--brand)' },
   { n: 'rocket',    I: Rocket,        c: '#6366f1' },
   { n: 'bulb',      I: Lightbulb,     c: '#fbbf24' },
-  { n: 'check',     I: CheckCircle,   c: '#14224F', f: true },
+  { n: 'check',     I: CheckCircle,   c: 'var(--brand)', f: true },
   { n: 'x',         I: XCircle,       c: '#ef4444', f: true },
   { n: 'alert',     I: AlertTriangle, c: '#f59e0b' },
-  { n: 'shield',    I: ShieldCheck,   c: '#14224F' },
+  { n: 'shield',    I: ShieldCheck,   c: 'var(--brand)' },
   { n: 'gift',      I: Gift,          c: '#ec4899' },
   { n: 'cake',      I: Cake,          c: '#ec4899' },
   { n: 'coffee',    I: Coffee,        c: '#92400e' },
@@ -41,7 +41,7 @@ const STICKERS = [
   { n: 'moon',      I: Moon,          c: '#6366f1' },
   { n: 'cloud',     I: Cloud,         c: '#94a3b8' },
   { n: 'camera',    I: Camera,        c: '#475569' },
-  { n: 'phone',     I: Phone,         c: '#14224F' },
+  { n: 'phone',     I: Phone,         c: 'var(--brand)' },
   { n: 'mail',      I: Mail,          c: '#3b82f6' },
   { n: 'map-pin',   I: MapPin,        c: '#ef4444' },
   { n: 'clock',     I: Clock,         c: '#64748b' },
@@ -63,7 +63,7 @@ function renderMessageText(text, isMe = false) {
       const s = STICKER_MAP[m[1]];
       const Icon = s.I;
       // Sender's green bubble: green icons would be invisible — make them white
-      const lowContrast = isMe && (s.c === '#14224F' || s.c === '#0C1733');
+      const lowContrast = isMe && (s.c === 'var(--brand)' || s.c === '#0C1733');
       const color = lowContrast ? '#ffffff' : s.c;
       const fillColor = s.f ? color : 'none';
       return <Icon key={i} size={18} color={color} fill={fillColor} style={{ display: 'inline', verticalAlign: '-4px', margin: '0 2px' }} />;
@@ -479,19 +479,19 @@ function Messages() {
               >
                 <div style={{ position: 'relative', width: '50px', height: '50px', borderRadius: '50%', background: 'var(--bg-muted)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginRight: '15px', flexShrink: 0 }}>
                   {chat.partnerAvatar ? <img src={chat.partnerAvatar} alt="avatar" style={{width: '100%', height: '100%', borderRadius: '50%', objectFit: 'cover'}}/> : <User size={24} color="#64748b" />}
-                  {chat.isOnline && <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', background: '#14224F', border: '2px solid white', borderRadius: '50%' }}></div>}
+                  {chat.isOnline && <div style={{ position: 'absolute', bottom: '2px', right: '2px', width: '12px', height: '12px', background: 'var(--brand)', border: '2px solid white', borderRadius: '50%' }}></div>}
                 </div>
                 
                 <div style={{ flex: 1, overflow: 'hidden' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                     <h4 style={{ margin: 0, fontSize: '15px', color: 'var(--text-primary)', fontWeight: activeChat?.partnerId === chat.partnerId ? 'bold' : '600' }}>{chat.partnerName}</h4>
-                    <span style={{ fontSize: '12px', color: chat.unread > 0 ? '#14224F' : '#94a3b8', fontWeight: chat.unread > 0 ? 'bold' : 'normal' }}>{chat.time}</span>
+                    <span style={{ fontSize: '12px', color: chat.unread > 0 ? 'var(--brand)' : '#94a3b8', fontWeight: chat.unread > 0 ? 'bold' : 'normal' }}>{chat.time}</span>
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <p style={{ margin: 0, fontSize: '13px', color: 'var(--text-tertiary)', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
                       {renderMessageText(chat.lastMessage)}
                     </p>
-                    {chat.unread > 0 && <span style={{ background: '#14224F', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', marginLeft: '10px' }}>{chat.unread}</span>}
+                    {chat.unread > 0 && <span style={{ background: 'var(--brand)', color: 'white', fontSize: '11px', fontWeight: 'bold', padding: '2px 6px', borderRadius: '10px', marginLeft: '10px' }}>{chat.unread}</span>}
                   </div>
                 </div>
               </div>
@@ -514,7 +514,7 @@ function Messages() {
                 </div>
                 <div>
                   <h3 style={{ margin: 0, fontSize: '16px', color: 'var(--text-primary)' }}>{activeChat.partnerName}</h3>
-                  <span style={{ fontSize: '13px', color: partnerTyping ? '#14224F' : (activeChat.isOnline ? '#14224F' : '#94a3b8'), fontWeight: '500', fontStyle: partnerTyping ? 'italic' : 'normal' }}>
+                  <span style={{ fontSize: '13px', color: partnerTyping ? 'var(--brand)' : (activeChat.isOnline ? 'var(--brand)' : '#94a3b8'), fontWeight: '500', fontStyle: partnerTyping ? 'italic' : 'normal' }}>
                     {partnerTyping ? 'yazır...' : (activeChat.isOnline ? 'Onlayn' : 'Oflayn')}
                   </span>
                 </div>
@@ -550,7 +550,7 @@ function Messages() {
                   const isMe = msg.senderId === userId;
                   const bubble = {
                     maxWidth: '70%',
-                    background: isMe ? '#14224F' : 'var(--bg-surface)',
+                    background: isMe ? 'var(--brand)' : 'var(--bg-surface)',
                     color: isMe ? 'white' : 'var(--text-primary)',
                     padding: '12px 16px',
                     borderRadius: isMe ? '16px 16px 0 16px' : '16px 16px 16px 0',
@@ -588,7 +588,7 @@ function Messages() {
                             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: `1px solid ${isMe ? 'rgba(255,255,255,0.2)' : 'var(--border)'}`, paddingTop: 8 }}>
                               <span style={{ fontSize: 18, fontWeight: 800 }}>{meta.price} ₼</span>
                               {!isMe && (
-                                <button onClick={() => acceptOffer(meta)} style={{ background: '#14224F', color: 'white', border: 'none', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
+                                <button onClick={() => acceptOffer(meta)} style={{ background: 'var(--brand)', color: 'white', border: 'none', padding: '6px 14px', borderRadius: 8, cursor: 'pointer', fontWeight: 700, fontSize: 13, display: 'inline-flex', alignItems: 'center', gap: 5 }}>
                                   <ShoppingCart size={13} /> Qəbul et
                                 </button>
                               )}
@@ -663,7 +663,7 @@ function Messages() {
                 <button
                   type="submit"
                   disabled={composerEmpty}
-                  style={{ background: !composerEmpty ? '#14224F' : 'var(--border-strong)', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: !composerEmpty ? 'pointer' : 'not-allowed', transition: '0.2s', paddingLeft: '4px', flexShrink: 0 }}
+                  style={{ background: !composerEmpty ? 'var(--brand)' : 'var(--border-strong)', color: 'white', border: 'none', width: '45px', height: '45px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: !composerEmpty ? 'pointer' : 'not-allowed', transition: '0.2s', paddingLeft: '4px', flexShrink: 0 }}
                 >
                   <Send size={20} />
                 </button>
@@ -775,7 +775,7 @@ const iconBtn = (active) => ({
   background: active ? 'var(--bg-muted)' : 'transparent',
   border: 'none',
   cursor: 'pointer',
-  color: active ? '#14224F' : 'var(--text-muted)',
+  color: active ? 'var(--brand)' : 'var(--text-muted)',
   display: 'flex',
   alignItems: 'center',
   justifyContent: 'center',

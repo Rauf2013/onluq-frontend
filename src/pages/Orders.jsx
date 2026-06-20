@@ -305,7 +305,7 @@ function Orders() {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px' }}>
                   <div style={{ flex: '1 1 300px' }}>
-                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: order.serviceId ? '#0f172a' : '#94a3b8', fontWeight: '700', textDecoration: order.serviceId ? 'none' : 'line-through' }}>
+                    <h3 style={{ margin: '0 0 10px 0', fontSize: '18px', color: order.serviceId ? 'var(--text-primary)' : '#94a3b8', fontWeight: '700', textDecoration: order.serviceId ? 'none' : 'line-through' }}>
                       {order.serviceId?.title || 'Silinmiş Xidmət'}
                     </h3>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-tertiary)', fontSize: '14px' }}>

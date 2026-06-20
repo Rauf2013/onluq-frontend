@@ -519,7 +519,7 @@ function AdminPanel() {
       {confirmAction && (
         <div className="custom-modal-overlay active" onClick={() => setConfirmAction(null)}>
           <div className="custom-modal" onClick={(e) => e.stopPropagation()}>
-            <div className="modal-icon" style={{ width: 80, height: 80, background: confirmAction.danger ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)', color: confirmAction.danger ? '#ef4444' : '#14224F', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
+            <div className="modal-icon" style={{ width: 80, height: 80, background: confirmAction.danger ? 'rgba(239,68,68,0.12)' : 'rgba(16,185,129,0.12)', color: confirmAction.danger ? '#ef4444' : 'var(--brand)', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 16px' }}>
               {confirmAction.danger ? <Trash2 size={32} /> : <ShieldCheck size={32} />}
             </div>
             <h3 style={{ margin: '0 0 8px', textAlign: 'center', fontSize: 20, color: 'var(--text-primary)', fontWeight: 800 }}>{confirmAction.label}</h3>

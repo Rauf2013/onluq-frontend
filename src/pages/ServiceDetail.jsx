@@ -497,7 +497,7 @@ const TabBtn = ({ active, onClick, children }) => (
   <button onClick={onClick} style={{
     padding: '12px 18px', background: 'transparent', border: 'none',
     borderBottom: `2px solid ${active ? '#14224F' : 'transparent'}`,
-    color: active ? '#14224F' : 'var(--text-tertiary)', fontWeight: 700,
+    color: active ? 'var(--brand)' : 'var(--text-tertiary)', fontWeight: 700,
     cursor: 'pointer', fontSize: 15,
   }}>{children}</button>
 );
