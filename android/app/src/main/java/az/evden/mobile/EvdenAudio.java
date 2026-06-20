@@ -165,6 +165,16 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         call.resolve();
     }
 
+    // Zəng bitəndə: app artıq kilid ekranının üstündə görünməsin (təhlükəsizlik).
+    @PluginMethod
+    public void allowLockAgain(PluginCall call) {
+        final android.app.Activity act = getActivity();
+        if (act != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+            act.runOnUiThread(() -> { try { act.setShowWhenLocked(false); act.setTurnScreenOn(false); } catch (Exception ignored) {} });
+        }
+        call.resolve();
+    }
+
     // Səsi marşrutla: speaker=true → ucadan dinamik, false → qulaq üstü (earpiece).
     // Android 12+ (API 31): MODERN setCommunicationDevice — WebView WebRTC səsini ETİBARLI yönləndirir
     // (köhnə setSpeakerphoneOn yeni telefonlarda işləmir). Köhnə Android-də fallback.

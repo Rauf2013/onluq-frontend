@@ -162,6 +162,11 @@ export async function dismissIncomingCall() {
   const p = _audioPlugin();
   if (p && p.dismissIncomingCall) await safe(() => p.dismissIncomingCall());
 }
+// Zəng bitəndə app artıq kilid ekranının üstündə görünməsin (təhlükəsizlik)
+export async function allowLockAgain() {
+  const p = _audioPlugin();
+  if (p && p.allowLockAgain) await safe(() => p.allowLockAgain());
+}
 // App bağlı ikən "Cavabla" basılmışdısa, app açılanda gözləyən qəbulu yoxla (30 san. pəncərə)
 export async function consumePendingAccept() {
   const p = _audioPlugin();

@@ -1,9 +1,13 @@
 package az.evden.mobile;
 
 import android.Manifest;
+import android.app.KeyguardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.view.WindowManager;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -49,8 +53,28 @@ public class MainActivity extends BridgeActivity {
 
     private void handleCallIntent(Intent intent) {
         if (intent != null && intent.getBooleanExtra("evden_call_accept", false)) {
+            showOverLockScreen();   // kilid ekranında ilişməsin
             EvdenAudio.markPendingAccept();
             EvdenAudio.dismiss(this);
         }
+    }
+
+    // Zəng qəbul ediləndə app kilid ekranının ÜSTÜNDƏ görünsün + ekranı oyat + kilidi açmağa təklif et.
+    // (Yalnız zəng halında — adi açılışda telefon onsuz da kilidsizdir, ona görə təhlükəsizlik problemi yox.)
+    private void showOverLockScreen() {
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+                setShowWhenLocked(true);
+                setTurnScreenOn(true);
+                KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
+                if (km != null) km.requestDismissKeyguard(this, null);
+            } else {
+                getWindow().addFlags(
+                    WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
+                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                );
+            }
+        } catch (Exception ignored) {}
     }
 }

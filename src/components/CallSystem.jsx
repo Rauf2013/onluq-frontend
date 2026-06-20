@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, Volume2, Volume1 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNativeRingtone, stopNativeRingtone, showIncomingCall, dismissIncomingCall, onCallAction, consumePendingAccept, isNative } from '../native/capacitor';
+import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNativeRingtone, stopNativeRingtone, showIncomingCall, dismissIncomingCall, onCallAction, consumePendingAccept, allowLockAgain, isNative } from '../native/capacitor';
 
 // ICE/TURN server konfiqurasiyası.
 // ⚠ TURN ŞƏRTDİR: yalnız STUN ilə symmetric NAT (əksər mobil operatorlar, bəzi ev
@@ -132,7 +132,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   const cleanup = () => {
     stopRing();
-    if (isNative) dismissIncomingCall();
+    if (isNative) { dismissIncomingCall(); allowLockAgain(); }
     if (reInviteRef.current) { clearInterval(reInviteRef.current); reInviteRef.current = null; }
     if (noAnswerRef.current) { clearTimeout(noAnswerRef.current); noAnswerRef.current = null; }
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
