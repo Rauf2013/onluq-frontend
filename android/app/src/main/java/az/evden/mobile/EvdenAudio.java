@@ -51,8 +51,14 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         }
     }
 
-    // IncomingCallActivity-dən accept/decline → web GlobalCall-a ötür
+    // App bağlı ikən Qəbul edildikdə → app açılanda web zəngi avtomatik qəbul etsin
+    private static volatile long pendingAcceptAt = 0;
+    public static void markPendingAccept() { pendingAcceptAt = System.currentTimeMillis(); }
+
+    // IncomingCallActivity / bildiriş düyməsindən accept/decline → web GlobalCall-a ötür.
+    // App AÇIQdırsa dərhal notifyListeners; bağlıdırsa pendingAccept qoyulur (app açılanda işlənir).
     public static void deliverCallAction(String action) {
+        if ("accept".equals(action)) markPendingAccept();
         if (instance != null) {
             JSObject d = new JSObject();
             d.put("action", action);
@@ -60,13 +66,22 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         }
     }
 
-    // Native full-screen gələn zəng bildirişi (kilid ekranında IncomingCallActivity açılır)
+    // Web GlobalCall ringing-ə düşəndə soruşur: gözləyən "qəbul" var? (app bağlı ikən basılmışdı)
     @PluginMethod
-    public void showIncomingCall(PluginCall call) {
+    public void consumePendingAccept(PluginCall call) {
+        boolean pending = pendingAcceptAt > 0 && (System.currentTimeMillis() - pendingAcceptAt) < 30000;
+        pendingAcceptAt = 0;
+        JSObject r = new JSObject();
+        r.put("accept", pending);
+        call.resolve(r);
+    }
+
+    // Native full-screen gələn zəng bildirişi — STATIK (həm plugin-dən, həm FCM servisindən çağrılır).
+    // contentIntent + fullScreenIntent → IncomingCallActivity; Qəbul/Rədd action düymələri → CallActionReceiver.
+    public static void showIncomingCallNotification(Context ctx, String caller, String kind) {
         try {
-            String caller = call.getString("caller", "EVDƏN zəng");
-            String kind = call.getString("kind", "audio");
-            Context ctx = getContext();
+            if (caller == null || caller.isEmpty()) caller = "EVDƏN zəng";
+            if (kind == null) kind = "audio";
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -81,9 +96,15 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
             full.putExtra(IncomingCallActivity.EXTRA_KIND, kind);
             full.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-            int flags = PendingIntent.FLAG_UPDATE_CURRENT;
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) flags |= PendingIntent.FLAG_IMMUTABLE;
-            PendingIntent pi = PendingIntent.getActivity(ctx, 100, full, flags);
+            int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) piFlags |= PendingIntent.FLAG_IMMUTABLE;
+            PendingIntent fullPi = PendingIntent.getActivity(ctx, 100, full, piFlags);
+
+            // Qəbul / Rədd action düymələri → CallActionReceiver (broadcast)
+            Intent acceptI = new Intent(ctx, CallActionReceiver.class).setAction(CallActionReceiver.ACTION_ACCEPT);
+            Intent declineI = new Intent(ctx, CallActionReceiver.class).setAction(CallActionReceiver.ACTION_DECLINE);
+            PendingIntent acceptPi = PendingIntent.getBroadcast(ctx, 101, acceptI, piFlags);
+            PendingIntent declinePi = PendingIntent.getBroadcast(ctx, 102, declineI, piFlags);
 
             NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, CALL_CHANNEL)
                 .setSmallIcon(ctx.getApplicationInfo().icon)
@@ -93,19 +114,31 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
                 .setCategory(NotificationCompat.CATEGORY_CALL)
                 .setOngoing(true)
                 .setAutoCancel(false)
-                .setFullScreenIntent(pi, true);
+                .setContentIntent(fullPi)
+                .setFullScreenIntent(fullPi, true)
+                .addAction(0, "Rədd et", declinePi)
+                .addAction(0, "Cavabla", acceptPi);
 
             nm.notify(CALL_NOTIF_ID, b.build());
         } catch (Exception ignored) {}
+    }
+
+    public static void dismiss(Context ctx) {
+        try {
+            NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
+            nm.cancel(CALL_NOTIF_ID);
+        } catch (Exception ignored) {}
+    }
+
+    @PluginMethod
+    public void showIncomingCall(PluginCall call) {
+        showIncomingCallNotification(getContext(), call.getString("caller", "EVDƏN zəng"), call.getString("kind", "audio"));
         call.resolve();
     }
 
     @PluginMethod
     public void dismissIncomingCall(PluginCall call) {
-        try {
-            NotificationManager nm = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-            nm.cancel(CALL_NOTIF_ID);
-        } catch (Exception ignored) {}
+        dismiss(getContext());
         call.resolve();
     }
 

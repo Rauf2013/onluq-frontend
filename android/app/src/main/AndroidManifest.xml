@@ -23,7 +23,8 @@
             </intent-filter>
         </activity>
 
-        <!-- Native gələn zəng ekranı (full-screen, kilid ekranında, başqa app-dayken) -->
+        <!-- Native gələn zəng ekranı (full-screen, kilid ekranında, başqa app-dayken).
+             DİQQƏT: tema NoActionBar (NoActionBarLaunch DEYİL!) — splash teması düymələri gizlədirdi. -->
         <activity
             android:name=".IncomingCallActivity"
             android:exported="false"
@@ -32,7 +33,21 @@
             android:launchMode="singleInstance"
             android:excludeFromRecents="true"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|smallestScreenSize|screenLayout|uiMode|navigation|density"
-            android:theme="@style/AppTheme.NoActionBarLaunch" />
+            android:theme="@style/AppTheme.NoActionBar" />
+
+        <!-- Zəng bildiriş düymələri (Cavabla/Rədd et) -->
+        <receiver android:name=".CallActionReceiver" android:exported="false" />
+
+        <!-- FCM servis — type=call push-u native full-screen zəngə çevirir (app bağlı olsa da).
+             Capacitor-un öz servisi əvəzlənir (bizimki ondan extends edir → adi push salamat). -->
+        <service android:name="com.capacitorjs.plugins.pushnotifications.MessagingService" tools:node="remove" />
+        <service
+            android:name=".EvdenFcmService"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -162,6 +162,16 @@ export async function dismissIncomingCall() {
   const p = _audioPlugin();
   if (p && p.dismissIncomingCall) await safe(() => p.dismissIncomingCall());
 }
+// App bağlı ikən "Cavabla" basılmışdısa, app açılanda gözləyən qəbulu yoxla (30 san. pəncərə)
+export async function consumePendingAccept() {
+  const p = _audioPlugin();
+  if (p && p.consumePendingAccept) {
+    const r = await safe(() => p.consumePendingAccept());
+    return !!(r && r.accept);
+  }
+  return false;
+}
+
 // Native ekrandakı Cavabla/Rədd et → callback(action: 'accept'|'decline')
 export function onCallAction(cb) {
   const p = _audioPlugin();

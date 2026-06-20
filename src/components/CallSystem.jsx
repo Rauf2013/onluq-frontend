@@ -1,7 +1,7 @@
 ﻿import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, Volume2, Volume1 } from 'lucide-react';
 import { toast } from 'react-toastify';
-import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNativeRingtone, stopNativeRingtone, showIncomingCall, dismissIncomingCall, onCallAction, isNative } from '../native/capacitor';
+import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNativeRingtone, stopNativeRingtone, showIncomingCall, dismissIncomingCall, onCallAction, consumePendingAccept, isNative } from '../native/capacitor';
 
 // ICE/TURN server konfiqurasiyası.
 // ⚠ TURN ŞƏRTDİR: yalnız STUN ilə symmetric NAT (əksər mobil operatorlar, bəzi ev
@@ -385,8 +385,14 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       // Zəng edənin adı backend-dən gəlir (qlobal mount-da partnerName prop yoxdur)
       setRemoteName(callerName);
       setState('ringing');
-      // Native full-screen gələn zəng ekranı (kilid ekranında / başqa app-dayken)
-      if (isNative) showIncomingCall(callerName, nk);
+      if (isNative) {
+        // Native full-screen gələn zəng ekranı (kilid ekranında / başqa app-dayken)
+        showIncomingCall(callerName, nk);
+        // App bağlı ikən bildirişdən "Cavabla" basılmışdısa → avtomatik qəbul et
+        consumePendingAccept().then((acc) => {
+          if (acc && socket) socket.emit('call:accept', { to: from });
+        });
+      }
     };
 
     const onAccept = async ({ from }) => {
