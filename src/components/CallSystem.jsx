@@ -11,17 +11,35 @@ import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNat
 //   VITE_TURN_URLS=turn:host:3478,turns:host:5349   (vergüllə ayır)
 //   VITE_TURN_USERNAME=...     VITE_TURN_CREDENTIAL=...
 const buildIceServers = () => {
+  // Çox STUN → birbaşa P2P şansı artır (relay olmadan = ƏN AŞAĞI gecikmə).
   const servers = [
-    { urls: 'stun:stun.l.google.com:19302' },
-    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: [
+      'stun:stun.l.google.com:19302',
+      'stun:stun1.l.google.com:19302',
+      'stun:stun2.l.google.com:19302',
+      'stun:stun3.l.google.com:19302',
+      'stun:stun4.l.google.com:19302',
+    ] },
   ];
+  // 1-ci TURN (env): ExpressTURN — udp+tcp+tls
   const turnUrls = (import.meta.env.VITE_TURN_URLS || '')
     .split(',').map((s) => s.trim()).filter(Boolean);
-  if (turnUrls.length) {
+  if (turnUrls.length && import.meta.env.VITE_TURN_USERNAME) {
     servers.push({
       urls: turnUrls,
       username: import.meta.env.VITE_TURN_USERNAME || '',
       credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+    });
+  }
+  // 2-ci TURN (env): coğrafi-yaxın provayder (məs. Metered) — fərqli cred.
+  // Gecikməni azaltmaq üçün: relay lazım olanda WebRTC ən sürətli serveri seçir.
+  const turn2 = (import.meta.env.VITE_TURN2_URLS || '')
+    .split(',').map((s) => s.trim()).filter(Boolean);
+  if (turn2.length && import.meta.env.VITE_TURN2_USERNAME) {
+    servers.push({
+      urls: turn2,
+      username: import.meta.env.VITE_TURN2_USERNAME || '',
+      credential: import.meta.env.VITE_TURN2_CREDENTIAL || '',
     });
   }
   return servers;
