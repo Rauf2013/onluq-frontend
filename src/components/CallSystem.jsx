@@ -289,6 +289,16 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       const stream = e.streams[0];
       remoteStreamRef.current = stream;
       setRemoteStream(stream);
+      // GECİKMƏ AZALDICI: səs jitter buffer-ini minimuma sal (gecikmənin böyük hissəsi budur).
+      // TURN-dan asılı deyil — HAMI üçün gecikməni azaldır.
+      try {
+        pc.getReceivers().forEach((r) => {
+          if (r && r.track && r.track.kind === 'audio') {
+            if ('jitterBufferTarget' in r) { try { r.jitterBufferTarget = 0; } catch {} }   // standart (ms)
+            if ('playoutDelayHint' in r) { try { r.playoutDelayHint = 0; } catch {} }        // Chromium (san)
+          }
+        });
+      } catch {}
     };
 
     pc.onconnectionstatechange = () => {
