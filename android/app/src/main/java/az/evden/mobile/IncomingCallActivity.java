@@ -116,8 +116,9 @@ public class IncomingCallActivity extends Activity {
 
     private void onAccept() {
         EvdenAudio.deliverCallAction("accept");
-        // App-ı önə gətir (WebView zəngi qəbul etsin)
+        // App-ı önə gətir (WebView zəngi qəbul etsin) + "accept" extra → MainActivity kilid üstündə açılsın
         Intent i = new Intent(this, MainActivity.class);
+        i.putExtra("evden_call_accept", true);
         i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         startActivity(i);
         finish();

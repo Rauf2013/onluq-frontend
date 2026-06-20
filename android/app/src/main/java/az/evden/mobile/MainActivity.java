@@ -59,20 +59,18 @@ public class MainActivity extends BridgeActivity {
         }
     }
 
-    // Zəng qəbul ediləndə app kilid ekranının ÜSTÜNDƏ görünsün + ekranı oyat + kilidi açmağa təklif et.
-    // (Yalnız zəng halında — adi açılışda telefon onsuz da kilidsizdir, ona görə təhlükəsizlik problemi yox.)
+    // Zəng qəbul ediləndə app kilid ekranının ÜSTÜNDƏ görünsün + ekranı oyat.
+    // PIN/şifrə SORUŞMURUQ (WhatsApp kimi) — istifadəçi kilid üstündə birbaşa danışır.
+    // (Yalnız zəng halında; zəng bitəndə allowLockAgain ilə geri sönür → təhlükəsizlik.)
     private void showOverLockScreen() {
         try {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
                 setShowWhenLocked(true);
                 setTurnScreenOn(true);
-                KeyguardManager km = (KeyguardManager) getSystemService(Context.KEYGUARD_SERVICE);
-                if (km != null) km.requestDismissKeyguard(this, null);
             } else {
                 getWindow().addFlags(
                     WindowManager.LayoutParams.FLAG_SHOW_WHEN_LOCKED |
-                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON |
-                    WindowManager.LayoutParams.FLAG_DISMISS_KEYGUARD
+                    WindowManager.LayoutParams.FLAG_TURN_SCREEN_ON
                 );
             }
         } catch (Exception ignored) {}
