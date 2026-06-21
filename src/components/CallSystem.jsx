@@ -274,9 +274,6 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   // === Peer connection qur ===
   const setupPeer = async (peerKind, peerId) => {
-    // Səsli zəngdə native zəng rejimini (MODE_IN_COMMUNICATION) getUserMedia-dan ƏVVƏL qur —
-    // belə WebView WebRTC səsi voice-call marşrutuna düşür və earpiece/proximity işləyir.
-    if (peerKind !== 'video') { startCallAudio(); setSpeakerphone(false); }
     const pc = new RTCPeerConnection(ICE);
     pcRef.current = pc;
 
@@ -332,7 +329,13 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     }
     localStreamRef.current = stream;
     setLocalStream(stream);
+    // Mikrofon track-i MÜTLƏQ aktiv olsun — "bir tərəfli səs" (mənim səsim getmir) buqunun qarşısı.
+    stream.getAudioTracks().forEach((t) => { t.enabled = true; });
     stream.getTracks().forEach((t) => pc.addTrack(t, stream));
+
+    // Audio rejimi (MODE_IN_COMMUNICATION/earpiece) mikrofon TUTULDUQDAN SONRA qurulur —
+    // əvvəl qursaq bəzi cihazlarda mikrofona qarışırdı → aralıq bir tərəfli səs. İndi təmizdir.
+    if (peerKind !== 'video') { startCallAudio(); setSpeakerphone(false); }
 
     return pc;
   };
