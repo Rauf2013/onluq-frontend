@@ -1,54 +1,37 @@
-﻿import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
+import React, { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { Phone, PhoneOff, Video, VideoOff, Mic, MicOff, User, Volume2, Volume1 } from 'lucide-react';
 import { toast } from 'react-toastify';
+import { API_URL } from '../api';
 import { startCallAudio, stopCallAudio, setSpeakerphone, startProximity, playNativeRingtone, stopNativeRingtone, showIncomingCall, dismissIncomingCall, onCallAction, consumePendingAccept, allowLockAgain, isNative } from '../native/capacitor';
 
-// ICE/TURN server konfiqurasiyası.
-// ⚠ TURN ŞƏRTDİR: yalnız STUN ilə symmetric NAT (əksər mobil operatorlar, bəzi ev
-// routerları) arxasında media (səs/görüntü) çata bilmir — "bəzən gəlir, bəzən gəlmir,
-// tək tərəfli" probleminin əsl səbəbi budur. TURN relay olmadan P2P qurulmur.
-// Dəyərlər build vaxtı env-dən oxunur (.env.production):
-//   VITE_TURN_URLS=turn:host:3478,turns:host:5349   (vergüllə ayır)
-//   VITE_TURN_USERNAME=...     VITE_TURN_CREDENTIAL=...
-const buildIceServers = () => {
-  // Çox STUN → birbaşa P2P şansı artır (relay olmadan = ƏN AŞAĞI gecikmə).
-  const servers = [
-    { urls: [
-      'stun:stun.l.google.com:19302',
-      'stun:stun1.l.google.com:19302',
-      'stun:stun2.l.google.com:19302',
-      'stun:stun3.l.google.com:19302',
-      'stun:stun4.l.google.com:19302',
-    ] },
-  ];
-  // 1-ci TURN (env): ExpressTURN — udp+tcp+tls
-  const turnUrls = (import.meta.env.VITE_TURN_URLS || '')
-    .split(',').map((s) => s.trim()).filter(Boolean);
-  if (turnUrls.length && import.meta.env.VITE_TURN_USERNAME) {
-    servers.push({
-      urls: turnUrls,
-      username: import.meta.env.VITE_TURN_USERNAME || '',
-      credential: import.meta.env.VITE_TURN_CREDENTIAL || '',
+// ─────────────────────────────────────────────────────────────────────────────
+// ZƏNG MOTORU: Agora (SD-RTN qlobal şəbəkə).
+// Köhnə əl-WebRTC (offer/answer/ICE + tək uzaq TURN) atıldı — "bəzən gəlir, bəzən
+// gəlmir, tək tərəfli, gecikir" probleminin kökü o idi. İndi media Agora-nın qlobal
+// serverlərindən keçir → NAT problemi yox, gecikmə minimum, peşəkar səs motoru.
+//
+// Socket YALNIZ zəng İDARƏSİ üçün qalır: invite / accept / reject / end.
+// Hər iki tərəf "active"-ə çatanda EYNİ Agora kanalına qoşulur (kanal adı 2 user id-dən
+// deterministik düzəlir). Media-nı Agora aparır; biz publish/subscribe edirik.
+// Kilid ekranı bildirişi + audio marşrutu (earpiece/speaker) əvvəlki kimi native-dir.
+// ─────────────────────────────────────────────────────────────────────────────
+// Agora SDK böyükdür (~1.5MB) — yalnız İLK zəngdə yüklə (app açılışı yüngül qalsın).
+let _agoraPromise = null;
+const getAgora = () => {
+  if (!_agoraPromise) {
+    _agoraPromise = import('agora-rtc-sdk-ng').then((m) => {
+      const A = m.default || m;
+      try { A.setLogLevel(2); } catch {} // 2 = WARNING (konsol spam-ı azalt)
+      return A;
     });
   }
-  // 2-ci TURN (env): coğrafi-yaxın provayder (məs. Metered) — fərqli cred.
-  // Gecikməni azaltmaq üçün: relay lazım olanda WebRTC ən sürətli serveri seçir.
-  const turn2 = (import.meta.env.VITE_TURN2_URLS || '')
-    .split(',').map((s) => s.trim()).filter(Boolean);
-  if (turn2.length && import.meta.env.VITE_TURN2_USERNAME) {
-    servers.push({
-      urls: turn2,
-      username: import.meta.env.VITE_TURN2_USERNAME || '',
-      credential: import.meta.env.VITE_TURN2_CREDENTIAL || '',
-    });
-  }
-  return servers;
+  return _agoraPromise;
 };
 
-const ICE = {
-  iceServers: buildIceServers(),
-  iceCandidatePoolSize: 10,
-};
+// Hər iki tərəf üçün eyni kanal adı: id-ləri sırala + birləşdir (Agora charset: hex+_ OK).
+const channelFor = (a, b) => [String(a), String(b)].sort().join('_').slice(0, 64);
+
+const authToken = () => localStorage.getItem('token') || sessionStorage.getItem('token') || '';
 
 // state: 'idle' | 'calling' | 'ringing' | 'active'
 const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) => {
@@ -59,12 +42,10 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   const [muted, setMuted] = useState(false);
   const [camOff, setCamOff] = useState(false);
   // Səs marşrutu: false = qulaq üstü dinamik (earpiece), true = ana (ucadan) dinamik.
-  // Video zəngdə default spiker açıq; səsli zəngdə default earpiece (telefon kimi).
   const [speakerOn, setSpeakerOn] = useState(false);
+  const [remoteHasVideo, setRemoteHasVideo] = useState(false);
   const proximityStopRef = useRef(null);
   const [duration, setDuration] = useState(0);
-  const [localStream, setLocalStream] = useState(null);
-  const [remoteStream, setRemoteStream] = useState(null);
 
   // Stable refs (event listener-lərdə stale closure-dan qaçmaq üçün)
   const stateRef = useRef(state);
@@ -74,18 +55,19 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   useEffect(() => { kindRef.current = kind; }, [kind]);
   useEffect(() => { remoteIdRef.current = remoteId; }, [remoteId]);
 
-  const pcRef = useRef(null);
-  const localVideoRef = useRef(null);
-  const remoteAudioRef = useRef(null); // remote SƏS — həmişə (səsli + görüntülü çağrı)
-  const remoteVideoRef = useRef(null); // remote GÖRÜNTÜ — yalnız görüntülü (MUTED → autoplay işləsin)
-  const localStreamRef = useRef(null); // cleanup-da state stale olmasın deyə — kamera/mikrofon TAM sönsün
-  const remoteStreamRef = useRef(null);
+  // ── Agora refs ──
+  const clientRef = useRef(null);      // AgoraRTC client
+  const micTrackRef = useRef(null);    // local mikrofon track
+  const camTrackRef = useRef(null);    // local kamera track (yalnız video)
+  const remoteUserRef = useRef(null);  // qarşı tərəfin Agora user-i (video play üçün)
+  const localVideoRef = useRef(null);  // local video konteyner (div — Agora ora render edir)
+  const remoteVideoRef = useRef(null); // remote video konteyner (div)
+
   const timerRef = useRef(null);
-  const pendingIceRef = useRef([]);
   const audioCtxRef = useRef(null);    // ringtone üçün Web Audio context
   const ringRef = useRef(null);        // aktiv ringtone interval-i
-  const reInviteRef = useRef(null);    // çıxan zəng: dəvəti təkrar göndərmə (qarşı tərəf sonra onlayn olsa tutsun)
-  const noAnswerRef = useRef(null);    // çıxan zəng: cavab yoxdursa avtomatik bitirmə taymeri
+  const reInviteRef = useRef(null);    // çıxan zəng: dəvəti təkrar göndərmə
+  const noAnswerRef = useRef(null);    // çıxan zəng: cavab yoxdursa avtomatik bitirmə
 
   const fmtTime = (s) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
 
@@ -96,7 +78,6 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     try { if (navigator.vibrate) navigator.vibrate(0); } catch {}
   };
   const playRing = (mode) => {
-    // mode: 'outgoing' (zəng edirik — diiirt diiirt) | 'incoming' (bizə zəng gəlir — fərqli zəng)
     stopRing();
     try {
       const Ctx = window.AudioContext || window.webkitAudioContext;
@@ -118,12 +99,9 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       };
       let timer;
       if (mode === 'outgoing') {
-        // Klassik telefon ringback — cüt ton (440+480 Hz), 1 san. səslənir, sonra fasilə.
-        // Daha yumşaq və "telefon zəngi" hissi (əvvəlki quru tək "diit"dən gözəl).
         const tick = () => { beep(440, 1.0, 0.13); beep(480, 1.0, 0.11); };
         tick(); timer = setInterval(tick, 3000);
       } else {
-        // Gələn zəng — melodik, diqqət çəkən "zəng" naxışı + titrəyiş (telefon zəngi hissi).
         const ring = () => {
           beep(660, 0.4, 0.18);
           setTimeout(() => beep(880, 0.4, 0.18), 300);
@@ -142,39 +120,35 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     timerRef.current = setInterval(() => setDuration((d) => d + 1), 1000);
   };
 
-  // === Hard cleanup — bütün resursları azad et ===
-  const stopAllTracks = (stream) => {
-    if (!stream) return;
-    try { stream.getTracks().forEach((t) => { try { t.stop(); } catch {} }); } catch {}
+  // ── Agora kanalını tərk et + bütün track-ləri bağla ──
+  const leaveAgora = () => {
+    try { if (micTrackRef.current) micTrackRef.current.close(); } catch {}
+    try { if (camTrackRef.current) camTrackRef.current.close(); } catch {}
+    micTrackRef.current = null;
+    camTrackRef.current = null;
+    remoteUserRef.current = null;
+    const c = clientRef.current;
+    clientRef.current = null;
+    if (c) {
+      try { c.removeAllListeners(); } catch {}
+      // unpublish + leave — fire-and-forget (cleanup sinxron olmalıdır)
+      Promise.resolve().then(async () => {
+        try { await c.unpublish(); } catch {}
+        try { await c.leave(); } catch {}
+      });
+    }
   };
 
+  // === Hard cleanup — bütün resursları azad et ===
   const cleanup = () => {
     stopRing();
     if (isNative) { dismissIncomingCall(); allowLockAgain(); }
     if (reInviteRef.current) { clearInterval(reInviteRef.current); reInviteRef.current = null; }
     if (noAnswerRef.current) { clearTimeout(noAnswerRef.current); noAnswerRef.current = null; }
     if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null; }
-    // peer-in göndərənlərinin də tracklarını dayandır
-    if (pcRef.current) {
-      try {
-        pcRef.current.getSenders().forEach((s) => { if (s.track) { try { s.track.stop(); } catch {} } });
-        pcRef.current.getReceivers().forEach((r) => { if (r.track) { try { r.track.stop(); } catch {} } });
-      } catch {}
-      try { pcRef.current.close(); } catch {}
-      pcRef.current = null;
-    }
-    // Stream-ləri HƏMİŞƏ ref-dən dayandır (state stale ola bilər) — kamera/mikrofon işığı SÖNSÜN
-    stopAllTracks(localStreamRef.current); localStreamRef.current = null;
-    stopAllTracks(remoteStreamRef.current); remoteStreamRef.current = null;
-    setLocalStream((s) => { stopAllTracks(s); return null; });
-    setRemoteStream((s) => { stopAllTracks(s); return null; });
-    // Media element-ləri tam boşalt (pause + srcObject null)
-    for (const el of [localVideoRef.current, remoteAudioRef.current, remoteVideoRef.current]) {
-      if (el) { try { el.pause(); } catch {} try { el.srcObject = null; } catch {} }
-    }
-    // AudioContext-i BAĞLA — yoxsa Android telefonu "zəng səs rejimi"ndə qalır, səs boğuq olur
+    leaveAgora();
+    stopCallAudio();
     if (audioCtxRef.current) { try { audioCtxRef.current.close(); } catch {} audioCtxRef.current = null; }
-    pendingIceRef.current = [];
     setState('idle');
     setKind('audio');
     setRemoteId(null);
@@ -182,41 +156,24 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     setDuration(0);
     setMuted(false);
     setCamOff(false);
+    setRemoteHasVideo(false);
   };
 
   // Komponent unmount-da da hard cleanup
   useEffect(() => () => cleanup(), []);
 
-  // === Stream-i UI element-inə bağla (element render olunduqdan sonra) ===
+  // Remote video hazır olanda konteynerə render et
   useEffect(() => {
-    if (localStream && localVideoRef.current && kind === 'video') {
-      localVideoRef.current.srcObject = localStream;
+    if (state === 'active' && kind === 'video' && remoteHasVideo && remoteUserRef.current && remoteUserRef.current.videoTrack && remoteVideoRef.current) {
+      try { remoteUserRef.current.videoTrack.play(remoteVideoRef.current); } catch {}
     }
-  }, [localStream, kind, state]);
+  }, [state, kind, remoteHasVideo]);
 
-  // Remote stream-i SƏS (audio) və GÖRÜNTÜ (video) elementlərinə AYRICA bağla.
-  // Video element MUTED-dir (səs ayrı <audio>-dan gəlir) — belə Android WebView
-  // autoplay-i bloklamır və ortadakı böyük "play" overlay-i ÇIXMIR (sənin gördüyün bug).
-  useEffect(() => {
-    if (!remoteStream) return;
-    const a = remoteAudioRef.current;
-    if (a) {
-      try { a.srcObject = remoteStream; const p = a.play(); if (p?.catch) p.catch(() => {}); } catch {}
-    }
-    if (kind === 'video') {
-      const v = remoteVideoRef.current;
-      if (v) {
-        try { v.srcObject = remoteStream; const p = v.play(); if (p?.catch) p.catch(() => {}); } catch {}
-      }
-    }
-  }, [remoteStream, kind, state]);
-
-  // Ringtone — vəziyyətə görə: zəng edirik (outgoing), bizə zəng gəlir (incoming), digər → sus
+  // Ringtone — vəziyyətə görə
   useEffect(() => {
     if (state === 'calling') {
       playRing('outgoing');
     } else if (state === 'ringing') {
-      // Gələn zəng: telefonun ƏSL ringtone-unu çal (native). Alınmasa (web) → Web Audio melodiyası.
       if (isNative) {
         playNativeRingtone().then((ok) => { if (!ok) playRing('incoming'); });
         try { if (navigator.vibrate) navigator.vibrate([600, 400, 600, 400]); } catch {}
@@ -226,27 +183,24 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     } else {
       stopRing();
       stopNativeRingtone();
-      if (isNative) dismissIncomingCall(); // zəng cavablandı/bitdi → native ekranı qapat
+      if (isNative) dismissIncomingCall();
     }
   }, [state]);
 
-  // Aktiv zəngdə SƏS MARŞRUTU.
-  // VİDEO zəng → HƏMİŞƏ ana (ucadan) dinamik. Earpiece/proximity/spiker düyməsi YOX.
-  // SƏSLİ zəng → default qulaq üstü (earpiece) + proximity (qulağa qoyanda earpiece) + spiker düyməsi.
+  // Aktiv zəngdə SƏS MARŞRUTU (native AudioManager — Agora-nın səsi də bu marşrutdan keçir).
+  // VİDEO → ana (ucadan) dinamik. SƏSLİ → earpiece + proximity + spiker düyməsi.
   useEffect(() => {
     if (state !== 'active') return;
-    startCallAudio(); // native zəng rejimi (MODE_IN_COMMUNICATION) — earpiece marşrutu üçün şərt
+    startCallAudio(); // MODE_IN_COMMUNICATION
 
     if (kindRef.current === 'video') {
       setSpeakerOn(true);
-      setSpeakerphone(true); // video → ana dinamik
+      setSpeakerphone(true);
       return () => { stopCallAudio(); };
     }
 
-    // Səsli zəng: default earpiece
     setSpeakerOn(false);
     setSpeakerphone(false);
-    // Proximity: qulağa yaxınlaşanda earpiece-ə keç (spiker açıq idisə də)
     proximityStopRef.current = startProximity((near) => {
       if (near) { setSpeakerphone(false); setSpeakerOn(false); }
     });
@@ -259,11 +213,8 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
   // Native gələn zəng ekranındakı Cavabla/Rədd et → web zəngini idarə et
   useEffect(() => {
     const off = onCallAction((action) => {
-      if (action === 'accept') {
-        if (stateRef.current === 'ringing' && socket && remoteIdRef.current) {
-          socket.emit('call:accept', { to: remoteIdRef.current });
-        }
-      } else if (action === 'decline') {
+      if (action === 'accept') doAccept();
+      else if (action === 'decline') {
         if (socket && remoteIdRef.current) socket.emit('call:reject', { to: remoteIdRef.current });
         cleanup();
       }
@@ -272,110 +223,81 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
-  // === Peer connection qur ===
-  const setupPeer = async (peerKind, peerId) => {
-    // Zəng qurulmağa başlayır → gələn-zəng səsini/ekranını DƏRHAL söndür (qulağa sızmasın,
-    // audio fokusu WebRTC mikrofonu ilə toqquşmasın → "səslər getmir" buqunun qarşısı).
+  // ── Agora kanalına qoşul + mikrofon/kamera publish et ──
+  const joinAgora = async (callKind, peerId) => {
+    // Gələn-zəng səsi/ekranı qəti sönsün (qulağa sızmasın, audio fokusu toqquşmasın)
     if (isNative) { try { stopNativeRingtone(); dismissIncomingCall(); } catch {} }
-    const pc = new RTCPeerConnection(ICE);
-    pcRef.current = pc;
 
-    pc.onicecandidate = (e) => {
-      if (e.candidate && peerId) socket.emit('call:ice', { to: peerId, candidate: e.candidate });
-    };
-
-    // ⚡ KRİTİK FIX: ontrack yalnız stream-i state-ə yaz, render olduqdan sonra srcObject useEffect-də qoşulur
-    pc.ontrack = (e) => {
-      const stream = e.streams[0];
-      remoteStreamRef.current = stream;
-      setRemoteStream(stream);
-      // GECİKMƏ AZALDICI: səs jitter buffer-ini minimuma sal (gecikmənin böyük hissəsi budur).
-      // TURN-dan asılı deyil — HAMI üçün gecikməni azaldır.
-      try {
-        pc.getReceivers().forEach((r) => {
-          if (r && r.track && r.track.kind === 'audio') {
-            if ('jitterBufferTarget' in r) { try { r.jitterBufferTarget = 0; } catch {} }   // standart (ms)
-            if ('playoutDelayHint' in r) { try { r.playoutDelayHint = 0; } catch {} }        // Chromium (san)
-          }
-        });
-      } catch {}
-    };
-
-    pc.onconnectionstatechange = () => {
-      const st = pc.connectionState;
-      if (['failed', 'disconnected', 'closed'].includes(st)) {
-        if (pcRef.current === pc) {
-          // Bir az gözlə — bəzən "disconnected" qısa müddətli olur (ICE restart-da gərək yox)
-          setTimeout(() => {
-            if (pcRef.current === pc && ['failed', 'disconnected', 'closed'].includes(pc.connectionState)) {
-              cleanup();
-            }
-          }, 1500);
-        }
-      }
-    };
-
-    const constraints = {
-      audio: {
-        echoCancellation: true,
-        noiseSuppression: true,
-        autoGainControl: true,
-      },
-      video: peerKind === 'video' ? { width: { ideal: 640 }, height: { ideal: 480 } } : false,
-    };
-    let stream;
+    const channel = channelFor(myId, peerId);
+    let cfg = null;
     try {
-      stream = await navigator.mediaDevices.getUserMedia(constraints);
+      const r = await fetch(`${API_URL}/api/agora/token?channel=${encodeURIComponent(channel)}&uid=0`, {
+        headers: { Authorization: `Bearer ${authToken()}` },
+      });
+      cfg = await r.json().catch(() => ({}));
+      if (!r.ok || !cfg.appId || !cfg.token) throw new Error(cfg.message || 'token');
     } catch (e) {
-      toast.error(peerKind === 'video' ? 'Kamera/Mikrofon icazəsi rədd edildi.' : 'Mikrofon icazəsi rədd edildi.');
-      throw e;
+      toast.error('Zəng xidmətinə qoşulmaq alınmadı.');
+      cleanup();
+      return;
     }
-    localStreamRef.current = stream;
-    setLocalStream(stream);
-    // Mikrofon track-i MÜTLƏQ aktiv olsun — "bir tərəfli səs" (mənim səsim getmir) buqunun qarşısı.
-    stream.getAudioTracks().forEach((t) => { t.enabled = true; });
-    stream.getTracks().forEach((t) => pc.addTrack(t, stream));
 
-    // Audio rejimi (MODE_IN_COMMUNICATION/earpiece) mikrofon TUTULDUQDAN SONRA qurulur —
-    // əvvəl qursaq bəzi cihazlarda mikrofona qarışırdı → aralıq bir tərəfli səs. İndi təmizdir.
-    if (peerKind !== 'video') { startCallAudio(); setSpeakerphone(false); }
+    const AgoraRTC = await getAgora();
+    const client = AgoraRTC.createClient({ mode: 'rtc', codec: 'vp8' });
+    clientRef.current = client;
 
-    return pc;
-  };
+    client.on('user-published', async (user, mediaType) => {
+      if (clientRef.current !== client) return;
+      try {
+        await client.subscribe(user, mediaType);
+        if (mediaType === 'audio') {
+          try { user.audioTrack && user.audioTrack.play(); } catch {}
+        }
+        if (mediaType === 'video') {
+          remoteUserRef.current = user;
+          setRemoteHasVideo(true);
+        }
+      } catch {}
+    });
+    client.on('user-unpublished', (user, mediaType) => {
+      if (mediaType === 'video') setRemoteHasVideo(false);
+    });
+    client.on('user-left', () => {
+      toast.info('Qarşı tərəf zəngi bitirdi.');
+      cleanup();
+    });
 
-  const startAsCaller = async () => {
-    const peerId = remoteIdRef.current;
-    const peerKind = kindRef.current;
     try {
-      const pc = await setupPeer(peerKind, peerId);
-      const offer = await pc.createOffer();
-      await pc.setLocalDescription(offer);
-      socket.emit('call:offer', { to: peerId, sdp: offer.sdp, type: offer.type });
-      setState('active');
-      startTimer();
-    } catch { cleanup(); }
-  };
-
-  const startAsCallee = async (offerSdp, offerType, peerKind, peerId) => {
-    try {
-      const pc = await setupPeer(peerKind, peerId);
-      await pc.setRemoteDescription({ type: offerType || 'offer', sdp: offerSdp });
-      for (const c of pendingIceRef.current) {
-        try { await pc.addIceCandidate(new RTCIceCandidate(c)); } catch {}
+      await client.join(cfg.appId, channel, cfg.token, cfg.uid || null);
+      const mic = await AgoraRTC.createMicrophoneAudioTrack({ AEC: true, ANS: true, AGC: true });
+      micTrackRef.current = mic;
+      const toPublish = [mic];
+      if (callKind === 'video') {
+        const cam = await AgoraRTC.createCameraVideoTrack({ encoderConfig: '480p_1' });
+        camTrackRef.current = cam;
+        toPublish.push(cam);
+        if (localVideoRef.current) { try { cam.play(localVideoRef.current, { mirror: true }); } catch {} }
       }
-      pendingIceRef.current = [];
-      const ans = await pc.createAnswer();
-      await pc.setLocalDescription(ans);
-      socket.emit('call:answer', { to: peerId, sdp: ans.sdp, type: ans.type });
-      setState('active');
-      startTimer();
-    } catch { cleanup(); }
+      await client.publish(toPublish);
+    } catch (e) {
+      toast.error(callKind === 'video' ? 'Kamera/mikrofon açılmadı.' : 'Mikrofon açılmadı.');
+      cleanup();
+    }
+  };
+
+  // Callee tərəf qəbul edir (UI düyməsi / native ekran / app-bağlı pending accept — hamısı bura)
+  const doAccept = () => {
+    const peerId = remoteIdRef.current;
+    if (!peerId || !socket || stateRef.current !== 'ringing') return;
+    socket.emit('call:accept', { to: peerId });
+    setState('active');
+    startTimer();
+    joinAgora(kindRef.current, peerId);
   };
 
   // === Imperative API (parent-dən çağrılır) ===
   useImperativeHandle(ref, () => ({
     startCall: (k, pId, pName) => {
-      // Qlobal mount: partner zəng anında ötürülür (props yox). Yoxdursa prop-a düş.
       const targetId = pId || partnerId;
       const targetName = pName || partnerName;
       if (stateRef.current !== 'idle' || !targetId || !socket) return;
@@ -383,15 +305,12 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       setRemoteId(targetId);
       setRemoteName(targetName || 'İstifadəçi');
       setState('calling');
-      // Zəng "offline" deyə BLOKLANMIR — dəvət göndərilir və qarşı tərəf cavab verənə qədər
-      // davam edir. Hər 4 san. dəvəti təkrar göndər→ qarşı tərəf bir az sonra onlayn olsa da tutsun.
       socket.emit('call:invite', { to: targetId, kind: k });
       if (reInviteRef.current) clearInterval(reInviteRef.current);
       reInviteRef.current = setInterval(() => {
         if (stateRef.current === 'calling') socket.emit('call:invite', { to: targetId, kind: k });
         else { clearInterval(reInviteRef.current); reInviteRef.current = null; }
       }, 4000);
-      // 60 san. cavab gəlməsə avtomatik bitir ("cavab vermədi")
       if (noAnswerRef.current) clearTimeout(noAnswerRef.current);
       noAnswerRef.current = setTimeout(() => {
         if (stateRef.current === 'calling') { toast.info('Cavab vermədi.'); hangup(); }
@@ -399,17 +318,13 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     },
   }));
 
-  // === Socket listeners — STABIL, yalnız socket dəyişəndə re-subscribe ===
+  // === Socket listeners — yalnız zəng İDARƏSİ (media-nı Agora aparır) ===
   useEffect(() => {
     if (!socket) return;
 
     const onInvite = ({ from, kind: k, fromName }) => {
-      try { console.log('[EVDENCALL] invite received from', from, fromName, 'state=', stateRef.current); } catch {}
       if (stateRef.current !== 'idle') {
-        // Həmin nəfərdən TƏKRAR dəvət (re-invite) — artıq onun zəngi çalır/aktivdir → IGNORE.
-        // (Əvvəl burada "busy" göndərilirdi → zəng edən 5 san.-də "məşğuldur" alıb bağlanırdı. BUG.)
-        if (from === remoteIdRef.current) return;
-        // BAŞQA nəfər zəng edir, biz məşğuluq → busy
+        if (from === remoteIdRef.current) return; // həmin nəfərdən re-invite → IGNORE
         socket.emit('call:reject', { to: from, reason: 'busy' });
         return;
       }
@@ -417,25 +332,27 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       const callerName = fromName || (partnerName && partnerId === from ? partnerName : 'EVDƏN zəng');
       setKind(nk);
       setRemoteId(from);
-      // Zəng edənin adı backend-dən gəlir (qlobal mount-da partnerName prop yoxdur)
       setRemoteName(callerName);
       setState('ringing');
       if (isNative) {
-        // Native full-screen gələn zəng ekranı (kilid ekranında / başqa app-dayken)
         showIncomingCall(callerName, nk);
         // App bağlı ikən bildirişdən "Cavabla" basılmışdısa → avtomatik qəbul et
         consumePendingAccept().then((acc) => {
-          if (acc && socket) socket.emit('call:accept', { to: from });
+          if (acc) {
+            // remoteId/kind state-i təzə qoyulub; ref-lər növbəti tick-də hazır olur
+            setTimeout(() => doAccept(), 0);
+          }
         });
       }
     };
 
-    const onAccept = async ({ from }) => {
+    const onAccept = ({ from }) => {
       if (stateRef.current !== 'calling' || from !== remoteIdRef.current) return;
-      // Qarşı tərəf cavab verdi — təkrar-dəvət və cavab-yoxdur taymerlərini dayandır
       if (reInviteRef.current) { clearInterval(reInviteRef.current); reInviteRef.current = null; }
       if (noAnswerRef.current) { clearTimeout(noAnswerRef.current); noAnswerRef.current = null; }
-      await startAsCaller();
+      setState('active');
+      startTimer();
+      joinAgora(kindRef.current, from);
     };
 
     const onReject = ({ from, reason }) => {
@@ -444,34 +361,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       cleanup();
     };
 
-    // Qarşı tərəf offline ola bilər — AMMA zəngi BLOKLAMIRIQ. Çalmağa davam edir,
-    // push bildirişi gedir, təkrar-dəvət göndərilir. Cavab gəlməsə 60 san. sonra avtomatik bitir.
-    const onUnavailable = () => { /* məqsədli olaraq heç nə etmə — zəng çalmağa davam etsin */ };
-
-    const onOffer = async ({ from, sdp, type }) => {
-      if (from !== remoteIdRef.current) return;
-      await startAsCallee(sdp, type, kindRef.current, from);
-    };
-
-    const onAnswer = async ({ from, sdp, type }) => {
-      if (from !== remoteIdRef.current || !pcRef.current) return;
-      try {
-        await pcRef.current.setRemoteDescription({ type: type || 'answer', sdp });
-        for (const c of pendingIceRef.current) {
-          try { await pcRef.current.addIceCandidate(new RTCIceCandidate(c)); } catch {}
-        }
-        pendingIceRef.current = [];
-      } catch {}
-    };
-
-    const onIce = async ({ from, candidate }) => {
-      if (from !== remoteIdRef.current) return;
-      if (pcRef.current && pcRef.current.remoteDescription) {
-        try { await pcRef.current.addIceCandidate(new RTCIceCandidate(candidate)); } catch {}
-      } else {
-        pendingIceRef.current.push(candidate);
-      }
-    };
+    const onUnavailable = () => { /* zəng çalmağa davam etsin (push gedir, re-invite var) */ };
 
     const onEnd = ({ from }) => {
       if (from !== remoteIdRef.current) return;
@@ -483,9 +373,6 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
     socket.on('call:accept', onAccept);
     socket.on('call:reject', onReject);
     socket.on('call:unavailable', onUnavailable);
-    socket.on('call:offer', onOffer);
-    socket.on('call:answer', onAnswer);
-    socket.on('call:ice', onIce);
     socket.on('call:end', onEnd);
 
     return () => {
@@ -493,33 +380,28 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       socket.off('call:accept', onAccept);
       socket.off('call:reject', onReject);
       socket.off('call:unavailable', onUnavailable);
-      socket.off('call:offer', onOffer);
-      socket.off('call:answer', onAnswer);
-      socket.off('call:ice', onIce);
       socket.off('call:end', onEnd);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [socket]);
 
-  const accept = () => socket.emit('call:accept', { to: remoteId });
-  const reject = () => { socket.emit('call:reject', { to: remoteId }); cleanup(); };
+  const accept = () => doAccept();
+  const reject = () => { if (remoteId) socket.emit('call:reject', { to: remoteId }); cleanup(); };
   const hangup = () => { if (remoteId) socket.emit('call:end', { to: remoteId }); cleanup(); };
+
   const toggleMute = () => {
-    if (!localStream) return;
     const next = !muted;
-    localStream.getAudioTracks().forEach((t) => (t.enabled = !next));
+    try { if (micTrackRef.current) micTrackRef.current.setMuted(next); } catch {}
     setMuted(next);
   };
-  // Spiker düyməsi: ana (ucadan) dinamik ↔ qulaq üstü dinamik (earpiece) arası keçid.
   const toggleSpeaker = () => {
     const next = !speakerOn;
     setSpeakerOn(next);
     setSpeakerphone(next);
   };
   const toggleCam = () => {
-    if (!localStream) return;
     const next = !camOff;
-    localStream.getVideoTracks().forEach((t) => (t.enabled = !next));
+    try { if (camTrackRef.current) camTrackRef.current.setEnabled(!next); } catch {}
     setCamOff(next);
   };
 
@@ -532,18 +414,16 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   return (
     <div style={{ position: 'fixed', inset: 0, background: 'linear-gradient(135deg, #0f172a 0%, #1e293b 100%)', zIndex: 3000, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: 'white' }}>
-      {/* Remote SƏS — həmişə var (səsli + görüntülü çağrı). Gizli audio elementi. */}
-      <audio ref={remoteAudioRef} autoPlay playsInline />
-      {/* Remote GÖRÜNTÜ — yalnız görüntülü çağrı. MUTED → autoplay işləyir, ortadakı böyük ▶ overlay çıxmır. */}
+      {/* Remote GÖRÜNTÜ — Agora bu konteynerə render edir (yalnız görüntülü aktiv zaman) */}
       {isVideo && (
-        <video ref={remoteVideoRef} autoPlay playsInline muted
-          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', objectFit: 'cover', background: '#000', display: isActive ? 'block' : 'none' }} />
+        <div ref={remoteVideoRef}
+          style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', background: '#000', display: isActive ? 'block' : 'none' }} />
       )}
 
-      {/* Local video preview — yalnız görüntülü aktiv zaman */}
+      {/* Local video preview — Agora bu konteynerə render edir */}
       {isVideo && isActive && (
-        <video ref={localVideoRef} autoPlay playsInline muted
-          style={{ position: 'absolute', top: 'calc(16px + env(safe-area-inset-top))', right: 16, width: 'clamp(96px, 28vw, 140px)', height: 'clamp(128px, 37vw, 186px)', objectFit: 'cover', borderRadius: 12, border: '2px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', background: '#0f172a', zIndex: 1 }} />
+        <div ref={localVideoRef}
+          style={{ position: 'absolute', top: 'calc(16px + env(safe-area-inset-top))', right: 16, width: 'clamp(96px, 28vw, 140px)', height: 'clamp(128px, 37vw, 186px)', objectFit: 'cover', borderRadius: 12, border: '2px solid white', boxShadow: '0 4px 12px rgba(0,0,0,0.5)', background: '#0f172a', overflow: 'hidden', zIndex: 1 }} />
       )}
 
       {/* Üst informasiya overlay (video çağrı aktivdə) */}
@@ -586,7 +466,6 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
             <button onClick={toggleMute} title={muted ? 'Səssizliyi aç' : 'Səssiz et'} style={btnGray(muted)}>
               {muted ? <MicOff size={22} /> : <Mic size={22} />}
             </button>
-            {/* Spiker düyməsi YALNIZ səsli zəngdə — video zəngdə səs həmişə ana dinamikdən gəlir */}
             {!isVideo && (
               <button onClick={toggleSpeaker} title={speakerOn ? 'Ucadan dinamik (açıq)' : 'Qulaq dinamiki'}
                 style={{ ...btnBase, background: speakerOn ? 'rgba(255,255,255,0.38)' : 'rgba(255,255,255,0.18)' }}>
