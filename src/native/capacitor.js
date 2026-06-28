@@ -153,6 +153,18 @@ export async function setSpeakerphone(on) {
   if (p && p.setSpeakerphone) await safe(() => p.setSpeakerphone({ on: !!on }));
 }
 
+// Android 14+ (API 34): full-screen-intent icazəsi avtomatik verilmir → kilid ekranı YANMIR
+// (yeni Samsung S24/A73 və s.). Yoxdursa istifadəçini sistem ayarına yönləndirir (bir dəfə).
+// Köhnə Android-də (A51 və s.) onsuz da var → no-op. true=verilib.
+let _fsiChecked = false;
+export async function ensureFullScreenIntent() {
+  const p = _audioPlugin();
+  if (!p || !p.ensureFullScreenIntent || _fsiChecked) return true;
+  _fsiChecked = true;
+  const r = await safe(() => p.ensureFullScreenIntent());
+  return !(r && r.granted === false);
+}
+
 // Native full-screen gələn zəng ekranı (kilid ekranında, başqa app-dayken).
 export async function showIncomingCall(caller, kind) {
   const p = _audioPlugin();
@@ -226,6 +238,9 @@ export async function initPush(apiUrl, getAuthToken) {
   if (!perm || perm.receive !== 'granted') { _pushInited = false; return; }
 
   await safe(() => PushNotifications.register());
+
+  // Android 14+ kilid ekranı yanması üçün full-screen-intent icazəsini yoxla (bir dəfə).
+  await ensureFullScreenIntent();
 
   // FCM token alındıqda backend-ə qeydiyyat
   await safe(() => PushNotifications.addListener('registration', async (t) => {

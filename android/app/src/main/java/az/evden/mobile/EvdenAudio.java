@@ -15,6 +15,9 @@ import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.provider.Settings;
 
 import androidx.core.app.NotificationCompat;
 
@@ -36,6 +39,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     private SensorManager sensorManager;
     private Sensor proximitySensor;
     private static Ringtone ringtone;
+    private static Handler ringAutoStop;       // zəng səsi heç vaxt sonsuz çalmasın (təhlükəsizlik)
 
     // Telefonun ƏSL zəng səsini LOOP ilə çal (gələn zəng kimi). Həm app açıq, həm FCM (bağlı) işlədir.
     public static void startRingtone(Context ctx) {
@@ -48,9 +52,17 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) ringtone.setLooping(true);
                 ringtone.play();
             }
+            // Təhlükəsizlik: siqnal itsə belə 45 san. sonra avtomatik sus (qulaqda ilişib qalmasın).
+            cancelRingAutoStop();
+            ringAutoStop = new Handler(Looper.getMainLooper());
+            ringAutoStop.postDelayed(EvdenAudio::stopRingtoneStatic, 45000);
         } catch (Exception ignored) {}
     }
+    private static void cancelRingAutoStop() {
+        try { if (ringAutoStop != null) { ringAutoStop.removeCallbacksAndMessages(null); ringAutoStop = null; } } catch (Exception ignored) {}
+    }
     public static void stopRingtoneStatic() {
+        cancelRingAutoStop();
         try { if (ringtone != null) { ringtone.stop(); ringtone = null; } } catch (Exception ignored) {}
     }
 
@@ -202,8 +214,31 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
     // Zəng başlayanda: zəng rejimi + default earpiece (qulaq üstü).
     @PluginMethod
     public void startCall(PluginCall call) {
+        stopRingtoneStatic(); // MODE_IN_COMMUNICATION-dan ƏVVƏL zəng səsini kəs — yoxsa qulaq dinamikinə sızır
         routeAudio(false);
         call.resolve();
+    }
+
+    // Android 14+ (API 34): full-screen-intent icazəsi avtomatik verilmir → kilid ekranı yanmır.
+    // İcazə yoxdursa istifadəçini sistem ayarına yönləndir (bir dəfə). Köhnə Android-də onsuz da var.
+    @PluginMethod
+    public void ensureFullScreenIntent(PluginCall call) {
+        boolean granted = true;
+        try {
+            if (Build.VERSION.SDK_INT >= 34) { // UPSIDE_DOWN_CAKE
+                NotificationManager nm = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                granted = nm != null && nm.canUseFullScreenIntent();
+                if (!granted) {
+                    Intent i = new Intent(Settings.ACTION_MANAGE_APP_USE_FULL_SCREEN_INTENT,
+                        Uri.parse("package:" + getContext().getPackageName()));
+                    i.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    getContext().startActivity(i);
+                }
+            }
+        } catch (Exception ignored) {}
+        JSObject r = new JSObject();
+        r.put("granted", granted);
+        call.resolve(r);
     }
 
     // Zəng bitəndə: normal rejimə qaytar.

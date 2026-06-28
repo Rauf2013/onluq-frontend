@@ -12,13 +12,21 @@ public class EvdenFcmService extends MessagingService {
     @Override
     public void onMessageReceived(RemoteMessage remoteMessage) {
         Map<String, String> data = remoteMessage.getData();
-        if (data != null && "call".equals(data.get("type"))) {
-            EvdenAudio.showIncomingCallNotification(
-                getApplicationContext(),
-                data.get("callerName"),
-                data.get("kind")
-            );
-            return;
+        if (data != null) {
+            String type = data.get("type");
+            // Zəng ləğv edildi (qarşı tərəf bağladı/rədd etdi) → native bildiriş + zəng səsini söndür.
+            if ("call_cancel".equals(type)) {
+                EvdenAudio.dismiss(getApplicationContext());
+                return;
+            }
+            if ("call".equals(type)) {
+                EvdenAudio.showIncomingCallNotification(
+                    getApplicationContext(),
+                    data.get("callerName"),
+                    data.get("kind")
+                );
+                return;
+            }
         }
         super.onMessageReceived(remoteMessage);
     }

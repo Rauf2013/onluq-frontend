@@ -115,6 +115,7 @@ public class IncomingCallActivity extends Activity {
     }
 
     private void onAccept() {
+        EvdenAudio.stopRingtoneStatic();   // zəng səsini DƏRHAL kəs (qulaq dinamikinə sızmasın)
         EvdenAudio.deliverCallAction("accept");
         // App-ı önə gətir (WebView zəngi qəbul etsin) + "accept" extra → MainActivity kilid üstündə açılsın
         Intent i = new Intent(this, MainActivity.class);
@@ -125,7 +126,8 @@ public class IncomingCallActivity extends Activity {
     }
 
     private void onDecline() {
-        EvdenAudio.deliverCallAction("decline");
+        EvdenAudio.dismiss(this);          // zəng səsini dayandır + bildirişi sil (DƏRHAL — əvvəl səs qalırdı)
+        EvdenAudio.deliverCallAction("decline");  // app açıqdırsa web call:reject göndərir
         finish();
     }
 

@@ -274,6 +274,9 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
 
   // === Peer connection qur ===
   const setupPeer = async (peerKind, peerId) => {
+    // Zəng qurulmağa başlayır → gələn-zəng səsini/ekranını DƏRHAL söndür (qulağa sızmasın,
+    // audio fokusu WebRTC mikrofonu ilə toqquşmasın → "səslər getmir" buqunun qarşısı).
+    if (isNative) { try { stopNativeRingtone(); dismissIncomingCall(); } catch {} }
     const pc = new RTCPeerConnection(ICE);
     pcRef.current = pc;
 
