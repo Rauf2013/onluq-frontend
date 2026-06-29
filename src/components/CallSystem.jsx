@@ -335,7 +335,7 @@ const CallSystem = forwardRef(({ socket, myId, partnerId, partnerName }, ref) =>
       setRemoteName(callerName);
       setState('ringing');
       if (isNative) {
-        showIncomingCall(callerName, nk);
+        showIncomingCall(callerName, nk, from);
         // App bağlı ikən bildirişdən "Cavabla" basılmışdısa → avtomatik qəbul et
         consumePendingAccept().then((acc) => {
           if (acc) {

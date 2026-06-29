@@ -16,6 +16,10 @@ public class CallActionReceiver extends BroadcastReceiver {
         boolean accept = ACTION_ACCEPT.equals(action);
         // App açıqdırsa dərhal web-ə ötür; bağlıdırsa pendingAccept qoyulur (app açılanda işlənir)
         EvdenAudio.deliverCallAction(accept ? "accept" : "decline");
+        if (!accept) {
+            // App BAĞLIDIRSA: birbaşa serverə "red et" → zəng edən tərəf dayansın (re-invite kəsilsin)
+            EvdenAudio.nativeReject(ctx, intent.getStringExtra("callerId"));
+        }
         if (accept) {
             try {
                 Intent i = new Intent(ctx, MainActivity.class);

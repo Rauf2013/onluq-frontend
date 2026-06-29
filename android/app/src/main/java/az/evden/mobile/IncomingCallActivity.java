@@ -21,6 +21,9 @@ public class IncomingCallActivity extends Activity {
 
     public static final String EXTRA_CALLER = "caller";
     public static final String EXTRA_KIND = "kind";
+    public static final String EXTRA_CALLER_ID = "callerId";
+
+    private String callerId = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,6 +46,8 @@ public class IncomingCallActivity extends Activity {
 
         String caller = getIntent().getStringExtra(EXTRA_CALLER);
         String kind = getIntent().getStringExtra(EXTRA_KIND);
+        callerId = getIntent().getStringExtra(EXTRA_CALLER_ID);
+        if (callerId == null) callerId = "";
         if (caller == null || caller.isEmpty()) caller = "EVDƏN zəng";
         boolean isVideo = "video".equals(kind);
 
@@ -126,8 +131,9 @@ public class IncomingCallActivity extends Activity {
     }
 
     private void onDecline() {
-        EvdenAudio.dismiss(this);          // zəng səsini dayandır + bildirişi sil (DƏRHAL — əvvəl səs qalırdı)
+        EvdenAudio.dismiss(this);                 // zəng səsini dayandır + bildirişi sil (DƏRHAL)
         EvdenAudio.deliverCallAction("decline");  // app açıqdırsa web call:reject göndərir
+        EvdenAudio.nativeReject(this, callerId);  // app BAĞLIDIRSA: birbaşa serverə "red et" (caller dayansın)
         finish();
     }
 

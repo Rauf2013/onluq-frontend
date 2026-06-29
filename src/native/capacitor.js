@@ -166,9 +166,18 @@ export async function ensureFullScreenIntent() {
 }
 
 // Native full-screen gələn zəng ekranı (kilid ekranında, başqa app-dayken).
-export async function showIncomingCall(caller, kind) {
+export async function showIncomingCall(caller, kind, callerId) {
   const p = _audioPlugin();
-  if (p && p.showIncomingCall) await safe(() => p.showIncomingCall({ caller: caller || 'EVDƏN zəng', kind: kind || 'audio' }));
+  if (p && p.showIncomingCall) await safe(() => p.showIncomingCall({ caller: caller || 'EVDƏN zəng', kind: kind || 'audio', callerId: callerId || '' }));
+}
+
+// App BAĞLI ikən kilid ekranından "Rədd et" basanda native qatın serverə "red et" göndərə
+// bilməsi üçün refresh token + apiUrl-i native-ə yaz (login-dən sonra).
+export async function setNativeAuth(apiUrl) {
+  const p = _audioPlugin();
+  if (!p || !p.setAuth) return;
+  const refreshToken = localStorage.getItem('refreshToken') || sessionStorage.getItem('refreshToken') || '';
+  await safe(() => p.setAuth({ refreshToken, apiUrl: apiUrl || '' }));
 }
 export async function dismissIncomingCall() {
   const p = _audioPlugin();
@@ -230,6 +239,9 @@ let _pushInited = false;
 export async function initPush(apiUrl, getAuthToken) {
   if (!isNative || _pushInited) return;
   _pushInited = true;
+
+  // App bağlıkən kilid ekranından red üçün native-ə refresh token + apiUrl yaz.
+  await setNativeAuth(apiUrl);
 
   let perm = await safe(() => PushNotifications.checkPermissions());
   if (!perm || perm.receive !== 'granted') {

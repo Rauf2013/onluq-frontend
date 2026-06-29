@@ -23,7 +23,8 @@ public class EvdenFcmService extends MessagingService {
                 EvdenAudio.showIncomingCallNotification(
                     getApplicationContext(),
                     data.get("callerName"),
-                    data.get("kind")
+                    data.get("kind"),
+                    data.get("callerId")
                 );
                 return;
             }

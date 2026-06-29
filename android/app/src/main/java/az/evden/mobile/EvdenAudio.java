@@ -5,6 +5,12 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -105,12 +111,81 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
         call.resolve(r);
     }
 
+    // ── Native zəngi rədd et (app BAĞLI ikən) — birbaşa serverə bildir ──
+    // App killed olanda işləyən socket/JS yoxdur → zəng edən tərəf "red edildi" bilmirdi.
+    // SharedPreferences-dəki refresh token ilə access alıb /api/calls/reject vururuq (arxa fonda).
+    public static void nativeReject(Context ctx, String callerId) {
+        if (callerId == null || callerId.isEmpty()) return;
+        final Context app = ctx.getApplicationContext();
+        new Thread(() -> {
+            try {
+                SharedPreferences sp = app.getSharedPreferences("evden_native", Context.MODE_PRIVATE);
+                String refresh = sp.getString("refreshToken", "");
+                String apiUrl = sp.getString("apiUrl", "");
+                if (refresh.isEmpty() || apiUrl.isEmpty()) return;
+                // 1) refresh → təzə access token
+                String refreshBody = new org.json.JSONObject().put("refreshToken", refresh).toString();
+                String refResp = httpPostJson(apiUrl + "/api/auth/refresh", refreshBody, null);
+                String token = "";
+                try { token = new org.json.JSONObject(refResp).optString("token", ""); } catch (Exception ignored) {}
+                if (token.isEmpty()) return;
+                // 2) zəngi rədd et → server caller-ə call:reject göndərir
+                String rejectBody = new org.json.JSONObject().put("to", callerId).toString();
+                httpPostJson(apiUrl + "/api/calls/reject", rejectBody, token);
+            } catch (Exception ignored) {}
+        }).start();
+    }
+
+    private static String httpPostJson(String urlStr, String body, String bearer) {
+        HttpURLConnection conn = null;
+        try {
+            URL url = new URL(urlStr);
+            conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setConnectTimeout(8000);
+            conn.setReadTimeout(8000);
+            conn.setDoOutput(true);
+            conn.setRequestProperty("Content-Type", "application/json");
+            if (bearer != null) conn.setRequestProperty("Authorization", "Bearer " + bearer);
+            OutputStream os = conn.getOutputStream();
+            os.write(body.getBytes("UTF-8"));
+            os.flush(); os.close();
+            int code = conn.getResponseCode();
+            java.io.InputStream is = (code >= 200 && code < 300) ? conn.getInputStream() : conn.getErrorStream();
+            if (is == null) return "";
+            BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while ((line = br.readLine()) != null) sb.append(line);
+            br.close();
+            return sb.toString();
+        } catch (Exception e) {
+            return "";
+        } finally {
+            if (conn != null) conn.disconnect();
+        }
+    }
+
+    // JS login-dən sonra refresh token + apiUrl-i native saxla (app bağlıkən reject üçün lazım).
+    @PluginMethod
+    public void setAuth(PluginCall call) {
+        try {
+            SharedPreferences sp = getContext().getSharedPreferences("evden_native", Context.MODE_PRIVATE);
+            sp.edit()
+              .putString("refreshToken", call.getString("refreshToken", ""))
+              .putString("apiUrl", call.getString("apiUrl", ""))
+              .apply();
+        } catch (Exception ignored) {}
+        call.resolve();
+    }
+
     // Native full-screen gələn zəng bildirişi — STATIK (həm plugin-dən, həm FCM servisindən çağrılır).
     // contentIntent + fullScreenIntent → IncomingCallActivity; Qəbul/Rədd action düymələri → CallActionReceiver.
-    public static void showIncomingCallNotification(Context ctx, String caller, String kind) {
+    public static void showIncomingCallNotification(Context ctx, String caller, String kind, String callerId) {
         try {
             if (caller == null || caller.isEmpty()) caller = "EVDƏN zəng";
             if (kind == null) kind = "audio";
+            if (callerId == null) callerId = "";
             startRingtone(ctx); // telefonun ƏSL zəng səsi (loop) — bildiriş "ding"i yox
             NotificationManager nm = (NotificationManager) ctx.getSystemService(Context.NOTIFICATION_SERVICE);
 
@@ -124,6 +199,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
             Intent full = new Intent(ctx, IncomingCallActivity.class);
             full.putExtra(IncomingCallActivity.EXTRA_CALLER, caller);
             full.putExtra(IncomingCallActivity.EXTRA_KIND, kind);
+            full.putExtra(IncomingCallActivity.EXTRA_CALLER_ID, callerId);
             full.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
             int piFlags = PendingIntent.FLAG_UPDATE_CURRENT;
@@ -136,8 +212,9 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
                 .putExtra("evden_call_accept", true)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             PendingIntent acceptPi = PendingIntent.getActivity(ctx, 101, acceptI, piFlags);
-            // RƏDD → broadcast (Activity açmağa ehtiyac yox, sadəcə dayandır + dismiss)
+            // RƏDD → broadcast (Activity açmağa ehtiyac yox, sadəcə dayandır + dismiss + caller-ə bildir)
             Intent declineI = new Intent(ctx, CallActionReceiver.class).setAction(CallActionReceiver.ACTION_DECLINE);
+            declineI.putExtra("callerId", callerId);
             PendingIntent declinePi = PendingIntent.getBroadcast(ctx, 102, declineI, piFlags);
 
             NotificationCompat.Builder b = new NotificationCompat.Builder(ctx, CALL_CHANNEL)
@@ -167,7 +244,7 @@ public class EvdenAudio extends Plugin implements SensorEventListener {
 
     @PluginMethod
     public void showIncomingCall(PluginCall call) {
-        showIncomingCallNotification(getContext(), call.getString("caller", "EVDƏN zəng"), call.getString("kind", "audio"));
+        showIncomingCallNotification(getContext(), call.getString("caller", "EVDƏN zəng"), call.getString("kind", "audio"), call.getString("callerId", ""));
         call.resolve();
     }
 
